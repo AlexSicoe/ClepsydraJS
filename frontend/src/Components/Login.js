@@ -69,8 +69,8 @@ export default class Login extends Component {
                     console.log('Username & password do not match')
                     alert('Username & password do not match')
                 } else {
-                    console.log('Username does\'nt exist')
-                    alert('Username does\'nt exist')
+                    console.log('Username doesn\'t exist')
+                    alert('Username doesn\'t exist')
                 }
             })
             .catch((error) => {

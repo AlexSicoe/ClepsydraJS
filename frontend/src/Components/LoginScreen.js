@@ -52,7 +52,7 @@ export default class LoginScreen extends Component {
     }
 
     handleClick(event) {
-        // console.log("event",event)
+        console.log("event: ",event)
         var loginMessage
         var loginScreen = []
         if (this.state.isLogin) {
