@@ -13,7 +13,7 @@ export default class Login extends Component {
         super(props)
 
         this.state = {
-            username: '',
+            email: '',
             password: ''
         }
     }
@@ -25,10 +25,10 @@ export default class Login extends Component {
                     <div>
                         <AppBar title="Login" />
                         <TextField
-                            hintText="Enter your Username"
-                            floatingLabelText="Username"
+                            hintText="Enter your Email"
+                            floatingLabelText="Email"
                             onChange={(event, newValue) =>
-                                this.setState({ username: newValue })
+                                this.setState({ email: newValue })
                             } />
                         <br />
                         <TextField
@@ -54,7 +54,7 @@ export default class Login extends Component {
         var apiBaseUrl = 'http://localhost:4000/api'
         var self = this
         var payload = {
-            'email': this.state.username,
+            'email': this.state.email,
             'password': this.state.password
         }
         axios.post(apiBaseUrl + '/login', payload)
