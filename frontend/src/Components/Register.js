@@ -12,8 +12,7 @@ export default class Register extends Component {
         super(props)
 
         this.state = {
-            first_name: '',
-            last_name: '',
+            username: '',
             email: '',
             password: ''
         }
@@ -26,17 +25,10 @@ export default class Register extends Component {
                     <div>
                         <AppBar title="Register" />
                         <TextField
-                            hintText="Enter your First Name"
-                            floatingLabelText="First Name"
+                            hintText="Enter your Username"
+                            floatingLabelText="Username"
                             onChange={(event, newValue) =>
-                                this.setState({ first_name: newValue })
-                            } />
-                        <br />
-                        <TextField
-                            hintText="Enter your Last Name"
-                            floatingLabelText="Last Name"
-                            onChange={(event, newValue) =>
-                                this.setState({ last_name: newValue })
+                                this.setState({ username: newValue })
                             } />
                         <br />
                         <TextField
@@ -46,6 +38,7 @@ export default class Register extends Component {
                             onChange={(event, newValue) =>
                                 this.setState({ email: newValue })
                             } />
+                        <br />
                         <TextField
                             type="password"
                             hintText="Enter your password"
@@ -68,15 +61,13 @@ export default class Register extends Component {
         var apiBaseUrl = 'http://localhost:4000/api'
 
         console.log('values',
-            this.state.first_name,
-            this.state.last_name,
+            this.state.username,
             this.state.email,
             this.state.password);
         //TODO check for empty values before hitting submit
         var self = this;
         var payload = {
-            "first_name": this.state.first_name,
-            "last_name": this.state.last_name,
+            "username": this.state.username,
             "email": this.state.email,
             "password": this.state.password
         }
@@ -84,7 +75,7 @@ export default class Register extends Component {
         axios.post(apiBaseUrl + '/register', payload)
             .then((response) => {
                 console.log(response);
-                if (response.data.code === 200) {
+                if (response.status === 201) {
                     // console.log('registration successful')
                     var loginScreen = []
                     loginScreen.push(<Login parentContext={this} />)
@@ -95,6 +86,8 @@ export default class Register extends Component {
                         buttonLabel: 'Register',
                         isLogin: true
                     })
+                } else {
+                    alert('An error occurred. Please try again.')
                 }
             })
             .catch((error) => console.log(error))

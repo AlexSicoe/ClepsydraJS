@@ -60,17 +60,14 @@ export default class Login extends Component {
         axios.post(apiBaseUrl + '/login', payload)
             .then((response) => {
                 console.log(response)
-                if (response.data.code === 200) {
-                    console.log('Login successful')
+                if (response.status === 200) {
+                    console.log(response.data.message)
                     var uploadScreen = []
                     uploadScreen.push(<UploadScreen app context={self.props.appContext} />)
                     self.props.appContext.setState({ loginPage: [], uploadScreen: uploadScreen })
-                } else if (response.data.code === 204) {
-                    console.log('Username & password do not match')
-                    alert('Username & password do not match')
-                } else {
-                    console.log('Username doesn\'t exist')
-                    alert('Username doesn\'t exist')
+                } else if (response.status === 401) {
+                    console.log(response.data.message)
+                    alert(response.data.message)
                 }
             })
             .catch((error) => {
