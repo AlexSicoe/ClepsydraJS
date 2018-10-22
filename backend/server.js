@@ -11,7 +11,6 @@ const sequelize = new Sequelize('clepsydra', 'root', '', {
 const login = require('./routes/loginroutes')
 
 
-
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
