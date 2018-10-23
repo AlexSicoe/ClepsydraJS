@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import RaisedButton from 'material-ui/RaisedButton'
+import { BroswerRouter as Router, Route, NavLink as Link } from "react-router-dom";
 
 import Login from './Login'
 import Register from './Register'
@@ -12,64 +13,45 @@ export default class LoginScreen extends Component {
         this.state = {
             username: '',
             password: '',
-            loginScreen: [],
-            loginMessage: '',
+            loginMessage: 'Not Registered yet? Go to Registration',
             buttonLabel: 'Register',
             isLogin: true
         }
     }
 
     componentWillMount() {
-        var loginScreen = []
-        loginScreen.push(
-            <Login parentContext={this}
-                appContext={this.props.parentContext} />
-        )
-        var loginMessage = 'Not registered yet, Register Now'
-        this.setState({
-            loginScreen: loginScreen,
-            loginMessage: loginMessage
-        })
+
     }
 
     render() {
         return (
-            <div className="loginScreen">
-                {this.state.loginScreen}
-                <div>
-                    {this.state.loginMessage}
-                    <MuiThemeProvider>
-                        <div>
-                            <RaisedButton label={this.state.buttonLabel}
-                                primary={true}
-                                style={style}
-                                onClick={(event) => this.handleClick(event)} />
-                        </div>
-                    </MuiThemeProvider>
-                </div>
+            <div className="loginScreen" /*TODO, deschide /login prin router*/>
+                {this.state.isLogin ? <Login /> : <Register />}
+                {this.state.loginMessage}
+                <MuiThemeProvider>
+                    <div>
+                        <RaisedButton label={this.state.buttonLabel}
+                            primary={true}
+                            style={style}
+                            onClick={(event) => this.handleClick(event)} />
+                    </div>
+                </MuiThemeProvider>
             </div>
         )
+
     }
 
     handleClick(event) {
-        console.log("event: ",event)
-        var loginMessage
-        var loginScreen = []
+        // console.log("event: ", event)
         if (this.state.isLogin) {
-            loginScreen.push(<Register parentContext={this} />)
-            loginMessage = 'Already registered. Go to Login'
             this.setState({
-                loginScreen: loginScreen,
-                loginMessage: loginMessage,
+                loginMessage: 'Already registered? Go to Login',
                 buttonLabel: 'Login',
                 isLogin: false
             })
         } else {
-            loginScreen.push(<Login parentContext={this} />)
-            loginMessage = 'Not Registered yet. Go to Registration'
             this.setState({
-                loginScreen: loginScreen,
-                loginMessage: loginMessage,
+                loginMessage: 'Not Registered yet? Go to Registration',
                 buttonLabel: 'Register',
                 isLogin: true
             })

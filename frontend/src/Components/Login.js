@@ -6,7 +6,7 @@ import axios from 'axios'
 
 import React, { Component } from 'react'
 
-import UploadScreen from "./UploadScreen"
+import HomeScreen from "./HomeScreen"
 
 export default class Login extends Component {
     constructor(props) {
@@ -63,7 +63,7 @@ export default class Login extends Component {
                 if (response.status === 200) {
                     console.log(response.data.message)
                     var uploadScreen = []
-                    uploadScreen.push(<UploadScreen app context={self.props.appContext} />)
+                    uploadScreen.push(<HomeScreen app context={self.props.appContext} />)
                     self.props.appContext.setState({ loginPage: [], uploadScreen: uploadScreen })
                 } else if (response.status === 401) {
                     console.log(response.data.message)
