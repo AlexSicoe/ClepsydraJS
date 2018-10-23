@@ -4,7 +4,7 @@ export default class UploadScreen extends Component {
   render() {
     return (
       <div>
-        Hello World!
+        {this.props.userData} 
       </div>
     )
   }

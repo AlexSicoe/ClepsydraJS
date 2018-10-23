@@ -5,8 +5,6 @@ import RaisedButton from 'material-ui/RaisedButton'
 import TextField from 'material-ui/TextField'
 import axios from 'axios'
 
-import Login from './Login'
-
 export default class Register extends Component {
     constructor(props) {
         super(props)
@@ -58,34 +56,25 @@ export default class Register extends Component {
     }
 
     handleClick(event) {
-        var apiBaseUrl = 'http://localhost:4000/api'
+        const SERVER = 'http://localhost:4000/api'
 
         console.log('values',
             this.state.username,
             this.state.email,
             this.state.password);
-        //TODO check for empty values before hitting submit
-        var self = this;
+        //TODO validate empty values before hitting submit
         var payload = {
             "username": this.state.username,
             "email": this.state.email,
             "password": this.state.password
         }
 
-        axios.post(apiBaseUrl + '/register', payload)
+        axios.post(SERVER + '/register', payload)
             .then((response) => {
                 console.log(response);
                 if (response.status === 201) {
                     // console.log('registration successful')
-                    var loginScreen = []
-                    loginScreen.push(<Login parentContext={this} />)
-                    var loginMessage = 'Not Registered yet. Go to registration'
-                    self.props.parentContext.setState({
-                        loginScreen: loginScreen,
-                        loginMessage: loginMessage,
-                        buttonLabel: 'Register',
-                        isLogin: true
-                    })
+                  this.props.handleSuccess()
                 } else {
                     alert('An error occurred. Please try again.')
                 }

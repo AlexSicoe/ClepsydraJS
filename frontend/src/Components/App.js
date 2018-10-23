@@ -22,12 +22,15 @@ export default class App extends Component {
   }
 
   render() {
+    var userData = 'LOREM IPSUM DOLOR SIT AMET'
     return (
       <Router>
         <>
-          <Route path="/home" render={() => <HomeScreen /*TODO what user?*/ />
+          <Route path="/home" render={() =>
+            <HomeScreen userData={userData} />
           } />
-          <Route path="/login" render={() => <LoginScreen /*TODO props*/ />
+          <Route path="/login" render={() =>
+            <LoginScreen /*TODO props*/ />
           } />
           <Route exact path="/" render={() => (
             this.state.isLoggedIn ? (

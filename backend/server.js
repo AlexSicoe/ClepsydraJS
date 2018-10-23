@@ -94,14 +94,9 @@ router.post('/login', (req, res, next) => {
         .then((user) => {
             if (user !== null) {
                 // user.password = undefined //bassically, don't send the password
-                res.status(200).send({
-                    message: 'Login successful',
-                    user: user
-                })
+                res.status(200).send(user) //Login successful
             } else {
-                res.status(401).send({
-                    message: 'Email and password do not match'
-                })
+                res.status(401).send() // Email and password do not match
             }
         })
         .catch((error) => next(error))

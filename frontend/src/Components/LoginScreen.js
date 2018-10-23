@@ -11,12 +11,14 @@ export default class LoginScreen extends Component {
         super(props)
 
         this.state = {
-            username: '',
+            email: '',
             password: '',
             loginMessage: 'Not Registered yet? Go to Registration',
             buttonLabel: 'Register',
             isLogin: true
         }
+
+        this.redirectToLogin = this.redirectToLogin.bind(this)
     }
 
     componentWillMount() {
@@ -25,8 +27,8 @@ export default class LoginScreen extends Component {
 
     render() {
         return (
-            <div className="loginScreen" /*TODO, deschide /login prin router*/>
-                {this.state.isLogin ? <Login /> : <Register />}
+            <div className="loginScreen">
+                {this.state.isLogin ? this.renderLogin() : this.renderRegister()}
                 {this.state.loginMessage}
                 <MuiThemeProvider>
                     <div>
@@ -38,7 +40,18 @@ export default class LoginScreen extends Component {
                 </MuiThemeProvider>
             </div>
         )
+    }
 
+    renderLogin() {
+        return (
+            <Login />            
+        )
+    }
+
+    renderRegister() {
+        return (
+            <Register handleSuccess = {this.redirectToLogin} />
+        )
     }
 
     handleClick(event) {
@@ -57,7 +70,23 @@ export default class LoginScreen extends Component {
             })
         }
     }
+
+    redirectToLogin() {
+        this.setState({
+            loginMessage: 'Not Registered yet? Go to Registration',
+            buttonLabel: 'Register',
+            isLogin: true
+        })
+    }
 }
 const style = {
     margin: 15
+}
+
+function SubComponent() {
+  return (
+    <div>
+      
+    </div>
+  )
 }
