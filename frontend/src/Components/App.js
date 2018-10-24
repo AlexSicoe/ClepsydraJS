@@ -12,8 +12,7 @@ export default class App extends Component {
     super(props)
 
     this.state = {
-      isLoggedIn: false,
-
+      isAuthorized: false,
     }
   }
 
@@ -22,18 +21,18 @@ export default class App extends Component {
   }
 
   render() {
-    var userData = 'LOREM IPSUM DOLOR SIT AMET'
+    var email = 'dummy@dummy.com'
     return (
       <Router>
         <>
           <Route path="/home" render={() =>
-            <HomeScreen userData={userData} />
+            <HomeScreen email={email} />
           } />
           <Route path="/login" render={() =>
             <LoginScreen /*TODO props*/ />
           } />
           <Route exact path="/" render={() => (
-            this.state.isLoggedIn ? (
+            this.state.isAuthorized ? (
               <Redirect to="/home" />
             ) : (
                 <Redirect to="/login" />

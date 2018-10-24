@@ -14,39 +14,41 @@ export default class Login extends Component {
 
         this.state = {
             email: '',
-            password: ''
+            password: '',
+            isAuthorized: false,
         }
     }
 
     render() {
         return (
-            <div>
-                <MuiThemeProvider>
-                    <div>
-                        <AppBar title="Login" />
-                        <TextField
-                            hintText="Enter your Email"
-                            floatingLabelText="Email"
-                            onChange={(event, newValue) =>
-                                this.setState({ email: newValue })
-                            } />
-                        <br />
-                        <TextField
-                            type="password"
-                            hintText="Enter your password"
-                            floatingLabelText="Password"
-                            onChange={(event, newValue) =>
-                                this.setState({ password: newValue })
-                            } />
-                        <br />
-                        <RaisedButton
-                            label="Submit"
-                            primary={true}
-                            style={style}
-                            onClick={(event) => this.handleClick(event)} />
-                    </div>
-                </MuiThemeProvider>
-            </div>
+            this.state.isAuthorized ? (<RedirectToHomeScreen email={this.state.email} />) :
+                <div>
+                    <MuiThemeProvider>
+                        <div>
+                            <AppBar title="Login" />
+                            <TextField
+                                hintText="Enter your Email"
+                                floatingLabelText="Email"
+                                onChange={(event, newValue) =>
+                                    this.setState({ email: newValue })
+                                } />
+                            <br />
+                            <TextField
+                                type="password"
+                                hintText="Enter your password"
+                                floatingLabelText="Password"
+                                onChange={(event, newValue) =>
+                                    this.setState({ password: newValue })
+                                } />
+                            <br />
+                            <RaisedButton
+                                label="Submit"
+                                primary={true}
+                                style={style}
+                                onClick={(event) => this.handleClick(event)} />
+                        </div>
+                    </MuiThemeProvider>
+                </div>
         )
     }
 
@@ -61,11 +63,12 @@ export default class Login extends Component {
                 console.log(response)
                 if (response.status === 200) {
                     console.log('Login Successful')
-                    //TODO Redirect to HomeScreen
-                    redirectToHomeScreen('LOREM IPSUM 7000') //FIXME
+                    this.setState({ isAuthorized: true }) //TODO, token in state, verify with token
+
                 } else if (response.status === 401) {
                     console.log('Email & Password do not match') //FIXME gets caught as error
                     alert('Email & Password do not match')
+                    // this.setState({ isAuthorized: false})
                 }
             })
             .catch((error) => {
@@ -79,17 +82,20 @@ const style = {
 }
 
 
-function redirectToHomeScreen(userData) {
-    return (
+
+const RedirectToHomeScreen = (props) =>
+    (
         <div>
             <Router>
                 <>
                     <Route path="/home" render={() =>
-                        <HomeScreen userData={userData} />
+                        <HomeScreen email={props.email} />
                     } />
-                    <Redirect to="/home" />
+                    <Route exact path="/login" render={() => (
+                        <Redirect to="/home" />
+                    )}
+                    />
                 </>
             </Router>
         </div>
     )
-}

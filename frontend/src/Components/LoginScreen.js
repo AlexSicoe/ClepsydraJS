@@ -13,12 +13,11 @@ export default class LoginScreen extends Component {
         this.state = {
             email: '',
             password: '',
-            loginMessage: 'Not Registered yet? Go to Registration',
-            buttonLabel: 'Register',
             isLogin: true
         }
 
         this.redirectToLogin = this.redirectToLogin.bind(this)
+        this.handleClick = this.handleClick.bind(this)
     }
 
     componentWillMount() {
@@ -29,52 +28,54 @@ export default class LoginScreen extends Component {
         return (
             <div className="loginScreen">
                 {this.state.isLogin ? this.renderLogin() : this.renderRegister()}
-                {this.state.loginMessage}
-                <MuiThemeProvider>
-                    <div>
-                        <RaisedButton label={this.state.buttonLabel}
-                            primary={true}
-                            style={style}
-                            onClick={(event) => this.handleClick(event)} />
-                    </div>
-                </MuiThemeProvider>
             </div>
         )
     }
 
     renderLogin() {
+        var properties = {
+            loginMessage: 'Not Registered yet? Go to Registration',
+            buttonLabel: 'Register',
+            handleClick: this.handleClick,
+        }
         return (
-            <Login />            
+            <>
+                <Login />
+                <SubComponent {...properties} />
+            </>
         )
     }
 
     renderRegister() {
+        var properties = {
+            loginMessage: 'Already registered? Go to Login',
+            buttonLabel: 'Login',
+            handleClick: this.handleClick,
+        }
         return (
-            <Register handleSuccess = {this.redirectToLogin} />
+            <>
+                <Register handleSuccess={this.redirectToLogin} />
+                <SubComponent{...properties} />
+            </>
         )
     }
 
-    handleClick(event) {
+    handleClick(e) {
         // console.log("event: ", event)
-        if (this.state.isLogin) {
+        e.preventDefault()
+        this.state.isLogin ?
             this.setState({
-                loginMessage: 'Already registered? Go to Login',
-                buttonLabel: 'Login',
                 isLogin: false
             })
-        } else {
+            :
             this.setState({
-                loginMessage: 'Not Registered yet? Go to Registration',
-                buttonLabel: 'Register',
                 isLogin: true
             })
-        }
+
     }
 
     redirectToLogin() {
         this.setState({
-            loginMessage: 'Not Registered yet? Go to Registration',
-            buttonLabel: 'Register',
             isLogin: true
         })
     }
@@ -83,10 +84,17 @@ const style = {
     margin: 15
 }
 
-function SubComponent() {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+const SubComponent = (props) =>
+    (
+        <>
+            {props.loginMessage}
+            <MuiThemeProvider>
+                <div>
+                    <RaisedButton label={props.buttonLabel}
+                        primary={true}
+                        style={style}
+                        onClick={(event) => props.handleClick(event)} />
+                </div>
+            </MuiThemeProvider>
+        </>
+    )
