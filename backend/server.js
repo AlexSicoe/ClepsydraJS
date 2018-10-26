@@ -13,8 +13,7 @@ const sequelize = new Sequelize('clepsydra', 'root', 'supersecret', {
         timestamps: false
     }
 });
-
-const User = model.defineUser(sequelize)
+model.defineModels(sequelize)
 
 
 const app = express()
@@ -36,12 +35,12 @@ router.get('/create', (req, res, next) => {
 
 //route to handle user registration
 router.post('/register', (req, res, next) => {
-    User.create(req.body)
+    model.User.create(req.body)
         .then(() => res.status(201).send('User registered successfully'))
         .catch((error) => next(error))
 })
 router.post('/login', (req, res, next) => {
-    User.findOne({
+    model.User.findOne({
         where: {
             email: req.body.email,
             password: req.body.password

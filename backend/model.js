@@ -1,6 +1,12 @@
 const Sequelize = require('sequelize');
 
-exports.defineUser = sequelize =>
+exports.User;
+
+exports.defineModels = (sequelize) => {
+    this.User = defineUser(sequelize)
+}
+
+defineUser = (sequelize) =>
     sequelize.define('user', {
         username: {
             type: Sequelize.STRING,
@@ -32,4 +38,4 @@ exports.defineUser = sequelize =>
         }
     }, {
             underscored: true
-        });
+        })
