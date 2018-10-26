@@ -33,29 +33,27 @@ export default class LoginScreen extends Component {
     }
 
     renderLogin() {
-        var properties = {
-            loginMessage: 'Not Registered yet? Go to Registration',
-            buttonLabel: 'Register',
-            handleClick: this.handleClick,
-        }
         return (
             <>
                 <Login />
-                <SubComponent {...properties} />
+                <Footer
+                    loginMessage="Not Registered yet? Go to Registration"
+                    buttonLabel="Register"
+                    handleClick={this.handleClick}
+                />
             </>
         )
     }
 
     renderRegister() {
-        var properties = {
-            loginMessage: 'Already registered? Go to Login',
-            buttonLabel: 'Login',
-            handleClick: this.handleClick,
-        }
         return (
             <>
                 <Register handleSuccess={this.redirectToLogin} />
-                <SubComponent{...properties} />
+                <Footer
+                    loginMessage="Already registered? Go to Login"
+                    buttonLabel="Login"
+                    handleClick={this.handleClick}
+                />
             </>
         )
     }
@@ -80,11 +78,8 @@ export default class LoginScreen extends Component {
         })
     }
 }
-const style = {
-    margin: 15
-}
 
-const SubComponent = (props) =>
+const Footer = (props) =>
     (
         <>
             {props.loginMessage}
@@ -98,3 +93,7 @@ const SubComponent = (props) =>
             </MuiThemeProvider>
         </>
     )
+
+const style = {
+    margin: 15
+}

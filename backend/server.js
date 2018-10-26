@@ -4,68 +4,24 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const Sequelize = require('sequelize')
-const sequelize = new Sequelize('clepsydra', 'root', '', {
+const model = require('./model')
+
+
+const sequelize = new Sequelize('clepsydra', 'root', 'supersecret', {
     dialect: 'mysql',
     define: {
         timestamps: false
     }
-})
+});
+
+const User = model.defineUser(sequelize)
+
 
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cors())
 var router = express.Router()
-
-var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'clepsydra'
-})
-
-connection.connect((err) => {
-    if (!err) {
-        console.log('Database is connected')
-    } else {
-        console.log('Error connecting database\n' + err)
-    }
-})
-
-
-User = sequelize.define('user', {
-    username: {
-        type: Sequelize.STRING,
-        unique: true,
-        allowNull: false,
-        validate: {
-            len: [3, 20]
-        }
-    },
-    password: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-            len: [6, 30]
-        }
-    },
-    email: {
-        type: Sequelize.STRING,
-        unique: true,
-        allowNull: false,
-        validate: {
-            isEmail: true
-        }
-    },
-    timestamp: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW
-    }
-}, {
-        underscored: true
-    })
-
 
 
 //test route
@@ -107,5 +63,4 @@ router.post('/login', (req, res, next) => {
 
 app.use('/api', router)
 app.listen(4000)
-
 
