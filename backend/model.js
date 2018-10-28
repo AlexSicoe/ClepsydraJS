@@ -56,7 +56,16 @@ const defineUser = (sequelize) =>
       allowNull: false,
       defaultValue: Sequelize.NOW,
     },
-  })
+  }, {
+      defaultScope: {
+        attributes: { exclude: ['password'] },
+      },
+      scopes: {
+        withPassword: {
+          attributes: {},
+        }
+      }
+    })
 
 
 const defineProject = (sequelize) =>
