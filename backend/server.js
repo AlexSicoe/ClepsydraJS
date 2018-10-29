@@ -67,11 +67,10 @@ router.post('/login', async (req, res, next) => {
 
   try {
     let user = await User.findOne(whereDetailsMatch)
-    if (user) {
-      res.status(200).send('successfully logged in').json(user)
-    } else {
-      res.status(401).send('mail and password do not match')
+    if (!user) {
+      res.status(401).send('mail and password do not match') 
     }
+    res.status(200).send('successfully logged in').json(user)
   } catch (err) {
     next({ err: err.message, status: err.status })
   }
@@ -94,11 +93,10 @@ router.get('/users', async (req, res, next) => {
 router.get('/users/:uid', async (req, res, next) => {
   try {
     let user = await User.findById(req.params.uid, { include: [Project] })
-    if (user) {
-      res.status(200).json(user)
-    } else {
+    if (!user) {
       res.status(404).send('user not found')
     }
+    res.status(200).json(user)
   } catch (err) {
     next({ err: err.message, status: err.status })
   }
@@ -107,11 +105,10 @@ router.get('/users/:uid', async (req, res, next) => {
 router.put('/users/:uid', async (req, res, next) => {
   try {
     let user = await User.findById(req.params.uid)
-    if (user) {
-      await user.update(req.body)
-    } else {
+    if (!user) {
       res.status(404).send('cannot find user')
     }
+    await user.update(req.body)
     if (!res.headersSent) {
       res.status(201).send('updated user')
     }
@@ -123,11 +120,10 @@ router.put('/users/:uid', async (req, res, next) => {
 router.delete('/users/:uid', async (req, res, next) => {
   try {
     let user = await User.findById(req.params.uid)
-    if (user) {
-      await user.destroy()
-    } else {
+    if (!user) {
       res.status(404).send('cannot find user')
     }
+    await user.destroy()
     res.status(201).send('removed user')
   } catch (err) {
     next({ err: err, status: 500 })
