@@ -58,7 +58,6 @@ router.post('/register', async (req, res, next) => {
 })
 
 router.post('/login', async (req, res, next) => {
-  let user
   const whereDetailsMatch = {
     where: {
       email: req.body.email,
@@ -67,8 +66,8 @@ router.post('/login', async (req, res, next) => {
   }
 
   try {
-    user = await User.findOne(whereDetailsMatch)
-    if (user !== null) {
+    let user = await User.findOne(whereDetailsMatch)
+    if (user) {
       res.status(200).send('successfully logged in').json(user)
     } else {
       res.status(401).send('mail and password do not match')
@@ -80,62 +79,59 @@ router.post('/login', async (req, res, next) => {
 
 //=====================================
 
-router.get('/users', (req, res, next) => {
-  User.findAll()
-    .then((users) => res.status(200).json(users))
-    .catch((err) => next({ err: err, status: 500 }))
+
+
+router.get('/users', async (req, res, next) => {
+  try {
+    let users = await User.findAll()
+    res.status(200).json(users)
+  } catch (err) {
+    next({ err: err, status: 500 })
+  }
 })
 
-//@deprecated. Use /register instead
-router.post('/users', (req, res, next) => {
-  User.create(req.body)
-    .then(() => res.status(201).send('created user'))
-    .catch((err) => next({ err: err, status: 500 }))
+
+router.get('/users/:uid', async (req, res, next) => {
+  try {
+    let user = await User.findById(req.params.uid, { include: [Project] })
+    if (user) {
+      res.status(200).json(user)
+    } else {
+      res.status(404).send('user not found')
+    }
+  } catch (err) {
+    next({ err: err.message, status: err.status })
+  }
 })
 
-router.get('/users/:uid', (req, res, next) => {
-  User.findById(req.params.uid, { include: [Project] }) //TODO see docs
-    .then((user) => {
-      if (user) {
-        res.status(200).json(user)
-      }
-      else {
-        res.status(404).send('user not found')
-      }
-    })
-    .catch((err) => next({
-      err: err.message, status: err.status
-    }))
+router.put('/users/:uid', async (req, res, next) => {
+  try {
+    let user = await User.findById(req.params.uid)
+    if (user) {
+      await user.update(req.body)
+    } else {
+      res.status(404).send('cannot find user')
+    }
+    if (!res.headersSent) {
+      res.status(201).send('updated user')
+    }
+  } catch (err) {
+    next({ err: err, status: 500 })
+  }
 })
 
-router.put('/users/:uid', (req, res, next) => {
-  User.findById(req.params.uid)
-    .then((user) => {
-      if (user) {
-        return user.update(req.body)
-      } else {
-        res.status(404).send('cannot find user')
-      }
-    })
-    .then(() => {
-      if (!res.headersSent) {
-        res.status(201).send('updated user')
-      }
-    })
-    .catch((err) => next({ err: err, status: 500 }))
-})
-
-router.delete('/users/:uid', (req, res, next) => {
-  User.findById(req.params.uid)
-    .then((user) => {
-      if (user) {
-        return user.destroy()
-      } else {
-        res.status(404).send('cannot find user')
-      }
-    })
-    .then(() => res.status(201).send('removed user'))
-    .catch((err) => next({ err: err, status: 500 }))
+router.delete('/users/:uid', async (req, res, next) => {
+  try {
+    let user = await User.findById(req.params.uid)
+    if (user) {
+      await user.destroy()
+    } else {
+      res.status(404).send('cannot find user')
+    }
+    res.status(201).send('removed user')
+  } catch (err) {
+    next({ err: err, status: 500 })
+  }
 })
 
 router.get('/users/:uid/projects', (req, res, next) => {
