@@ -31,37 +31,51 @@ var router = express.Router()
 router.get('/', (req, res) => {
   res.json({ message: 'Welcome to our REST API' })
 })
+
+/*
 router.get('/create', (req, res, next) => {
   sequelize.sync({ force: true })
     .then(() => res.status(201).send('created tables'))
     .catch((err) => next({ err: err, status: 500 }))
+})*/
+
+router.get('/create', async (req, res, next) => {
+  try {
+    await sequelize.sync({ force: true })
+    res.status(201).send('created tables')
+  } catch (err) {
+    next({ err: err, status: 500 })
+  }
 })
 
-//route to handle user registration
-router.post('/register', (req, res, next) => {
-  User.create(req.body)
-    .then(() => res.status(201).send('user registered successfully'))
-    .catch((err) => next({ err: err, status: 500 }))
+router.post('/register', async (req, res, next) => {
+  try {
+    await User.create(req.body)
+    res.status(201).send('user registered successfully')
+  } catch (err) {
+    next({ err: err, status: 500 })
+  }
 })
 
-router.post('/login', (req, res, next) => {
-  User.findOne({
+router.post('/login', async (req, res, next) => {
+  let user
+  const whereDetailsMatch = {
     where: {
       email: req.body.email,
       password: req.body.password
     }
-  })
-    .then((user) => {
-      if (user !== null) {
-        // user.password = undefined //bassically, don't send the password
-        res.status(200).send('successfully logged in').json(user)
-      } else {
-        res.status(401).send('mail and password do not match')
-      }
-    })
-    .catch((err) => next({
-      err: err.message, status: err.status //TODO test
-    }))
+  }
+
+  try {
+    user = await User.findOne(whereDetailsMatch)
+    if (user !== null) {
+      res.status(200).send('successfully logged in').json(user)
+    } else {
+      res.status(401).send('mail and password do not match')
+    }
+  } catch (err) {
+    next({ err: err.message, status: err.status })
+  }
 })
 
 //=====================================
