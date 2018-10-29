@@ -84,6 +84,7 @@ const defineUserProject = (sequelize) =>
   sequelize.define('userProject', {
     role: {
       type: Sequelize.STRING,
+      allowNull: false,
       validate: {
         len: [2, 30],
         notEmpty: true,

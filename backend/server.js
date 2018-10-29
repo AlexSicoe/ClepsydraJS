@@ -68,7 +68,7 @@ router.post('/login', async (req, res, next) => {
   try {
     let user = await User.findOne(whereDetailsMatch)
     if (!user) {
-      res.status(401).send('mail and password do not match') 
+      res.status(401).send('mail and password do not match')
     }
     res.status(200).send('successfully logged in').json(user)
   } catch (err) {
@@ -130,37 +130,42 @@ router.delete('/users/:uid', async (req, res, next) => {
   }
 })
 
-router.get('/users/:uid/projects', (req, res, next) => {
-  User.findById(req.params.uid)
-    .then((user) => {
-      if (user) {
-        return user.getProjects()
-      } else {
-        res.status(404).send('cannot find user')
-      }
-    })
-    .then((projects) => res.status(200).json(projects))
-    .catch((err) => next({ err: err, status: 500 }))
+router.get('/users/:uid/projects', async (req, res, next) => {
+  try {
+    let user = await User.findById(req.params.uid)
+    if (!user) {
+      res.status(404).send('cannot find user')
+    }
+    let projects = await user.getProjects()
+    res.status(200).json(projects)
+  }
+  catch (err) {
+    next({ err: err, status: 500 })
+  }
 })
 
-router.post('/users/:uid/projects', (req, res, next) => {
-  User.findById(req.params.uid)
-    .then((user) => {
-      if (user) {
-        let project = req.body
-        project.user_id = user.id //FIXME
-        return Project.create(project)
-      } else {
-        res.status(404).send('cannot find user')
-      }
-    })
-    .then((projects) => res.status(201).send('created'))
-    .catch((err) => next(err))
+router.post('/users/:uid/projects', async (req, res, next) => {
+  let through = {
+    role: 'Admin'
+  }
+
+  try {
+    let user = await User.findById(req.params.uid)
+    if (!user) {
+      res.status(404).send('cannot find user')
+    }
+    let project = await Project.create(req.body)
+    await user.addProject(project, { through })
+    res.status(201).send('created')
+  }
+  catch (err) {
+    next(err)
+  }
 })
 
 //TODO test
 router.get('/users/:uid/projects/:pid', (req, res, next) => {
-  Project.findById(req.params.pid)
+  Project.findById(req.params.pid, { include: [User] }) //check include
     .then((project) => {
       if (project) {
         res.status(200).json(project)
