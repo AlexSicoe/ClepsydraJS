@@ -12,6 +12,7 @@ const sequelize = new Sequelize('clepsydra', 'root', 'supersecret', {
     underscored: true
   }
 })
+
 model.defineModels(sequelize)
 const User = model.User
 const Project = model.Project
@@ -27,24 +28,16 @@ app.use(cors())
 var router = express.Router()
 
 
-//test route
 router.get('/', (req, res) => {
-  res.json({ message: 'Welcome to our REST API' })
+  res.json({ message: 'Welcome to our wonderful REST API !!!' })
 })
-
-/*
-router.get('/create', (req, res, next) => {
-  sequelize.sync({ force: true })
-    .then(() => res.status(201).send('created tables'))
-    .catch((err) => next({ err: err, status: 500 }))
-})*/
 
 router.get('/create', async (req, res, next) => {
   try {
     await sequelize.sync({ force: true })
     res.status(201).send('created tables')
   } catch (err) {
-    next({ err: err, status: 500 })
+    next(err)
   }
 })
 
@@ -53,7 +46,7 @@ router.post('/register', async (req, res, next) => {
     await User.create(req.body)
     res.status(201).send('user registered successfully')
   } catch (err) {
-    next({ err: err, status: 500 })
+    next(err)
   }
 })
 
@@ -67,93 +60,83 @@ router.post('/login', async (req, res, next) => {
 
   try {
     let user = await User.findOne(whereDetailsMatch)
-    if (!user) {
+    if (!user)
       res.status(401).send('mail and password do not match')
-    }
     res.status(200).send('successfully logged in').json(user)
   } catch (err) {
-    next({ err: err.message, status: err.status })
+    next(err)
   }
 })
-
-//=====================================
-
-
 
 router.get('/users', async (req, res, next) => {
   try {
     let users = await User.findAll()
     res.status(200).json(users)
   } catch (err) {
-    next({ err: err, status: 500 })
+    next(err)
   }
 })
-
 
 router.get('/users/:uid', async (req, res, next) => {
   try {
     let user = await User.findById(req.params.uid, { include: [Project] })
-    if (!user) {
+    if (!user)
       res.status(404).send('user not found')
-    }
     res.status(200).json(user)
   } catch (err) {
-    next({ err: err.message, status: err.status })
+    next(err)
   }
 })
 
 router.put('/users/:uid', async (req, res, next) => {
   try {
     let user = await User.findById(req.params.uid)
-    if (!user) {
+    if (!user)
       res.status(404).send('cannot find user')
-    }
     await user.update(req.body)
-    if (!res.headersSent) {
-      res.status(201).send('updated user')
-    }
+    if (!res.headersSent)
+      res.status(200).send('updated user')
   } catch (err) {
-    next({ err: err, status: 500 })
+    next(err)
   }
 })
 
 router.delete('/users/:uid', async (req, res, next) => {
   try {
     let user = await User.findById(req.params.uid)
-    if (!user) {
+    if (!user)
       res.status(404).send('cannot find user')
-    }
     await user.destroy()
-    res.status(201).send('removed user')
+    res.status(200).send('removed user')
   } catch (err) {
-    next({ err: err, status: 500 })
+    next(err)
   }
 })
 
 router.get('/users/:uid/projects', async (req, res, next) => {
+  //get projects from a certain user
   try {
     let user = await User.findById(req.params.uid)
-    if (!user) {
+    if (!user)
       res.status(404).send('cannot find user')
-    }
-    let projects = await user.getProjects()
+    let projects = await user.getProjects() //TODO include role?
     res.status(200).json(projects)
   }
   catch (err) {
-    next({ err: err, status: 500 })
+    next(err)
   }
 })
 
 router.post('/users/:uid/projects', async (req, res, next) => {
+  //user makes a project
   let through = {
     role: 'Admin'
   }
 
   try {
     let user = await User.findById(req.params.uid)
-    if (!user) {
+    if (!user)
       res.status(404).send('cannot find user')
-    }
     let project = await Project.create(req.body)
     await user.addProject(project, { through })
     res.status(201).send('created')
@@ -163,129 +146,125 @@ router.post('/users/:uid/projects', async (req, res, next) => {
   }
 })
 
-//TODO test
-router.get('/users/:uid/projects/:pid', (req, res, next) => {
-  Project.findById(req.params.pid, { include: [User] }) //check include
-    .then((project) => {
-      if (project) {
-        res.status(200).json(project)
-      } else {
-        res.status(404).send('project not found')
-      }
-    })
-    .catch((err) => next(err))
+router.get('/projects', async (req, res, next) => {
+  try {
+    let projects = await Project.findAll()
+    res.status(200).json(projects)
+  } catch (err) {
+    next(err)
+  }
 })
 
-//TODO test
-router.put('/users/:uid/projects/:pid', (req, res, next) => {
-  Project.findById(req.params.pid)
-    .then((project) => {
-      if (project) {
-        return project.update(req.body)
-      } else {
-        res.status(404).send('project not found')
-      }
-    })
-    .then(() => res.status(201).send('project updated'))
-    .catch((err) => next(err))
+router.get('/projects/:pid', async (req, res, next) => {
+  try {
+    let project = await Project.findById(req.params.pid, { include: [User] })
+    if (!project)
+      res.status(404).send('project not found')
+    res.status(200).json(project)
+  } catch (err) {
+    next(err)
+  }
 })
 
-//TODO test
-router.delete('/users/:uid/projects/:pid', (req, res, next) => {
-  Project.findById(req.params.id)
-    .then((project) => {
-      if (project) {
-        return project.destroy()
-      } else {
-        res.status(404).send('project not found')
-      }
-    })
-    .then(() => res.status(201).send('project removed'))
-    .catch((err) => next(err))
+router.put('/projects/:pid', async (req, res, next) => {
+  try {
+    let project = await Project.findById(req.params.pid)
+    if (!project)
+      res.status(404).send('cannot find project')
+    await project.update(req.body)
+
+    res.status(200).send('updated project')
+  } catch (err) {
+    next(err)
+  }
 })
 
-router.get('/projects', (req, res, next) => {
-  Project.findAll()
-    .then((projects) => res.status(200).json(projects))
-    .catch((err) => next({ err: err, status: 500 }))
+router.delete('/projects/:pid', async (req, res, next) => {
+  try {
+    let project = await Project.findById(req.params.pid)
+    if (!project)
+      res.status(404).send('cannot find project')
+    await project.destroy()
+    res.status(200).send('removed project')
+  } catch (err) {
+    next(err)
+  }
 })
 
-//@deprecated. Use users/:uid/projects instead
-router.post('/projects', (req, res, next) => {
-  Project.create(req.body)
-    .then(() => res.status(201).send('created project'))
-    .catch((err) => next({ err: err, status: 500 }))
+router.get('/projects/:pid/users', async (req, res, next) => {
+  try {
+    let project = await Project.findById(req.params.pid)
+    if (!project)
+      res.status(404).send('cannot find project')
+    let users = await project.getUsers()
+    res.status(200).json(users)
+  } catch (err) {
+    next(err)
+  }
 })
 
-//TODO test
-router.get('/projects/:pid', (req, res, next) => {
-  Project.findById(req.params.pid, { include: [User] })
-    .then((project) => {
-      if (project) {
-        res.status(200).json(project)
-      } else {
-        res.status(404).send('project not found')
-      }
-    })
-    .catch((err) => next({ err: err.message, status: err.status }))
+router.post('/projects/:pid/users/:uid', async (req, res, next) => {
+  //adds user to project
+  const through = {
+    role: 'User'
+  }
+
+  try {
+    const findProject = Project.findById(req.params.pid)
+    const findUser = User.findById(req.params.uid)
+    const [project, user] = await Promise.all([findProject, findUser])
+    if (!project)
+      res.status(404).send('cannot find project')
+    if (!user)
+      res.status(404).send('cannot find user')
+    if (await project.hasUser(user))
+      res.status(404).send('user already belongs to project')
+    await project.addUser(user, { through })
+    res.status(200).send('added user to project')
+  } catch (err) {
+    next(err)
+  }
 })
 
-//TODO test
-router.put('/projects/:pid', (req, res, next) => {
-  Project.findById(req.params.pid)
-    .then((project) => {
-      if (project) {
-        return project.update(req.body)
-      } else {
-        res.status(404).send('cannot find project')
-      }
-    })
-    .then(() => {
-      if (!res.headersSent) {
-        res.status(201).send('updated project')
-      }
-    })
-    .catch((err) => next({ err: err, status: 500 }))
+router.put('/projects/:pid/users/:uid', async (req, res, next) => {
+  //edits joint data of user and project... 
+  //think about UserProject roles
+  const whereDetailsMatch = {
+    where: {
+      project_id: req.params.pid,
+      user_id: req.params.uid,
+    }
+  }
+
+  try {
+    let through = await UserProject.findOne(whereDetailsMatch)
+    if (!through)
+      res.status(404).send('cannot find userProject')
+    await through.update(req.body)
+    if (!res.headersSent)
+      res.status(200).send('userProject updated')
+  } catch (err) {
+    next(err)
+  }
 })
 
-//TODO test
-router.delete('/projects/:pid', (req, res, next) => {
-  Project.findById(req.params.pid)
-    .then((project) => {
-      if (project) {
-        return project.destroy()
-      } else {
-        res.status(404).send('cannot find project')
-      }
-    })
-    .then(() => res.status(201).send('removed project'))
-    .catch((err) => next({ err: err, status: 500 }))
-})
-
-//TODO test
-router.get('/projects/:pid/users', (req, res, next) => {
-  Project.findById(req.params.pid)
-    .then((project) => {
-      if (project) {
-        return project.getUsers()
-      }
-    })
-    .then((users) => res.status(200).json(users))
-    .catch((err) => next({ err: err, status: 500 }))
-})
-
-//TODO test
-router.post('/projects/:pid/users/:uid', (req, res, next) => {
-  //TODO add specific user to project
-})
-
-router.put('/projects/:pid/users/:uid', (req, res, next) => {
-  //TODO edit specific user from project... 
-  //think about UserProject roles too
-})
-
-router.delete('/projects/:pid/users/:uid', (req, res, next) => {
-  //TODO remove specific user from project.. but don't delete him, obviously
+router.delete('/projects/:pid/users/:uid', async (req, res, next) => {
+  //removes user from project
+  try {
+    const findProject = Project.findById(req.params.pid)
+    const findUser = User.findById(req.params.uid)
+    const [project, user] = await Promise.all([findProject, findUser])
+    if (!project)
+      res.status(404).send('cannot find project')
+    if (!user)
+      res.status(404).send('cannot find user')
+    if (!await project.hasUser(user))
+      res.status(404).send('project doesn\'t have said user')
+    await project.removeUser(user)
+    res.status(200).send('user removed from project')
+  } catch (err) {
+    next(err)
+  }
 })
 
 /*

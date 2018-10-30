@@ -33,13 +33,21 @@ const defineUser = (sequelize) =>
       unique: true,
       allowNull: false,
       validate: {
-        len: [3, 30],
+        notEmpty: {
+          args: true,
+          msg: 'username cannot be empty'
+        },
+        len: {
+          args: [3, 30],
+          msg: 'username must have between 3 and 30 characters'
+        }
       },
     },
     password: {
       type: Sequelize.STRING,
       allowNull: false,
       validate: {
+        notEmpty: true,
         len: [6, 30],
       },
     },
@@ -48,6 +56,7 @@ const defineUser = (sequelize) =>
       unique: true,
       allowNull: false,
       validate: {
+        notEmpty: true,
         isEmail: true,
       },
     },
@@ -73,11 +82,12 @@ const defineProject = (sequelize) =>
     name: {
       type: Sequelize.STRING,
       // unique: true
+      allowNull: false,
       validate: {
-        len: [2, 30],
         notEmpty: true,
-      },
-    },
+        len: [2, 30],
+      }
+    }
   })
 
 const defineUserProject = (sequelize) =>
@@ -86,13 +96,13 @@ const defineUserProject = (sequelize) =>
       type: Sequelize.STRING,
       allowNull: false,
       validate: {
-        len: [2, 30],
         notEmpty: true,
+        len: [2, 30],
         isIn: {
           args: [['Admin', 'Moderator', 'User']],
           msg: 'Must be Admin, Moderator or User'
         }
-      },
+      }
     }
     //TODO points??
   })
@@ -108,6 +118,7 @@ const defineKanbanColumn = (sequelize) =>
       type: Sequelize.STRING,
       allowNull: false,
       validate: {
+        notEmpty: true,
         len: [2, 30],
       }
     }
@@ -119,6 +130,7 @@ const defineTask = (sequelize) =>
       type: Sequelize.STRING,
       allowNull: false,
       validate: {
+        notEmpty: true,
         len: [2, 30],
       }
     },
@@ -126,6 +138,6 @@ const defineTask = (sequelize) =>
       type: Sequelize.DATE,
       allowNull: false,
       defaultValue: Sequelize.NOW,
-    },
+    }
   })
 
