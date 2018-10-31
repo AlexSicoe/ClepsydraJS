@@ -2,9 +2,6 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const Sequelize = require('sequelize')
-const model = require('./model')
-
-const Op = Sequelize.Op
 const sequelize = new Sequelize('clepsydra', 'root', 'supersecret', {
   dialect: 'mysql',
   define: {
@@ -12,8 +9,12 @@ const sequelize = new Sequelize('clepsydra', 'root', 'supersecret', {
     underscored: true
   }
 })
+exports.sequelize = sequelize
+const Op = Sequelize.Op
+const model = require('./model')
 
-model.defineModels(sequelize)
+
+
 const User = model.User
 const Project = model.Project
 const UserProject = model.UserProject
@@ -53,8 +54,8 @@ router.post('/register', async (req, res, next) => {
 router.post('/login', async (req, res, next) => {
   const whereDetailsMatch = {
     where: {
-          email: req.body.email,
-          password: req.body.password
+      email: req.body.email,
+      password: req.body.password
     }
   }
   try {
