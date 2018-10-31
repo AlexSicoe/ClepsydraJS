@@ -4,7 +4,7 @@ const cors = require('cors')
 const Sequelize = require('sequelize')
 const model = require('./model')
 
-
+const Op = Sequelize.Op
 const sequelize = new Sequelize('clepsydra', 'root', 'supersecret', {
   dialect: 'mysql',
   define: {
@@ -53,16 +53,15 @@ router.post('/register', async (req, res, next) => {
 router.post('/login', async (req, res, next) => {
   const whereDetailsMatch = {
     where: {
-      email: req.body.email,
-      password: req.body.password
+          email: req.body.email,
+          password: req.body.password
     }
   }
-
   try {
     let user = await User.findOne(whereDetailsMatch)
     if (!user)
       res.status(401).send('mail and password do not match')
-    res.status(200).send('successfully logged in').json(user)
+    res.status(200).json(user)
   } catch (err) {
     next(err)
   }
@@ -232,7 +231,7 @@ router.put('/projects/:pid/users/:uid', async (req, res, next) => {
   const whereDetailsMatch = {
     where: {
       project_id: req.params.pid,
-      user_id: req.params.uid,
+      user_id: req.params.uid
     }
   }
 
