@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 const server = require('./server')
-const sequelize = server.sequelize
+const { sequelize } = server
 
 exports.User = sequelize.define('user', {
   username: {
