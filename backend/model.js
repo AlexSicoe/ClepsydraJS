@@ -2,16 +2,7 @@ const Sequelize = require('sequelize')
 const server = require('./server')
 const sequelize = server.sequelize
 
-const defineRelations = () => {
-  User.belongsToMany(Project, { through: UserProject })
-  Project.belongsToMany(User, { through: UserProject })
-  Project.hasMany(Task)
-  Project.hasOne(KanbanBoard)
-  KanbanBoard.hasMany(KanbanColumn)
-  KanbanColumn.hasMany(Task)
-}
-
-const User = sequelize.define('user', {
+exports.User = sequelize.define('user', {
   username: {
     type: Sequelize.STRING,
     unique: true,
@@ -60,8 +51,7 @@ const User = sequelize.define('user', {
     }
   })
 
-
-const Project = sequelize.define('project', {
+exports.Project = sequelize.define('project', {
   name: {
     type: Sequelize.STRING,
     // unique: true
@@ -72,8 +62,7 @@ const Project = sequelize.define('project', {
     }
   }
 })
-
-const UserProject = sequelize.define('userProject', {
+exports.UserProject = sequelize.define('userProject', {
   role: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -88,12 +77,10 @@ const UserProject = sequelize.define('userProject', {
   }
   //TODO points??
 })
-
-const KanbanBoard = sequelize.define('kanbanBoard', {
+exports.KanbanBoard = sequelize.define('kanbanBoard', {
   //TODO
 })
-
-const KanbanColumn = sequelize.define('kanbanColumn', {
+exports.KanbanColumn = sequelize.define('kanbanColumn', {
   name: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -103,8 +90,7 @@ const KanbanColumn = sequelize.define('kanbanColumn', {
     }
   }
 })
-
-const Task = sequelize.define('task', {
+exports.Task = sequelize.define('task', {
   name: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -119,12 +105,3 @@ const Task = sequelize.define('task', {
     defaultValue: Sequelize.NOW,
   }
 })
-
-defineRelations()
-
-exports.User = User
-exports.Project = Project
-exports.UserProject = UserProject
-exports.KanbanBoard = KanbanBoard
-exports.KanbanColumn = KanbanColumn
-exports.Task = Task

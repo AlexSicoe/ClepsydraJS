@@ -13,21 +13,21 @@ exports.sequelize = sequelize
 const Op = Sequelize.Op
 const model = require('./model')
 
-
-
-const User = model.User
-const Project = model.Project
-const UserProject = model.UserProject
-const KanbanBoard = model.KanbanBoard
-const KanbanColumn = model.KanbanColumn
-const Task = model.Task
-
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cors())
 var router = express.Router()
 
+const { User, Project, UserProject, KanbanBoard, KanbanColumn, Task } = model
+const defineRelations = (() => {
+  User.belongsToMany(Project, { through: UserProject })
+  Project.belongsToMany(User, { through: UserProject })
+  Project.hasMany(Task)
+  Project.hasOne(KanbanBoard)
+  KanbanBoard.hasMany(KanbanColumn)
+  KanbanColumn.hasMany(Task)
+})()
 
 router.get('/', (req, res) => {
   res.json({ message: 'Welcome to our wonderful REST API !!!' })
