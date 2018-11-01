@@ -19,15 +19,22 @@ app.use(bodyParser.json())
 app.use(cors())
 var router = express.Router()
 
-const { User, Project, UserProject, KanbanBoard, KanbanColumn, Task } = model
-const defineRelations = (() => {
-  User.belongsToMany(Project, { through: UserProject })
-  Project.belongsToMany(User, { through: UserProject })
-  Project.hasMany(Task)
-  Project.hasOne(KanbanBoard)
-  KanbanBoard.hasMany(KanbanColumn)
-  KanbanColumn.hasMany(Task)
-})()
+const { User, Project, UserProject, Sprint, Column, Task } = model
+User.belongsToMany(Project, { through: UserProject })
+// Project.belongsToMany(User, { through: UserProject })
+Project.hasMany(Task)
+// Task.hasOne(Project)
+Project.hasMany(Sprint)
+// Sprint.belongsTo(Project)
+Sprint.hasMany(Column)
+// Column.belongsTo(Sprint)
+Column.hasMany(Task)
+// Task.belongsTo(Column)
+User.hasMany(Task, { as: 'assignedTask' })
+const Assignee = Task.belongsTo(User, { as: 'assignee' })
+User.hasMany(Task, { as: 'reportedTask' })
+const Reporter = Task.belongsTo(User, { as: 'reporter' })
+
 
 router.get('/', (req, res) => {
   res.json({ message: 'Welcome to our wonderful REST API !!!' })
@@ -35,6 +42,8 @@ router.get('/', (req, res) => {
 
 router.get('/create', async (req, res, next) => {
   try {
+    const results = await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', { raw: true })
+    console.table([...results])
     await sequelize.sync({ force: true })
     res.status(201).send('created tables')
   } catch (err) {

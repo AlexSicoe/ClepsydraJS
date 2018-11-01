@@ -54,7 +54,6 @@ exports.User = sequelize.define('user', {
 exports.Project = sequelize.define('project', {
   name: {
     type: Sequelize.STRING,
-    // unique: true
     allowNull: false,
     validate: {
       notEmpty: true,
@@ -77,10 +76,31 @@ exports.UserProject = sequelize.define('userProject', {
   }
   //TODO points??
 })
-exports.KanbanBoard = sequelize.define('kanbanBoard', {
-  //TODO
+exports.Sprint = sequelize.define('sprint', {
+  name: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+      len: [2, 30]
+    }
+  },
+  startDate: {
+    type: Sequelize.DATE,
+    allowNull: false,
+    validate: {
+      isBefore: this.finishDate //TODO test
+    }
+  },
+  finishDate: {
+    type: Sequelize.DATE,
+    allowNull: false,
+    validate: {
+      isAfter: this.startDate
+    }
+  }
 })
-exports.KanbanColumn = sequelize.define('kanbanColumn', {
+exports.Column = sequelize.define('column', {
   name: {
     type: Sequelize.STRING,
     allowNull: false,
