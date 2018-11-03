@@ -67,7 +67,6 @@ exports.UserProject = sequelize.define('userProject', {
     allowNull: false,
     validate: {
       notEmpty: true,
-      len: [2, 30],
       isIn: {
         args: [['Admin', 'Moderator', 'User']],
         msg: 'Must be Admin, Moderator or User'
@@ -100,7 +99,7 @@ exports.Sprint = sequelize.define('sprint', {
     }
   }
 })
-exports.Column = sequelize.define('column', {
+exports.Stage = sequelize.define('stage', {
   name: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -118,6 +117,11 @@ exports.Task = sequelize.define('task', {
       notEmpty: true,
       len: [2, 30],
     }
+  },
+  isFinished: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   },
   timestamp: {
     type: Sequelize.DATE,

@@ -19,21 +19,22 @@ app.use(bodyParser.json())
 app.use(cors())
 var router = express.Router()
 
-const { User, Project, UserProject, Sprint, Column, Task } = model
+const { User, Project, UserProject, Sprint, Stage, Task } = model
 User.belongsToMany(Project, { through: UserProject })
-// Project.belongsToMany(User, { through: UserProject })
+Project.belongsToMany(User, { through: UserProject })
 Project.hasMany(Task)
-// Task.hasOne(Project)
+Task.belongsTo(Project)
 Project.hasMany(Sprint)
-// Sprint.belongsTo(Project)
-Sprint.hasMany(Column)
-// Column.belongsTo(Sprint)
-Column.hasMany(Task)
-// Task.belongsTo(Column)
+Sprint.belongsTo(Project)
+Sprint.hasMany(Stage)
+Stage.belongsTo(Sprint)
+Stage.hasMany(Task)
+Task.belongsTo(Stage)
 User.hasMany(Task, { as: 'assignedTask' })
 const Assignee = Task.belongsTo(User, { as: 'assignee' })
 User.hasMany(Task, { as: 'reportedTask' })
 const Reporter = Task.belongsTo(User, { as: 'reporter' })
+
 
 
 router.get('/', (req, res) => {
@@ -103,12 +104,13 @@ router.put('/users/:uid', async (req, res, next) => {
     if (!user)
       res.status(404).send('cannot find user')
     await user.update(req.body)
-    if (!res.headersSent)
-      res.status(200).send('updated user')
+    res.status(200).send('updated user')
   } catch (err) {
     next(err)
   }
 })
+
+
 
 router.delete('/users/:uid', async (req, res, next) => {
   try {
@@ -148,7 +150,7 @@ router.post('/users/:uid/projects', async (req, res, next) => {
       res.status(404).send('cannot find user')
     let project = await Project.create(req.body)
     await user.addProject(project, { through })
-    res.status(201).send('created')
+    res.status(201).send('created project')
   }
   catch (err) {
     next(err)
@@ -250,8 +252,7 @@ router.put('/projects/:pid/users/:uid', async (req, res, next) => {
     if (!through)
       res.status(404).send('cannot find userProject')
     await through.update(req.body)
-    if (!res.headersSent)
-      res.status(200).send('userProject updated')
+    res.status(200).send('userProject updated')
   } catch (err) {
     next(err)
   }
@@ -275,6 +276,171 @@ router.delete('/projects/:pid/users/:uid', async (req, res, next) => {
     next(err)
   }
 })
+
+//TODO test
+router.get('/project/:pid/sprints'), async (req, res, next) => {
+  try {
+    const project = await Project.findById(req.params.pid)
+    if (!project)
+      res.status(404).send('cannot find project')
+    const sprints = await project.getSprints()
+    res.status(200).json(sprints)
+  } catch (err) {
+    next(err)
+  }
+}
+
+
+//TODO test
+router.post('/project/:pid/sprints', async (req, res, next) => {
+  try {
+    const project = await Project.findById(req.params.pid)
+    if (!project)
+      res.status(404).send('cannot find project')
+    const sprint = await Sprint.create(req.body)
+    await project.addSprint(sprint)
+    res.status(201).send('sprint created')
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test
+router.put('/sprints/:sid', async (req, res, next) => {
+  try {
+    const sprint = await Sprint.findById(req.params.sid)
+    if (!sprint)
+      res.status(404).send('cannot find sprint')
+    await sprint.update(req.body)
+    res.status(200).send('sprint updated')
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test
+router.delete('/sprints/:sid', async (req, res, next) => {
+  try {
+    const sprint = await Sprint.findById(req.params.sid)
+    if (!sprint)
+      res.status(404).send('cannot find sprint')
+    await sprint.destroy()
+    res.status(200).send('sprint removed')
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test
+router.get('/sprints/:sid/stages', async (req, res, next) => {
+  try {
+    const sprint = await Sprint.findById(req.params.sid)
+    if (!sprint)
+      res.status(404).send('cannot find sprint')
+    const stages = await Stage.findAll()
+    res.status(200).json(stages)
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test
+router.post('/sprints/:sid/stages', async (req, res, next) => {
+  try {
+    const sprint = await Sprint.findById(req.params.sid)
+    if (!sprint)
+      res.status(404).send('cannot find sprint')
+    const stage = await Stage.create(req.body)
+    sprint.addStage(stage)
+    res.status(200).send('stage created')
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test
+router.put('/stages/:stid', async (req, res, next) => {
+  try {
+    const stage = await Stage.findById(req.params.stid)
+    if (!stage)
+      res.status(404).send('cannot find stage')
+    stage.update(req.body)
+    res.status(200).send('updated stage')
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test
+router.delete('/stages/:stid', async (req, res, next) => {
+  try {
+    const stage = await Stage.findById(req.params.stid)
+    if (!stage)
+      res.status(404).send('cannot find stage')
+    stage.destroy()
+    res.status(200).send('removed stage')
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test
+router.get('/projects/:pid/tasks', async (req, res, next) => {
+  try {
+    const project = await Project.findById(req.params.pid)
+    if (!project)
+      res.status(404).send('cannot find project')
+    const tasks = await project.getTasks()
+    res.status(200).json(tasks)
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test
+router.post('/project/:pid/tasks', async (req, res, next) => {
+  try {
+    const project = await Project.findById(req.params.pid)
+    if (!project)
+      res.status(404).send('cannot find project')
+    let task = await Task.create(req.body)
+    await project.addTask(task)
+    res.status(201).send('task created')
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test
+router.put('/tasks/:tid', async (req, res, next) => {
+  try {
+    const task = await Task.findById(req.params.tid)
+    if (!task)
+      res.status(404).send('cannot find task')
+    await task.update(req.body)
+    res.status(200).send('task updated')
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test
+router.delete('/tasks/:tid', async (req, res, next) => {
+  try {
+    const task = await Task.findById(req.params.tid)
+    if (!task)
+      res.status(404).send('cannot find task')
+    await task.destroy()
+    res.status(200).send('task removed')
+  } catch (err) {
+    next(err)
+  }
+})
+
+
+
+
+
 
 /*
 router.use((err, req, res, next) => {
