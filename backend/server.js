@@ -277,8 +277,7 @@ router.delete('/projects/:pid/users/:uid', async (req, res, next) => {
   }
 })
 
-//TODO test
-router.get('/project/:pid/sprints'), async (req, res, next) => {
+router.get('/projects/:pid/sprints', async (req, res, next) => {
   try {
     const project = await Project.findById(req.params.pid)
     if (!project)
@@ -288,11 +287,9 @@ router.get('/project/:pid/sprints'), async (req, res, next) => {
   } catch (err) {
     next(err)
   }
-}
+})
 
-
-//TODO test
-router.post('/project/:pid/sprints', async (req, res, next) => {
+router.post('/projects/:pid/sprints', async (req, res, next) => {
   try {
     const project = await Project.findById(req.params.pid)
     if (!project)
@@ -305,7 +302,6 @@ router.post('/project/:pid/sprints', async (req, res, next) => {
   }
 })
 
-//TODO test
 router.put('/sprints/:sid', async (req, res, next) => {
   try {
     const sprint = await Sprint.findById(req.params.sid)
@@ -318,8 +314,8 @@ router.put('/sprints/:sid', async (req, res, next) => {
   }
 })
 
-//TODO test
 router.delete('/sprints/:sid', async (req, res, next) => {
+  //TODO remove from project with all its stages, atomically
   try {
     const sprint = await Sprint.findById(req.params.sid)
     if (!sprint)
@@ -331,7 +327,6 @@ router.delete('/sprints/:sid', async (req, res, next) => {
   }
 })
 
-//TODO test
 router.get('/sprints/:sid/stages', async (req, res, next) => {
   try {
     const sprint = await Sprint.findById(req.params.sid)
@@ -344,7 +339,6 @@ router.get('/sprints/:sid/stages', async (req, res, next) => {
   }
 })
 
-//TODO test
 router.post('/sprints/:sid/stages', async (req, res, next) => {
   try {
     const sprint = await Sprint.findById(req.params.sid)
@@ -358,7 +352,6 @@ router.post('/sprints/:sid/stages', async (req, res, next) => {
   }
 })
 
-//TODO test
 router.put('/stages/:stid', async (req, res, next) => {
   try {
     const stage = await Stage.findById(req.params.stid)
@@ -371,7 +364,6 @@ router.put('/stages/:stid', async (req, res, next) => {
   }
 })
 
-//TODO test
 router.delete('/stages/:stid', async (req, res, next) => {
   try {
     const stage = await Stage.findById(req.params.stid)
@@ -384,7 +376,6 @@ router.delete('/stages/:stid', async (req, res, next) => {
   }
 })
 
-//TODO test
 router.get('/projects/:pid/tasks', async (req, res, next) => {
   try {
     const project = await Project.findById(req.params.pid)
@@ -397,8 +388,7 @@ router.get('/projects/:pid/tasks', async (req, res, next) => {
   }
 })
 
-//TODO test
-router.post('/project/:pid/tasks', async (req, res, next) => {
+router.post('/projects/:pid/tasks', async (req, res, next) => {
   try {
     const project = await Project.findById(req.params.pid)
     if (!project)
@@ -411,7 +401,6 @@ router.post('/project/:pid/tasks', async (req, res, next) => {
   }
 })
 
-//TODO test
 router.put('/tasks/:tid', async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.tid)
@@ -424,7 +413,6 @@ router.put('/tasks/:tid', async (req, res, next) => {
   }
 })
 
-//TODO test
 router.delete('/tasks/:tid', async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.tid)
@@ -436,9 +424,6 @@ router.delete('/tasks/:tid', async (req, res, next) => {
     next(err)
   }
 })
-
-
-
 
 
 

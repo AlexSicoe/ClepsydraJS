@@ -87,16 +87,15 @@ exports.Sprint = sequelize.define('sprint', {
   startDate: {
     type: Sequelize.DATE,
     allowNull: false,
-    validate: {
-      isBefore: this.finishDate //TODO test
-    }
+    defaultValue: Sequelize.NOW,
+    // validate: {isBefore: this.finishDate },
+
   },
   finishDate: {
     type: Sequelize.DATE,
     allowNull: false,
-    validate: {
-      isAfter: this.startDate
-    }
+    defaultValue: Sequelize.NOW,
+    // validate: {isAfter: this.startDate  }
   }
 })
 exports.Stage = sequelize.define('stage', {
