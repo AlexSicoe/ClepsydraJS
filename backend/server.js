@@ -399,6 +399,7 @@ router.patch('/stages/:stid1/:stid2', async (req, res, next) => {
       ;[pos1, pos2] = [pos2, pos1]
     const update1 = stage1.update({ position: pos1 })
     const update2 = stage2.update({ position: pos2 })
+    await Promise.all([update1, update2])
     res.status(200).send('positions switched')
   } catch (err) {
     next(err)
