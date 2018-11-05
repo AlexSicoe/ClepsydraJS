@@ -22,11 +22,11 @@ var router = express.Router()
 const { User, Project, UserProject, Sprint, Stage, Task } = model
 User.belongsToMany(Project, { through: UserProject })
 Project.belongsToMany(User, { through: UserProject })
-Project.hasMany(Task)
+Project.hasMany(Task, { onDelete: 'cascade', hooks: true })
 Task.belongsTo(Project)
-Project.hasMany(Sprint)
+Project.hasMany(Sprint, { onDelete: 'cascade', hooks: true })
 Sprint.belongsTo(Project)
-Sprint.hasMany(Stage)
+Sprint.hasMany(Stage, { onDelete: 'cascade', hooks: true })
 Stage.belongsTo(Sprint)
 Stage.hasMany(Task)
 Task.belongsTo(Stage)
@@ -328,11 +328,17 @@ router.delete('/sprints/:sid', async (req, res, next) => {
 })
 
 router.get('/sprints/:sid/stages', async (req, res, next) => {
+  const withOptions = {
+    order: [
+      ['position', 'ASC']
+    ]
+  }
+
   try {
     const sprint = await Sprint.findById(req.params.sid)
     if (!sprint)
       res.status(404).send('cannot find sprint')
-    const stages = await Stage.findAll()
+    const stages = await Stage.findAll(withOptions)
     res.status(200).json(stages)
   } catch (err) {
     next(err)
@@ -345,6 +351,8 @@ router.post('/sprints/:sid/stages', async (req, res, next) => {
     if (!sprint)
       res.status(404).send('cannot find sprint')
     const stage = await Stage.create(req.body)
+    let nr = await Stage.count()
+    await stage.update({ position: nr++ })
     sprint.addStage(stage)
     res.status(200).send('stage created')
   } catch (err) {
@@ -371,6 +379,27 @@ router.delete('/stages/:stid', async (req, res, next) => {
       res.status(404).send('cannot find stage')
     stage.destroy()
     res.status(200).send('removed stage')
+  } catch (err) {
+    next(err)
+  }
+})
+
+//TODO test and refactor
+router.patch('/stages/:stid1/:stid2', async (req, res, next) => {
+  try {
+    const findStage1 = Stage.findById(req.params.stid1)
+    const findStage2 = Stage.findById(req.params.stid2)
+    const [stage1, stage2] = await Promise.all([findStage1, findStage2])
+    if (!stage1)
+      res.status(404).send('cannot find stage1')
+    if (!stage2)
+      res.status(404).send('cannot find stage2')
+    let pos1 = stage1.position
+    let pos2 = stage2.position
+      ;[pos1, pos2] = [pos2, pos1]
+    const update1 = stage1.update({ position: pos1 })
+    const update2 = stage2.update({ position: pos2 })
+    res.status(200).send('positions switched')
   } catch (err) {
     next(err)
   }
@@ -425,6 +454,21 @@ router.delete('/tasks/:tid', async (req, res, next) => {
   }
 })
 
+router.post('sprint/:sid/tasks/:tid', async (req, res, next) => {
+  try {
+    const findSprint = Sprint.findById(req.params.sid)
+    const findTask = Task.findById(req.params.tid)
+    const [sprint, task] = await Promise.all([findSprint, findTask])
+    if (!sprint)
+      res.status(404).send('cannot find sprint')
+    if (!task)
+      res.status(404).send('cannot find task')
+    //TODO if sprint doesn't have said task in any of its stages
+    //TODO add into initial stage
+  } catch (err) {
+    next(err)
+  }
+})
 
 
 /*

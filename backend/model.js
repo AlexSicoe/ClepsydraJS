@@ -106,8 +106,12 @@ exports.Stage = sequelize.define('stage', {
       notEmpty: true,
       len: [2, 30],
     }
+  },
+  position: {
+    type: Sequelize.INTEGER,
   }
 })
+
 exports.Task = sequelize.define('task', {
   name: {
     type: Sequelize.STRING,
