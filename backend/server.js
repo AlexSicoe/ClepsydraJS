@@ -338,7 +338,7 @@ router.get('/sprints/:sid/stages', async (req, res, next) => {
     const sprint = await Sprint.findById(req.params.sid)
     if (!sprint)
       res.status(404).send('cannot find sprint')
-    const stages = await Stage.findAll(withOptions)
+    const stages = await sprint.getStages(withOptions)
     res.status(200).json(stages)
   } catch (err) {
     next(err)
@@ -351,8 +351,8 @@ router.post('/sprints/:sid/stages', async (req, res, next) => {
     if (!sprint)
       res.status(404).send('cannot find sprint')
     const stage = await Stage.create(req.body)
-    let nr = await Stage.count()
-    await stage.update({ position: nr++ })
+    let nr = await sprint.countStages()
+    await stage.update({ position: ++nr })
     sprint.addStage(stage)
     res.status(200).send('stage created')
   } catch (err) {
