@@ -4,6 +4,7 @@ const cors = require('cors')
 const Sequelize = require('sequelize')
 const sequelize = new Sequelize('clepsydra', 'root', 'supersecret', {
   dialect: 'mysql',
+  operatorsAliases: false,
   define: {
     timestamps: false,
     underscored: true
@@ -30,10 +31,8 @@ Sprint.hasMany(Stage, { onDelete: 'cascade', hooks: true })
 Stage.belongsTo(Sprint)
 Stage.hasMany(Task)
 Task.belongsTo(Stage)
-User.hasMany(Task, { as: 'assignedTask' })
-const Assignee = Task.belongsTo(User, { as: 'assignee' })
-User.hasMany(Task, { as: 'reportedTask' })
-const Reporter = Task.belongsTo(User, { as: 'reporter' })
+User.hasMany(Task)
+Task.belongsTo(User)
 
 
 const errMsgUser = 'cannot find user'
@@ -398,7 +397,7 @@ router.get('/sprints/:sid/stages', async (req, res, next) => {
 router.post('/sprints/:sid/stages', async (req, res, next) => {
   const options = {
     where: {
-      sprint_id: { [Op.eq]: req.params.sid }
+      sprint_id: req.params.sid
     }
   }
 
@@ -601,6 +600,50 @@ router.delete('/sprints/:sid/tasks/:tid', async (req, res, next) => {
     next(err)
   }
 })
+
+router.post('/tasks/:tid/users/:uid', async (req, res, next) => {
+  //assign task to user
+  try {
+    const findTask = Task.findById(req.params.tid)
+    const findUser = User.findById(req.params.uid)
+    const [task, user] = await Promise.all([findTask, findUser])
+    if (!task) {
+      res.status(404).send(errMsgTask)
+      throw new Error(errMsgTask)
+    }
+    if (!user) {
+      res.status(404).send(errMsgUser)
+      throw new Error(errMsgUser)
+    }
+    await task.setUser(user)
+    res.status(200).send('task assigned to user')
+  } catch (err) {
+    next(err)
+  }
+
+})
+
+router.delete('/tasks/:tid/users/:uid', async (req, res, next) => {
+  //unassign task from user
+  try {
+    const findTask = Task.findById(req.params.tid)
+    const findUser = User.findById(req.params.uid)
+    const [task, user] = await Promise.all([findTask, findUser])
+    if (!task) {
+      res.status(404).send(errMsgTask)
+      throw new Error(errMsgTask)
+    }
+    if (!user) {
+      res.status(404).send(errMsgUser)
+      throw new Error(errMsgUser)
+    }
+    await task.setUser(null)
+    res.status(200).send('task unassigned from user')
+  } catch (err) {
+    next(err)
+  }
+})
+
 
 /*
 router.use((err, req, res, next) => {
