@@ -725,15 +725,12 @@ router.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
   }
 })
 
-
-
-/*
-router.use((err, req, res, next) => {
+app.use((err, req, res, next) => {
   let message = err.status == 500 ? 'some error' : err.message
   console.warn(err, message)
   res.status(500).send('some error')
 })
-*/
+
 app.use('/api', router)
 app.listen(4000)
 
