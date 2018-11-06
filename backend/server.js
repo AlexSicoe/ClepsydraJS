@@ -378,7 +378,8 @@ router.get('/sprints/:sid/stages', async (req, res, next) => {
   const withOptions = {
     order: [
       ['position', 'ASC']
-    ]
+    ],
+    include: [Task]
   }
 
   try {
@@ -531,7 +532,14 @@ router.delete('/tasks/:tid', async (req, res, next) => {
   }
 })
 
-router.post('sprint/:sid/tasks/:tid', async (req, res, next) => {
+router.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
+  //add task to sprint
+  const withOptions = {
+    order: [
+      ['position', 'ASC']
+    ]
+  }
+
   try {
     const findSprint = Sprint.findById(req.params.sid)
     const findTask = Task.findById(req.params.tid)
@@ -544,13 +552,60 @@ router.post('sprint/:sid/tasks/:tid', async (req, res, next) => {
       res.status(404).send(errMsgTask)
       throw new Error(errMsgTask)
     }
-    //TODO if sprint doesn't have said task in any of its stages
-    //TODO add into initial stage
+    //if sprint doesn't have said task in any of its stages
+    //add into initial stage
+    const stages = await sprint.getStages(withOptions)
+
+    // let flag = true
+    for (let i = 0; i < stages.length; i++) {
+      if (await stages[i].hasTask(task)) {
+        // flag = false
+        res.status(404).send('sprint already contains this task')
+        throw new Error('sprint already contains this task')
+      }
+    }
+    await stages[0].addTask(task)
+    res.status(200).send('task added to sprint')
+
+
+
   } catch (err) {
     next(err)
   }
 })
 
+router.delete('/sprints/:sid/tasks/:tid', async (req, res, next) => {
+  //if task belongs to a stage within this sprint, remove it
+  try {
+    const findSprint = Sprint.findById(req.params.sid)
+    const findTask = Task.findById(req.params.tid)
+    const [sprint, task] = await Promise.all([findSprint, findTask])
+    if (!sprint) {
+      res.status(404).send(errMsgSprint)
+      throw new Error(errMsgSprint)
+    }
+    if (!task) {
+      res.status(404).send(errMsgTask)
+      throw new Error(errMsgTask)
+    }
+    const stages = await sprint.getStages()
+
+    let flag = false
+    for (let i = 0; i < stages.length; i++) {
+      if (await stages[i].hasTask(task)) {
+        await stages[i].removeTask(task)
+        res.status(200).send('task removed')
+        flag = true
+        break
+      }
+    }
+    if (flag == false) {
+      res.status(404).send(`${errMsgTask} in this sprint`)
+    }
+  } catch (err) {
+    next(err)
+  }
+})
 
 /*
 router.use((err, req, res, next) => {
