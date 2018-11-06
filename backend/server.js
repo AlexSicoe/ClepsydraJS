@@ -556,19 +556,14 @@ router.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
     //add into initial stage
     const stages = await sprint.getStages(withOptions)
 
-    // let flag = true
-    for (let i = 0; i < stages.length; i++) {
-      if (await stages[i].hasTask(task)) {
-        // flag = false
+    for (let stage of stages) {
+      if (await stage.hasTask(task)) {
         res.status(404).send('sprint already contains this task')
         throw new Error('sprint already contains this task')
       }
     }
     await stages[0].addTask(task)
     res.status(200).send('task added to sprint')
-
-
-
   } catch (err) {
     next(err)
   }
@@ -591,9 +586,9 @@ router.delete('/sprints/:sid/tasks/:tid', async (req, res, next) => {
     const stages = await sprint.getStages()
 
     let flag = false
-    for (let i = 0; i < stages.length; i++) {
-      if (await stages[i].hasTask(task)) {
-        await stages[i].removeTask(task)
+    for (let stage of stages) {
+      if (await stage.hasTask(task)) {
+        await stage.removeTask(task)
         res.status(200).send('task removed')
         flag = true
         break
