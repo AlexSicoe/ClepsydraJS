@@ -452,6 +452,7 @@ router.delete('/stages/:stid', async (req, res, next) => {
 
 //TODO test and refactor
 router.patch('/stages/:stid1/:stid2', async (req, res, next) => {
+  //switch stages positions
   try {
     const findStage1 = Stage.findById(req.params.stid1)
     const findStage2 = Stage.findById(req.params.stid2)
@@ -554,7 +555,6 @@ router.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
     //if sprint doesn't have said task in any of its stages
     //add into initial stage
     const stages = await sprint.getStages(withOptions)
-
     for (let stage of stages) {
       if (await stage.hasTask(task)) {
         res.status(404).send('sprint already contains this task')
@@ -643,6 +643,88 @@ router.delete('/tasks/:tid/users/:uid', async (req, res, next) => {
     next(err)
   }
 })
+
+router.patch('/stages/:stid1/:stid2/tasks/:tid', async (req, res, next) => {
+  //move task from one stage to another
+  //TODO transaction
+  try {
+    const findStage1 = Stage.findById(req.params.stid1)
+    const findStage2 = Stage.findById(req.params.stid2)
+    const findTask = Task.findById(req.params.tid)
+    const [stage1, stage2, task] = await Promise.all([
+      findStage1, findStage2, findTask])
+    if (!(stage1 && stage2)) {
+      res.status(404).send(errMsgStage)
+      throw new Error(errMsgStage)
+    }
+    if (!task) {
+      res.status(404).send(errMsgTask)
+      throw new Error(errMsgTask)
+    }
+    //YAGNI?
+    if (!await stage1.hasTask(task)) {
+      res.status(404).send('stage1 doesn\'t have task')
+      throw new Error('stage1 doesn\'t have task')
+    }
+    const removeTask = stage1.removeTask(task)
+    const addTask = stage2.addTask(task)
+    await Promise.all([removeTask, addTask])
+    res.status(200).send('task moved between stages')
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
+  //move task from one sprint to another
+  //adds task to first stage of 2nd sprint
+  //TODO transaction
+  //TODO maybe use '/sprints/:sid/tasks/:tid' request called from here
+  const withOptions = {
+    order: [
+      ['position', 'ASC']
+    ]
+  }
+
+  try {
+    const findSprint1 = Sprint.findById(req.params.sid1)
+    const findSprint2 = Sprint.findById(req.params.sid2)
+    const findTask = Task.findById(req.params.tid)
+    const [sprint1, sprint2, task] = await Promise.all([
+      findSprint1, findSprint2, findTask
+    ])
+    if (!(sprint1 && sprint2)) {
+      res.status(404).send(errMsgSprint)
+      throw new Error(errMsgSprint)
+    }
+    if (!task) {
+      res.status(404).send(errMsgTask)
+      throw new Error(errMsgTask)
+    }
+    //find and remove task in sprint1
+    let flag = false
+    const stages1 = await sprint1.getStages()
+    for (let stage of stages1) {
+      if (await stage.hasTask(task)) {
+        await stage.removeTask(task)
+        flag = true
+        break
+      }
+    }
+    if (flag == false) {
+      res.status(404).send(`${errMsgTask} in sprint1`)
+      throw new Error(`${errMsgTask} in sprint1`)
+    }
+
+    //add to first stage in sprint2
+    const stages2 = await sprint2.getStages(withOptions)
+    await stages2[0].addTask(task)
+    res.status(200).send('task moved between sprints')
+  } catch (err) {
+    next(err)
+  }
+})
+
 
 
 /*
