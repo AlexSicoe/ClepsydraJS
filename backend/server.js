@@ -1,8 +1,12 @@
+'use strict'
+require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const moment = require('moment')
+const crypto = require('crypto')
 const Sequelize = require('sequelize')
-const sequelize = new Sequelize('clepsydra', 'root', 'supersecret', {
+const sequelize = new Sequelize(process.env.DB, process.env.DB_USER, process.env.DB_PASS, {
   dialect: 'mysql',
   operatorsAliases: false,
   define: {
@@ -18,7 +22,13 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cors())
-var router = express.Router()
+
+let adminRouter = express.Router()
+let authRouter = express.Router()
+let apiRouter = express.Router()
+app.use('/admin', adminRouter)
+app.use('/auth', authRouter)
+app.use('/api', apiRouter)
 
 const { User, Project, UserProject, Sprint, Stage, Task } = model
 User.belongsToMany(Project, { through: UserProject })
@@ -43,11 +53,35 @@ const errMsgSprint = 'cannot find sprint'
 const errMsgStage = 'cannot find stage'
 
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Welcome to our wonderful REST API !!!' })
+
+apiRouter.use(async (req, res, next) => {
+  let { token } = req.headers
+  try {
+    let user = await User.scope('withCredentials').findOne({ where: { token } })
+    if (!user) {
+      res.status(403).send({ 'message': 'invalid user' })
+      return
+    }
+    const timeDiff = moment().diff(user.expiry, 'seconds')
+    console.warn(`${timeDiff}seconds`)
+    if (timeDiff >= 0) {
+      res.status(403).send({ 'message': 'authentication expired' })
+      return
+    }
+    next()
+  } catch (err) {
+    next(err)
+  }
 })
 
-router.get('/create', async (req, res, next) => {
+
+const refreshToken = (user) => {
+  user.expiry = moment().add(3600, 'seconds')
+  user.token = crypto.randomBytes(64).toString('hex')
+}
+
+
+adminRouter.get('/create', async (req, res, next) => {
   try {
     const results = await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', { raw: true })
     console.table([...results])
@@ -58,7 +92,7 @@ router.get('/create', async (req, res, next) => {
   }
 })
 
-router.post('/register', async (req, res, next) => {
+adminRouter.post('/register', async (req, res, next) => {
   try {
     await User.create(req.body)
     res.status(201).send('user registered successfully')
@@ -67,26 +101,33 @@ router.post('/register', async (req, res, next) => {
   }
 })
 
-router.post('/login', async (req, res, next) => {
-  const whereDetailsMatch = {
-    where: {
-      email: req.body.email,
-      password: req.body.password
-    }
-  }
+authRouter.post('/login', async (req, res, next) => {
+  const { username, password } = req.body
+  const whereCredentialsMatch = { where: { username, password } }
+
   try {
-    let user = await User.findOne(whereDetailsMatch)
+    let user = await User.findOne(whereCredentialsMatch)
     if (!user) {
       res.status(401).send('mail and password do not match')
       throw new Error('mail and password do not match')
     }
-    res.status(200).json(user)
+    refreshToken(user)
+    await user.save()
+    res.status(200).json({
+      'message': 'you are in',
+      'token': user.token
+    })
   } catch (err) {
     next(err)
   }
 })
 
-router.get('/users', async (req, res, next) => {
+apiRouter.get('/', (req, res) => {
+  res.json({ message: 'Welcome to our wonderful REST API !!!' })
+})
+
+
+apiRouter.get('/users', async (req, res, next) => {
   try {
     let users = await User.findAll()
     res.status(200).json(users)
@@ -95,7 +136,7 @@ router.get('/users', async (req, res, next) => {
   }
 })
 
-router.get('/users/:uid', async (req, res, next) => {
+apiRouter.get('/users/:uid', async (req, res, next) => {
   try {
     let user = await User.findById(req.params.uid, { include: [Project] })
     if (!user) {
@@ -108,7 +149,7 @@ router.get('/users/:uid', async (req, res, next) => {
   }
 })
 
-router.put('/users/:uid', async (req, res, next) => {
+apiRouter.put('/users/:uid', async (req, res, next) => {
   try {
     let user = await User.findById(req.params.uid)
     if (!user) {
@@ -124,7 +165,7 @@ router.put('/users/:uid', async (req, res, next) => {
 
 
 
-router.delete('/users/:uid', async (req, res, next) => {
+apiRouter.delete('/users/:uid', async (req, res, next) => {
   try {
     let user = await User.findById(req.params.uid)
     if (!user) {
@@ -138,7 +179,7 @@ router.delete('/users/:uid', async (req, res, next) => {
   }
 })
 
-router.get('/users/:uid/projects', async (req, res, next) => {
+apiRouter.get('/users/:uid/projects', async (req, res, next) => {
   //get projects from a certain user
   try {
     let user = await User.findById(req.params.uid)
@@ -154,7 +195,7 @@ router.get('/users/:uid/projects', async (req, res, next) => {
   }
 })
 
-router.post('/users/:uid/projects', async (req, res, next) => {
+apiRouter.post('/users/:uid/projects', async (req, res, next) => {
   //user makes a project
   let through = {
     role: 'Admin'
@@ -175,7 +216,7 @@ router.post('/users/:uid/projects', async (req, res, next) => {
   }
 })
 
-router.get('/projects', async (req, res, next) => {
+apiRouter.get('/projects', async (req, res, next) => {
   try {
     let projects = await Project.findAll()
     res.status(200).json(projects)
@@ -184,7 +225,7 @@ router.get('/projects', async (req, res, next) => {
   }
 })
 
-router.get('/projects/:pid', async (req, res, next) => {
+apiRouter.get('/projects/:pid', async (req, res, next) => {
   try {
     let project = await Project.findById(req.params.pid, { include: [User] })
     if (!project) {
@@ -197,7 +238,7 @@ router.get('/projects/:pid', async (req, res, next) => {
   }
 })
 
-router.put('/projects/:pid', async (req, res, next) => {
+apiRouter.put('/projects/:pid', async (req, res, next) => {
   try {
     let project = await Project.findById(req.params.pid)
     if (!project) {
@@ -212,7 +253,7 @@ router.put('/projects/:pid', async (req, res, next) => {
   }
 })
 
-router.delete('/projects/:pid', async (req, res, next) => {
+apiRouter.delete('/projects/:pid', async (req, res, next) => {
   try {
     let project = await Project.findById(req.params.pid)
     if (!project) {
@@ -226,7 +267,7 @@ router.delete('/projects/:pid', async (req, res, next) => {
   }
 })
 
-router.get('/projects/:pid/users', async (req, res, next) => {
+apiRouter.get('/projects/:pid/users', async (req, res, next) => {
   try {
     let project = await Project.findById(req.params.pid)
     if (!project) {
@@ -240,7 +281,7 @@ router.get('/projects/:pid/users', async (req, res, next) => {
   }
 })
 
-router.post('/projects/:pid/users/:uid', async (req, res, next) => {
+apiRouter.post('/projects/:pid/users/:uid', async (req, res, next) => {
   //adds user to project
   const through = {
     role: 'User'
@@ -269,7 +310,7 @@ router.post('/projects/:pid/users/:uid', async (req, res, next) => {
   }
 })
 
-router.put('/projects/:pid/users/:uid', async (req, res, next) => {
+apiRouter.put('/projects/:pid/users/:uid', async (req, res, next) => {
   //edits joint data of user and project... 
   //think about UserProject roles
   const whereDetailsMatch = {
@@ -292,7 +333,7 @@ router.put('/projects/:pid/users/:uid', async (req, res, next) => {
   }
 })
 
-router.delete('/projects/:pid/users/:uid', async (req, res, next) => {
+apiRouter.delete('/projects/:pid/users/:uid', async (req, res, next) => {
   //removes user from project
   try {
     const findProject = Project.findById(req.params.pid)
@@ -315,7 +356,7 @@ router.delete('/projects/:pid/users/:uid', async (req, res, next) => {
   }
 })
 
-router.get('/projects/:pid/sprints', async (req, res, next) => {
+apiRouter.get('/projects/:pid/sprints', async (req, res, next) => {
   try {
     const project = await Project.findById(req.params.pid)
     if (!project) {
@@ -329,7 +370,7 @@ router.get('/projects/:pid/sprints', async (req, res, next) => {
   }
 })
 
-router.post('/projects/:pid/sprints', async (req, res, next) => {
+apiRouter.post('/projects/:pid/sprints', async (req, res, next) => {
   try {
     const project = await Project.findById(req.params.pid)
     if (!project) {
@@ -344,7 +385,7 @@ router.post('/projects/:pid/sprints', async (req, res, next) => {
   }
 })
 
-router.put('/sprints/:sid', async (req, res, next) => {
+apiRouter.put('/sprints/:sid', async (req, res, next) => {
   try {
     const sprint = await Sprint.findById(req.params.sid)
     if (!sprint) {
@@ -358,7 +399,7 @@ router.put('/sprints/:sid', async (req, res, next) => {
   }
 })
 
-router.delete('/sprints/:sid', async (req, res, next) => {
+apiRouter.delete('/sprints/:sid', async (req, res, next) => {
   //TODO remove from project with all its stages, atomically
   try {
     const sprint = await Sprint.findById(req.params.sid)
@@ -373,7 +414,7 @@ router.delete('/sprints/:sid', async (req, res, next) => {
   }
 })
 
-router.get('/sprints/:sid/stages', async (req, res, next) => {
+apiRouter.get('/sprints/:sid/stages', async (req, res, next) => {
   const withOptions = {
     order: [
       ['position', 'ASC']
@@ -394,7 +435,7 @@ router.get('/sprints/:sid/stages', async (req, res, next) => {
   }
 })
 
-router.post('/sprints/:sid/stages', async (req, res, next) => {
+apiRouter.post('/sprints/:sid/stages', async (req, res, next) => {
   const options = {
     where: {
       sprint_id: req.params.sid
@@ -422,7 +463,7 @@ router.post('/sprints/:sid/stages', async (req, res, next) => {
   }
 })
 
-router.put('/stages/:stid', async (req, res, next) => {
+apiRouter.put('/stages/:stid', async (req, res, next) => {
   try {
     const stage = await Stage.findById(req.params.stid)
     if (!stage) {
@@ -436,7 +477,7 @@ router.put('/stages/:stid', async (req, res, next) => {
   }
 })
 
-router.delete('/stages/:stid', async (req, res, next) => {
+apiRouter.delete('/stages/:stid', async (req, res, next) => {
   try {
     const stage = await Stage.findById(req.params.stid)
     if (!stage) {
@@ -451,7 +492,7 @@ router.delete('/stages/:stid', async (req, res, next) => {
 })
 
 //TODO test and refactor
-router.patch('/stages/:stid1/:stid2', async (req, res, next) => {
+apiRouter.patch('/stages/:stid1/:stid2', async (req, res, next) => {
   //switch stages positions
   try {
     const findStage1 = Stage.findById(req.params.stid1)
@@ -473,7 +514,7 @@ router.patch('/stages/:stid1/:stid2', async (req, res, next) => {
   }
 })
 
-router.get('/projects/:pid/tasks', async (req, res, next) => {
+apiRouter.get('/projects/:pid/tasks', async (req, res, next) => {
   try {
     const project = await Project.findById(req.params.pid)
     if (!project) {
@@ -487,7 +528,7 @@ router.get('/projects/:pid/tasks', async (req, res, next) => {
   }
 })
 
-router.post('/projects/:pid/tasks', async (req, res, next) => {
+apiRouter.post('/projects/:pid/tasks', async (req, res, next) => {
   try {
     const project = await Project.findById(req.params.pid)
     if (!project) {
@@ -503,7 +544,7 @@ router.post('/projects/:pid/tasks', async (req, res, next) => {
 })
 
 
-router.put('/tasks/:tid', async (req, res, next) => {
+apiRouter.put('/tasks/:tid', async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.tid)
     if (!task) {
@@ -518,7 +559,7 @@ router.put('/tasks/:tid', async (req, res, next) => {
   }
 })
 
-router.delete('/tasks/:tid', async (req, res, next) => {
+apiRouter.delete('/tasks/:tid', async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.tid)
     if (!task) {
@@ -532,7 +573,7 @@ router.delete('/tasks/:tid', async (req, res, next) => {
   }
 })
 
-router.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
+apiRouter.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   //add task to sprint
   const withOptions = {
     order: [
@@ -568,7 +609,7 @@ router.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   }
 })
 
-router.delete('/sprints/:sid/tasks/:tid', async (req, res, next) => {
+apiRouter.delete('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   //if task belongs to a stage within this sprint, remove it
   try {
     const findSprint = Sprint.findById(req.params.sid)
@@ -601,7 +642,7 @@ router.delete('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   }
 })
 
-router.post('/tasks/:tid/users/:uid', async (req, res, next) => {
+apiRouter.post('/tasks/:tid/users/:uid', async (req, res, next) => {
   //assign task to user
   try {
     const findTask = Task.findById(req.params.tid)
@@ -623,7 +664,7 @@ router.post('/tasks/:tid/users/:uid', async (req, res, next) => {
 
 })
 
-router.delete('/tasks/:tid/users/:uid', async (req, res, next) => {
+apiRouter.delete('/tasks/:tid/users/:uid', async (req, res, next) => {
   //unassign task from user
   try {
     const findTask = Task.findById(req.params.tid)
@@ -644,7 +685,7 @@ router.delete('/tasks/:tid/users/:uid', async (req, res, next) => {
   }
 })
 
-router.patch('/stages/:stid1/:stid2/tasks/:tid', async (req, res, next) => {
+apiRouter.patch('/stages/:stid1/:stid2/tasks/:tid', async (req, res, next) => {
   //move task from one stage to another
   //TODO transaction
   try {
@@ -675,7 +716,7 @@ router.patch('/stages/:stid1/:stid2/tasks/:tid', async (req, res, next) => {
   }
 })
 
-router.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
+apiRouter.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
   //move task from one sprint to another
   //adds task to first stage of 2nd sprint
   //TODO transaction
@@ -731,6 +772,6 @@ app.use((err, req, res, next) => {
   res.status(500).send('some error')
 })
 
-app.use('/api', router)
+
 app.listen(4000)
 

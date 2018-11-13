@@ -35,6 +35,8 @@ exports.User = sequelize.define('user', {
       isEmail: true,
     },
   },
+  token: Sequelize.STRING,
+  expiry: Sequelize.DATE,
   timestamp: {
     type: Sequelize.DATE,
     allowNull: false,
@@ -42,10 +44,10 @@ exports.User = sequelize.define('user', {
   },
 }, {
     defaultScope: {
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: ['password', 'token', 'expiry'] },
     },
     scopes: {
-      withPassword: {
+      withCredentials: {
         attributes: {},
       }
     }
