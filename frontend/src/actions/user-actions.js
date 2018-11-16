@@ -1,0 +1,48 @@
+import axios from 'axios'
+
+const SERVER = 'http://localhost:4000'
+const ADMIN = `${SERVER}/admin`
+const AUTH = `${SERVER}/auth`
+const API = `${SERVER}/api`
+
+
+export const setUsername = (username) => ({
+  type: 'SET_USERNAME',
+  payload: username
+})
+
+export const setPassword = (password) => ({
+  type: 'SET_PASSWORD',
+  payload: password
+})
+
+export const setEmail = (email) => ({
+  type: 'SET_EMAIL',
+  payload: email
+})
+
+//requests
+export const register = () => ({
+  type: 'REGISTER',
+  payload: axios.post(`${ADMIN}/register`)
+})
+
+export const login = () => ({
+  type: 'LOGIN',
+  payload: axios.post(`${AUTH}/login`)
+})
+
+export const getUser = (id) => ({
+  type: 'GET_USER',
+  payload: axios.get(`${API}/users/${id}`)
+})
+
+export const putUser = (id) => ({
+  type: 'PUT_USER',
+  payload: axios.put(`${API}/users/${id}`)
+})
+
+export const deleteUser = (id) => ({
+  type: 'DELETE_USER',
+  payload: axios.delete(`${API}/users/${id}`)
+})

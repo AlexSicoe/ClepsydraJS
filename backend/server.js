@@ -22,7 +22,7 @@ const model = require('./model')
 
 const PORT = 4000
 const TOKEN_LIFETIME = 3600000 //in seconds
-const CRYPTO_BYTES = 64
+const TOKEN_BYTES = 64
 
 const ERR_MSG_USER = 'cannot find user'
 const ERR_MSG_PROJECT = 'cannot find project'
@@ -83,7 +83,7 @@ apiRouter.use(async (req, res, next) => {
 
 const refreshToken = (user) => {
   user.expiry = moment().add(TOKEN_LIFETIME, 'seconds')
-  user.token = crypto.randomBytes(CRYPTO_BYTES).toString('hex')
+  user.token = crypto.randomBytes(TOKEN_BYTES).toString('hex')
 }
 
 
