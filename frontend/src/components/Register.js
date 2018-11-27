@@ -5,6 +5,7 @@ import RaisedButton from 'material-ui/RaisedButton'
 import TextField from 'material-ui/TextField'
 import { getUser, register, setUsername, setPassword, setEmail } from '../actions/user-actions'
 import { connect } from 'react-redux'
+import displayServerMessage from '../utils/displayServerMessage'
 
 
 const mapStateToProps = (state) => ({
@@ -13,6 +14,8 @@ const mapStateToProps = (state) => ({
   password: state.user.password,
   email: state.user.email,
   token: state.user.token,
+
+  message: state.user.message,
 
   error: state.user.error,
   fetching: state.user.fetching,
@@ -24,11 +27,16 @@ const mapDispatch = {
   onRegister: register,
   onSetUsername: setUsername,
   onSetPassword: setPassword,
-  onSetEmail: setEmail
+  onSetEmail: setEmail,
 }
 
 class Register extends Component {
+
+
   render() {
+    let { message } = this.props
+    displayServerMessage(message)
+
     return (
       <div>
         <MuiThemeProvider>

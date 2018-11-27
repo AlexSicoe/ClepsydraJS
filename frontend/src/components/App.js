@@ -3,7 +3,7 @@ import AuthScreen from './AuthScreen'
 import './App.css'
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { getUser, login, register, setUsername, setPassword, setEmail } from '../actions/user-actions'
+import { getUser, } from '../actions/user-actions'
 
 import HomeScreen from './HomeScreen'
 

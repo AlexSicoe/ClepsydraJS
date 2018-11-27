@@ -21,6 +21,10 @@ export const setEmail = (email) => ({
   payload: email
 })
 
+export const clearMessage = () => ({
+  type: 'CLEAR_MESSAGE',
+})
+
 //requests
 export const register = (credentials) => ({
   type: 'REGISTER',

@@ -29,6 +29,12 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         email: action.payload
       }
+    case 'CLEAR_MESSAGE':
+      return {
+        ...state,
+        error: null,
+        message: null,
+      }
 
     case 'REGISTER_PENDING':
       return {
@@ -49,10 +55,12 @@ export default (state = INITIAL_STATE, action) => {
     case 'REGISTER_REJECTED':
       return {
         ...state,
+        message: action.payload.response.data.message,
         error: action.payload,
         fetching: false,
         fetched: false,
       }
+
 
     case 'LOGIN_PENDING':
       return {
@@ -71,9 +79,11 @@ export default (state = INITIAL_STATE, action) => {
         token: action.payload.data.token,
         message: action.payload.data.message,
       }
+
     case 'LOGIN_REJECTED':
       return {
         ...state,
+        message: action.payload.response.data.message,
         error: action.payload,
         fetching: false,
         fetched: false,

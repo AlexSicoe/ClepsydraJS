@@ -6,6 +6,7 @@ import React, { Component } from 'react'
 import TextField from 'material-ui/TextField'
 import { getUser, login, setUsername, setPassword, setEmail } from '../actions/user-actions'
 import { connect } from 'react-redux'
+import displayServerMessage from '../utils/displayServerMessage'
 
 
 import HomeScreen from './HomeScreen'
@@ -15,6 +16,8 @@ const mapStateToProps = (state) => ({
 	password: state.user.password,
 	email: state.user.email,
 	token: state.user.token,
+
+	message: state.user.message,
 
 	error: state.user.error,
 	fetching: state.user.fetching,
@@ -26,23 +29,27 @@ const mapDispatch = {
 	onLogin: login,
 	onSetUsername: setUsername,
 	onSetPassword: setPassword,
-	onSetEmail: setEmail
+	onSetEmail: setEmail,
 }
 
 class Login extends Component {
 
 	render() {
+		let { message } = this.props
+		displayServerMessage(message)
+
+
 		return (
 			this.props.token !== '' ? (<RedirectToHomeScreen email={this.props.email} />) : //TODO modify
-				<div>
+				<>
 					<MuiThemeProvider>
 						<div>
 							<AppBar title="Login" />
 							<TextField
-								hintText="Enter your Email"
-								floatingLabelText="Email"
+								hintText="Enter your Username"
+								floatingLabelText="Username"
 								onChange={(event, newValue) =>
-									this.props.onSetEmail(newValue)
+									this.props.onSetUsername(newValue)
 								} />
 							<br />
 							<TextField
@@ -60,9 +67,16 @@ class Login extends Component {
 								onClick={(event) => this.handleClick(event)} />
 						</div>
 					</MuiThemeProvider>
-				</div>
+				</>
 		)
 	}
+
+	// displayServerMessage(message) {
+	// 	if (message) {
+	// 		alert(message)
+	// 		this.props.onClearMessage()
+	// 	}
+	// }
 
 	handleClick(event) {
 		let credentials = {
