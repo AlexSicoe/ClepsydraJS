@@ -34,12 +34,12 @@ const mapDispatch = {
 
 class Login extends Component {
 	render() {
-		let { message, token, email } = this.props
+		let { message, token, error, email } = this.props
 		displayMessage(message)
 
 
 		return (
-			token !== '' ? (<RedirectToHomeScreen email={email} />) : //TODO modify
+			token && !error !== '' ? (<RedirectToHomeScreen email={email} />) : //TODO modify
 				<>
 					<MuiThemeProvider>
 						<div>

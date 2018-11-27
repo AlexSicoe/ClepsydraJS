@@ -1,18 +1,16 @@
 import React, { Component } from 'react'
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import RaisedButton from 'material-ui/RaisedButton'
-import { BroswerRouter as Router, Route, NavLink as Link } from "react-router-dom";
 import { connect } from 'react-redux'
 
 import Login from './Login'
 import Register from './Register'
+import AuthFooter from './AuthFooter';
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state) => {
 
-})
+}
 
 const mapDispatch = {
- 
+
 }
 
 
@@ -40,10 +38,11 @@ class AuthScreen extends Component {
     return (
       <>
         <Login />
-        <Footer
+        <AuthFooter
           loginMessage="Not Registered yet? Go to Registration"
           buttonLabel="Register"
           handleClick={this.handleClick}
+
         />
       </>
     )
@@ -53,7 +52,7 @@ class AuthScreen extends Component {
     return (
       <>
         <Register handleSuccess={this.redirectToLogin} />
-        <Footer
+        <AuthFooter
           loginMessage="Already registered? Go to Login"
           buttonLabel="Login"
           handleClick={this.handleClick}
@@ -82,23 +81,7 @@ class AuthScreen extends Component {
   }
 }
 
-const Footer = (props) =>
-  (
-    <>
-      {props.loginMessage}
-      <MuiThemeProvider>
-        <div>
-          <RaisedButton label={props.buttonLabel}
-            primary={true}
-            style={style}
-            onClick={(event) => props.handleClick(event)} />
-        </div>
-      </MuiThemeProvider>
-    </>
-  )
 
-const style = {
-  margin: 15
-}
+
 
 export default connect(mapStateToProps, mapDispatch)(AuthScreen)

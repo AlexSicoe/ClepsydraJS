@@ -6,8 +6,8 @@ const INITIAL_STATE = {
   username: '',
   password: '',
   email: '',
-  token: '',
 
+  token: null,
   message: null
 }
 
@@ -118,7 +118,7 @@ export default (state = INITIAL_STATE, action) => {
         username: '',
         password: '',
         email: '',
-        token: '',
+        token: null,
       }
 
     default:
