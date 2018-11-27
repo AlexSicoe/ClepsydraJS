@@ -1,27 +1,39 @@
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import AppBar from 'material-ui/AppBar'
 import RaisedButton from 'material-ui/RaisedButton'
-import TextField from 'material-ui/TextField'
-import axios from 'axios'
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import React, { Component } from 'react'
+import TextField from 'material-ui/TextField'
+import { getUser, login, setUsername, setPassword, setEmail } from '../actions/user-actions'
+import { connect } from 'react-redux'
+
 
 import HomeScreen from './HomeScreen'
 
-export default class Login extends Component {
-	constructor(props) {
-		super(props)
+const mapStateToProps = (state) => ({
+	username: state.user.username,
+	password: state.user.password,
+	email: state.user.email,
+	token: state.user.token,
 
-		this.state = {
-			email: '',
-			password: '',
-			isAuthorized: false,
-		}
-	}
+	error: state.user.error,
+	fetching: state.user.fetching,
+	fetched: state.user.fetched
+})
+
+const mapDispatch = {
+	onGetUser: getUser,
+	onLogin: login,
+	onSetUsername: setUsername,
+	onSetPassword: setPassword,
+	onSetEmail: setEmail
+}
+
+class Login extends Component {
 
 	render() {
 		return (
-			this.state.isAuthorized ? (<RedirectToHomeScreen email={this.state.email} />) :
+			this.props.token !== '' ? (<RedirectToHomeScreen email={this.props.email} />) : //TODO modify
 				<div>
 					<MuiThemeProvider>
 						<div>
@@ -30,7 +42,7 @@ export default class Login extends Component {
 								hintText="Enter your Email"
 								floatingLabelText="Email"
 								onChange={(event, newValue) =>
-									this.setState({ email: newValue })
+									this.props.onSetEmail(newValue)
 								} />
 							<br />
 							<TextField
@@ -38,7 +50,7 @@ export default class Login extends Component {
 								hintText="Enter your password"
 								floatingLabelText="Password"
 								onChange={(event, newValue) =>
-									this.setState({ password: newValue })
+									this.props.onSetPassword(newValue)
 								} />
 							<br />
 							<RaisedButton
@@ -53,30 +65,39 @@ export default class Login extends Component {
 	}
 
 	handleClick(event) {
-		const SERVER = 'http://localhost:4000/api'
-		var payload = {
-			'email': this.state.email,
-			'password': this.state.password
+		let credentials = {
+			'username': this.props.username,
+			'email': this.props.email,
+			'password': this.props.password
 		}
-		axios.post(SERVER + '/login', payload)
-			.then((response) => {
-				console.log(response)
-				if (response.status === 200) {
-					console.log('Login Successful')
-					this.setState({ isAuthorized: true }) //TODO, token in state, verify with token
 
-				} else if (response.status === 401) {
-					console.log('Email & Password do not match') //FIXME gets caught as error
-					alert('Email & Password do not match')
-					// this.setState({ isAuthorized: false})
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-			})
+		this.props.onLogin(credentials)
+
+		// const SERVER = 'http://localhost:4000/api'
+		// var payload = {
+		// 	'email': this.state.email,
+		// 	'password': this.state.password
+		// }
+		// axios.post(SERVER + '/login', payload)
+		// 	.then((response) => {
+		// 		console.log(response)
+		// 		if (response.status === 200) {
+		// 			console.log('Login Successful')
+		// 			this.setState({ isAuthorized: true }) //TODO, token in state, verify with token
+
+		// 		} else if (response.status === 401) {
+		// 			console.log('Email & Password do not match') //FIXME gets caught as error
+		// 			alert('Email & Password do not match')
+		// 			// this.setState({ isAuthorized: false})
+		// 		}
+		// 	})
+		// 	.catch((error) => {
+		// 		console.log(error);
+		// 	})
 	}
 
 }
+
 const style = {
 	margin: 15
 }
@@ -99,3 +120,6 @@ const RedirectToHomeScreen = (props) =>
 			</Router>
 		</div>
 	)
+
+
+export default connect(mapStateToProps, mapDispatch)(Login)

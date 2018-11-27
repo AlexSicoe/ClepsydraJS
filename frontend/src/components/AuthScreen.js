@@ -2,18 +2,36 @@ import React, { Component } from 'react'
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import RaisedButton from 'material-ui/RaisedButton'
 import { BroswerRouter as Router, Route, NavLink as Link } from "react-router-dom";
+import { connect } from 'react-redux'
+import { getUser, login, register, setUsername, setPassword, setEmail } from '../actions/user-actions'
 
 import Login from './Login'
 import Register from './Register'
 
-export default class LoginScreen extends Component {
+const mapStateToProps = (state) => ({
+  // isAuthorized: state.user.isAuthorized,
+  user: state.user.user,
+  error: state.user.error,
+  fetching: state.user.fetching,
+  fetched: state.user.fetched
+})
+
+const mapDispatch = {
+  onGetUser: getUser,
+  onLogin: login,
+  onRegister: register,
+  onSetUsername: setUsername,
+  onSetPassword: setPassword,
+  onSetEmail: setEmail
+}
+
+
+class AuthScreen extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      email: '',
-      password: '',
-      isLogin: true
+      isDisplayingLogin: true
     }
 
     this.redirectToLogin = this.redirectToLogin.bind(this)
@@ -23,7 +41,7 @@ export default class LoginScreen extends Component {
   render() {
     return (
       <div className="loginScreen">
-        {this.state.isLogin ? this.renderLogin() : this.renderRegister()}
+        {this.state.isDisplayingLogin ? this.renderLogin() : this.renderRegister()}
       </div>
     )
   }
@@ -57,20 +75,20 @@ export default class LoginScreen extends Component {
   handleClick(e) {
     // console.log("event: ", event)
     e.preventDefault()
-    this.state.isLogin ?
+    this.state.isDisplayingLogin ?
       this.setState({
-        isLogin: false
+        isDisplayingLogin: false
       })
       :
       this.setState({
-        isLogin: true
+        isDisplayingLogin: true
       })
 
   }
 
   redirectToLogin() {
     this.setState({
-      isLogin: true
+      isDisplayingLogin: true
     })
   }
 }
@@ -93,3 +111,5 @@ const Footer = (props) =>
 const style = {
   margin: 15
 }
+
+export default connect(mapStateToProps, mapDispatch)(AuthScreen)

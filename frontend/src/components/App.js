@@ -1,20 +1,29 @@
 import React, { Component } from 'react'
-import LoginScreen from './LoginScreen'
+import AuthScreen from './AuthScreen'
 import './App.css'
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { getUser, login, register, setUsername, setPassword, setEmail } from '../actions/user-actions'
+
 import HomeScreen from './HomeScreen'
 
-export default class App extends Component {
-	constructor(props) {
-		super(props)
 
-		this.state = {
-			isAuthorized: false,
-		}
-	}
+
+
+const mapStateToProps = (state) => ({
+	token: state.user.token,
+})
+
+const mapDispatch = {
+	
+}
+
+
+class App extends Component {
 
 	componentWillMount() {
-		//TODO Ask server if logged in
+		//TODO Login with persisted token
+		//if token expired, redirect to login
 	}
 
 	render() {
@@ -22,21 +31,16 @@ export default class App extends Component {
 		return (
 			<Router>
 				<>
-					<Route path="/home" render={() =>
-						<HomeScreen email={email} />
-					} />
-					<Route path="/login" render={() =>
-						<LoginScreen /*TODO props*/ />
+					<Route path="/auth" render={() =>
+						<AuthScreen /*TODO props*/ />
 					} />
 					<Route exact path="/" render={() => (
-						this.state.isAuthorized ? (
-							<Redirect to="/home" />
-						) : (
-								<Redirect to="/login" />
-							)
+						<Redirect to="/auth" />
 					)} />
 				</>
 			</Router>
 		)
 	}
 }
+
+export default connect(mapStateToProps, mapDispatch)(App)

@@ -1,10 +1,15 @@
 const INITIAL_STATE = {
-  username: null,
-  password: null,
-  email: null,
   error: null,
   fetching: false,
   fetched: false,
+
+  // isAuthorized: false,
+  username: '',
+  password: '',
+  email: '',
+  token: '',
+
+  message: null
 }
 
 export default (state = INITIAL_STATE, action) => {
@@ -24,20 +29,75 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         email: action.payload
       }
-    case 'GET_USER_PENDING':
+
+    case 'REGISTER_PENDING':
       return {
         ...state,
         error: null,
         fetching: true,
-        fetched: false
+        fetched: false,
       }
-    case 'GET_USER_FULLFILLED':
+    case 'REGISTER_FULFILLED':
       return {
         ...state,
         error: null,
         fetching: false,
         fetched: true,
-        user: action.payload.data
+
+        message: action.payload.data.message,
+      }
+    case 'REGISTER_REJECTED':
+      return {
+        ...state,
+        error: action.payload,
+        fetching: false,
+        fetched: false,
+      }
+
+    case 'LOGIN_PENDING':
+      return {
+        ...state,
+        error: null,
+        fetching: true,
+        fetched: false,
+      }
+    case 'LOGIN_FULFILLED':
+      return {
+        ...state,
+        error: null,
+        fetching: false,
+        fetched: true,
+
+        token: action.payload.data.token,
+        message: action.payload.data.message,
+      }
+    case 'LOGIN_REJECTED':
+      return {
+        ...state,
+        error: action.payload,
+        fetching: false,
+        fetched: false,
+      }
+
+
+    case 'GET_USER_PENDING':
+      return {
+        ...state,
+        error: null,
+        fetching: true,
+        fetched: false,
+      }
+    case 'GET_USER_FULFILLED':
+      return {
+        ...state,
+        error: null,
+        fetching: false,
+        fetched: true,
+
+        username: action.payload.data.username,
+        password: action.payload.data.password, //TODO really? 
+        email: action.payload.data.email,
+        token: action.payload.data.token,
       }
     case 'GET_USER_REJECTED':
       return {
@@ -45,8 +105,13 @@ export default (state = INITIAL_STATE, action) => {
         error: action.payload,
         fetching: false,
         fetched: false,
-        user: null
+
+        username: '',
+        password: '',
+        email: '',
+        token: '',
       }
+
     default:
       return state
   }
