@@ -3,7 +3,6 @@ const INITIAL_STATE = {
   fetching: false,
   fetched: false,
 
-  // isAuthorized: false,
   username: '',
   password: '',
   email: '',

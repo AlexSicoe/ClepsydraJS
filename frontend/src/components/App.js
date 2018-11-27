@@ -3,7 +3,7 @@ import AuthScreen from './AuthScreen'
 import './App.css'
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { getUser, } from '../actions/user-actions'
+import { getUser } from '../actions/user-actions'
 
 import HomeScreen from './HomeScreen'
 
@@ -44,3 +44,4 @@ class App extends Component {
 }
 
 export default connect(mapStateToProps, mapDispatch)(App)
+

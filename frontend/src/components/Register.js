@@ -5,22 +5,21 @@ import RaisedButton from 'material-ui/RaisedButton'
 import TextField from 'material-ui/TextField'
 import { getUser, register, setUsername, setPassword, setEmail } from '../actions/user-actions'
 import { connect } from 'react-redux'
-import displayServerMessage from '../utils/displayServerMessage'
+import displayMessage from '../utils/displayMessage'
 
 
-const mapStateToProps = (state) => ({
-  // isAuthorized: state.user.isAuthorized,
-  username: state.user.username,
-  password: state.user.password,
-  email: state.user.email,
-  token: state.user.token,
-
-  message: state.user.message,
-
-  error: state.user.error,
-  fetching: state.user.fetching,
-  fetched: state.user.fetched
-})
+const mapStateToProps = (state) => {
+  let {
+    username, password, email,
+    error, fetching, fetched,
+    message,
+  } = state.user
+  return {
+    username, password, email,
+    error, fetching, fetched,
+    message,
+  }
+}
 
 const mapDispatch = {
   onGetUser: getUser,
@@ -35,7 +34,7 @@ class Register extends Component {
 
   render() {
     let { message } = this.props
-    displayServerMessage(message)
+    displayMessage(message)
 
     return (
       <div>
@@ -76,37 +75,9 @@ class Register extends Component {
   }
 
   handleClick(event) {
-    let credentials = {
-      'username': this.props.username,
-      'email': this.props.email,
-      'password': this.props.password
-    }
+    let { username, email, password } = this.props
+    let credentials = { username, email, password }
     this.props.onRegister(credentials)
-
-    // const SERVER = 'http://localhost:4000/api'
-
-    // console.log('values',
-    //   this.state.username,
-    //   this.state.email,
-    //   this.state.password);
-    // //TODO validate empty values before hitting submit
-    // var payload = {
-    //   'username': this.state.username,
-    //   'email': this.state.email,
-    //   'password': this.state.password
-    // }
-
-    // axios.post(SERVER + '/register', payload)
-    //   .then((response) => {
-    //     console.log(response);
-    //     if (response.status === 201) {
-    //       // console.log('registration successful')
-    //       this.props.handleSuccess()
-    //     } else {
-    //       alert('An error occurred. Please try again.')
-    //     }
-    //   })
-    //   .catch((error) => console.log(error))
   }
 }
 

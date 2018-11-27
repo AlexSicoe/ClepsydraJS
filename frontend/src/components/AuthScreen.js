@@ -3,26 +3,16 @@ import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import RaisedButton from 'material-ui/RaisedButton'
 import { BroswerRouter as Router, Route, NavLink as Link } from "react-router-dom";
 import { connect } from 'react-redux'
-import { getUser, login, register, setUsername, setPassword, setEmail } from '../actions/user-actions'
 
 import Login from './Login'
 import Register from './Register'
 
 const mapStateToProps = (state) => ({
-  // isAuthorized: state.user.isAuthorized,
-  user: state.user.user,
-  error: state.user.error,
-  fetching: state.user.fetching,
-  fetched: state.user.fetched
+
 })
 
 const mapDispatch = {
-  onGetUser: getUser,
-  onLogin: login,
-  onRegister: register,
-  onSetUsername: setUsername,
-  onSetPassword: setPassword,
-  onSetEmail: setEmail
+ 
 }
 
 
@@ -73,7 +63,6 @@ class AuthScreen extends Component {
   }
 
   handleClick(e) {
-    // console.log("event: ", event)
     e.preventDefault()
     this.state.isDisplayingLogin ?
       this.setState({
