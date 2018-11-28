@@ -22,7 +22,6 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatch = {
-  onGetUser: getUser,
   onRegister: register,
   onSetUsername: setUsername,
   onSetPassword: setPassword,

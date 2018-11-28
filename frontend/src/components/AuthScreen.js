@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 
 import Login from './Login'
 import Register from './Register'
 import AuthFooter from './AuthFooter';
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state) => ({
 
-}
+})
 
 const mapDispatch = {
 
@@ -37,6 +38,10 @@ class AuthScreen extends Component {
   renderLogin() {
     return (
       <>
+        <Router>
+
+        </Router>
+
         <Login />
         <AuthFooter
           loginMessage="Not Registered yet? Go to Registration"
@@ -64,13 +69,9 @@ class AuthScreen extends Component {
   handleClick(e) {
     e.preventDefault()
     this.state.isDisplayingLogin ?
-      this.setState({
-        isDisplayingLogin: false
-      })
+      this.setState({ isDisplayingLogin: false })
       :
-      this.setState({
-        isDisplayingLogin: true
-      })
+      this.setState({ isDisplayingLogin: true })
 
   }
 

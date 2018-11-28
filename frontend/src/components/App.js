@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import AuthScreen from './AuthScreen'
 import './App.css'
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getUser } from '../actions/user-actions'
 
@@ -15,7 +15,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatch = {
-	
+
 }
 
 
@@ -27,16 +27,19 @@ class App extends Component {
 	}
 
 	render() {
-		var email = 'dummy@dummy.com'
 		return (
 			<Router>
 				<>
-					<Route path="/auth" render={() =>
-						<AuthScreen /*TODO props*/ />
-					} />
-					<Route exact path="/" render={() => (
-						<Redirect to="/auth" />
-					)} />
+					<Switch>
+						<Route exact path="/auth" component={AuthScreen} />
+						<Route exact path="/home" component={HomeScreen} />
+					</Switch>
+
+					{
+						!this.props.token ?
+							<Redirect to="/auth" /> :
+							<Redirect to="/home" />
+					}
 				</>
 			</Router>
 		)

@@ -1,10 +1,10 @@
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import AppBar from 'material-ui/AppBar'
 import RaisedButton from 'material-ui/RaisedButton'
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import React, { Component } from 'react'
 import TextField from 'material-ui/TextField'
-import { getUser, login, setUsername, setPassword, setEmail } from '../actions/user-actions'
+import { login, setUsername, setPassword, setEmail } from '../actions/user-actions'
 import { connect } from 'react-redux'
 import displayMessage from '../utils/displayMessage'
 
@@ -15,8 +15,7 @@ const mapStateToProps = (state) => {
 	let {
 		username, password, email, token,
 		error, fetching, fetched,
-		message,
-	} = state.user
+		message, } = state.user
 	return {
 		username, password, email, token,
 		error, fetching, fetched,
@@ -25,7 +24,6 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatch = {
-	onGetUser: getUser,
 	onLogin: login,
 	onSetUsername: setUsername,
 	onSetPassword: setPassword,
@@ -34,12 +32,14 @@ const mapDispatch = {
 
 class Login extends Component {
 	render() {
-		let { message, token, error, email } = this.props
+		let { message, token, error } = this.props
 		displayMessage(message)
 
 
+
+
 		return (
-			token && !error !== '' ? (<RedirectToHomeScreen email={email} />) : //TODO modify
+			token && !error ? <RedirectToHomeScreen /> : //TODO modify
 				<>
 					<MuiThemeProvider>
 						<div>
@@ -86,19 +86,14 @@ const style = {
 
 const RedirectToHomeScreen = (props) =>
 	(
-		<div>
-			<Router>
-				<>
-					<Route path="/home" render={() =>
-						<HomeScreen email={props.email} />
-					} />
-					<Route exact path="/login" render={() => (
-						<Redirect to="/home" />
-					)}
-					/>
-				</>
-			</Router>
-		</div>
+		<Router>
+			<>
+				<Switch>
+					<Route path="/home" component={HomeScreen} />
+				</Switch>
+				<Redirect to="/home" />
+			</>
+		</Router>
 	)
 
 

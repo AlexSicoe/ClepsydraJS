@@ -13,6 +13,18 @@ const INITIAL_STATE = {
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case 'LOGOUT': {
+      return {
+        ...INITIAL_STATE
+      }
+    }
+    case 'CLEAR_MESSAGE':
+      return {
+        ...state,
+        error: null,
+        message: null,
+      }
+
     case 'SET_USERNAME':
       return {
         ...state,
@@ -27,12 +39,6 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         email: action.payload
-      }
-    case 'CLEAR_MESSAGE':
-      return {
-        ...state,
-        error: null,
-        message: null,
       }
 
     case 'REGISTER_PENDING':

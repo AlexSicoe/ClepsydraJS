@@ -36,6 +36,10 @@ export const login = (credentials) => ({
   payload: axios.post(`${AUTH}/login`, credentials)
 })
 
+export const logout = () => ({
+  type: 'LOGOUT', //TODO logout from server as well
+})
+
 export const getUser = (id) => ({
   type: 'GET_USER',
   payload: axios.get(`${API}/users/${id}`)
