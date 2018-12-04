@@ -63,6 +63,7 @@ exports.Project = sequelize.define('project', {
     }
   }
 })
+
 exports.UserProject = sequelize.define('userProject', {
   role: {
     type: Sequelize.STRING,

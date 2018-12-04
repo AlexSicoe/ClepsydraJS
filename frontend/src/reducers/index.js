@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import user from './user-reducer'
-import project from './project-reducer'
+import projects from './projects-reducer'
 
 export default combineReducers({
-  user, project
+  user, projects
 })

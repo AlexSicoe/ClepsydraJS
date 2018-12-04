@@ -40,17 +40,17 @@ export const logout = () => ({
   type: 'LOGOUT', //TODO logout from server as well
 })
 
-export const getUser = (id) => ({
+export const getUser = (id, token) => ({
   type: 'GET_USER',
-  payload: axios.get(`${API}/users/${id}`)
+  payload: axios.get(`${API}/users/${id}`, { headers: { token } })
 })
 
-export const putUser = (id) => ({
+export const putUser = (id, token) => ({
   type: 'PUT_USER',
-  payload: axios.put(`${API}/users/${id}`)
+  payload: axios.put(`${API}/users/${id}`, { headers: { token } })
 })
 
-export const deleteUser = (id) => ({
+export const deleteUser = (id, token) => ({
   type: 'DELETE_USER',
-  payload: axios.delete(`${API}/users/${id}`)
+  payload: axios.delete(`${API}/users/${id}`, { headers: { token } })
 })
