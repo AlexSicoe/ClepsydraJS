@@ -4,6 +4,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import RaisedButton from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
 import { logout } from '../actions/user-actions'
+import { postProject } from '../actions/project-actions'
 
 const mapStateToProps = (state) => {
   let { username, email, token,
@@ -17,7 +18,8 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatch = {
-  onLogout: logout
+  onPostProject: postProject,
+  onLogout: logout,
 }
 
 class HomeScreen extends Component {
@@ -31,13 +33,21 @@ class HomeScreen extends Component {
         <MuiThemeProvider>
           Hello {this.props.username}
           <br />
+          Here's a list of your projects
+          <br />
+          {}
+          <br />
+          <RaisedButton
+            label="Add Project"
+            primary={true}
+            style={style}
+            onClick={() => this.props.onPostProject()} />
+          <br />
           <RaisedButton
             label="Log out"
             primary={true}
             style={style}
-            onClick={(event) => {
-              this.props.onLogout()
-            }} />
+            onClick={() => this.props.onLogout()} />
         </MuiThemeProvider>
       </>
     )

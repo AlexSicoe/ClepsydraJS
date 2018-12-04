@@ -7,6 +7,7 @@ const INITIAL_STATE = {
   password: '',
   email: '',
 
+  uid: null,
   token: null,
   message: null
 }
@@ -14,9 +15,7 @@ const INITIAL_STATE = {
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case 'LOGOUT': {
-      return {
-        ...INITIAL_STATE
-      }
+      return INITIAL_STATE
     }
     case 'CLEAR_MESSAGE':
       return {
@@ -82,16 +81,17 @@ export default (state = INITIAL_STATE, action) => {
         fetched: true,
 
         token: action.payload.data.token,
+        uid: action.payload.data.uid,
         message: action.payload.data.message,
       }
 
     case 'LOGIN_REJECTED':
       return {
         ...state,
-        message: action.payload.response.data.message,
         error: action.payload,
         fetching: false,
         fetched: false,
+        message: action.payload.response.data.message,
       }
 
 

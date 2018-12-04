@@ -121,7 +121,8 @@ authRouter.post('/login', async (req, res, next) => {
     await user.save()
     res.status(200).send({
       message: 'you are in',
-      token: user.token
+      token: user.token,
+      uid: user.id
     })
   } catch (err) {
     next(err)
@@ -131,7 +132,6 @@ authRouter.post('/login', async (req, res, next) => {
 apiRouter.get('/', (req, res) => {
   res.send({ message: 'Welcome to our wonderful REST API !!!' })
 })
-
 
 apiRouter.get('/users', async (req, res, next) => {
   try {
