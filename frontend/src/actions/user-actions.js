@@ -37,7 +37,7 @@ export const login = (credentials) => ({
 })
 
 export const logout = () => ({
-  type: 'LOGOUT', //TODO logout from server as well
+  type: 'RESET_APP'
 })
 
 export const fetchUser = (id, token) => ({
