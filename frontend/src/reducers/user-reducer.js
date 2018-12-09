@@ -95,14 +95,14 @@ export default (state = INITIAL_STATE, action) => {
       }
 
 
-    case 'GET_USER_PENDING':
+    case 'FETCH_USER_PENDING':
       return {
         ...state,
         error: null,
         fetching: true,
         fetched: false,
       }
-    case 'GET_USER_FULFILLED':
+    case 'FETCH_USER_FULFILLED':
       return {
         ...state,
         error: null,
@@ -114,7 +114,7 @@ export default (state = INITIAL_STATE, action) => {
         email: action.payload.data.email,
         token: action.payload.data.token,
       }
-    case 'GET_USER_REJECTED':
+    case 'FETCH_USER_REJECTED':
       return {
         ...state,
         error: action.payload,

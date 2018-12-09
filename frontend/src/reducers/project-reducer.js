@@ -18,14 +18,15 @@ export default (state = INITIAL_STATE, action) => {
         error: null,
         message: null,
       }
-    case 'GET_PROJECT_PENDING':
+      
+    case 'FETCH_PROJECT_PENDING':
       return {
         ...state,
         error: null,
         fetching: true,
         fetched: false,
       }
-    case 'GET_PROJECT_FULFILLED':
+    case 'FETCH_PROJECT_FULFILLED':
       if (state.id !== action.payload.data.id) {
         return state
       }
@@ -38,7 +39,7 @@ export default (state = INITIAL_STATE, action) => {
         id: action.payload.data.id,
         name: action.payload.data.name,
       }
-    case 'GET_PROJECT_REJECTED':
+    case 'FETCH_PROJECT_REJECTED':
       return {
         ...state,
         error: action.payload,

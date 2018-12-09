@@ -11,17 +11,16 @@ import displayMessage from '../utils/displayMessage'
 
 import HomeScreen from './HomeScreen'
 
-const mapStateToProps = (state) => {
-	let {
-		username, password, email, token,
-		error, fetching, fetched,
-		message, } = state.user
-	return {
-		username, password, email, token,
-		error, fetching, fetched,
-		message,
-	}
-}
+const mapStateToProps = (state) => ({
+	username: state.user.username,
+	password: state.user.password,
+	email: state.user.email,
+	token: state.user.token,
+	error: state.user.error,
+	fetching: state.user.fetching,
+	fetched: state.user.fetched,
+	message: state.user.message,
+})
 
 const mapDispatch = {
 	onLogin: login,
@@ -34,9 +33,6 @@ class Login extends Component {
 	render() {
 		let { message, token, error } = this.props
 		displayMessage(message)
-
-
-
 
 		return (
 			token && !error ? <RedirectToHomeScreen /> : //TODO modify

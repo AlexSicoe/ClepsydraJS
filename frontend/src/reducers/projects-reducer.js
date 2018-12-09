@@ -17,19 +17,19 @@ export default (state = INITIAL_STATE, action) => {
         message: null,
       }
       
-    case 'GET_PROJECT_PENDING':
-    case 'GET_PROJECT_FULFILLED':
-    case 'GET_PROJECT_REJECTED':
+    case 'FETCH_PROJECT_PENDING':
+    case 'FETCH_PROJECT_FULFILLED':
+    case 'FETCH_PROJECT_REJECTED':
       return state.projects.map(p => project(p, action))
 
-    case 'GET_PROJECTS_OF_USER_PENDING':
+    case 'FETCH_PROJECTS_OF_USER_PENDING':
       return {
         ...state,
         error: null,
         fetching: true,
         fetched: false
       }
-    case 'GET_PROJECTS_OF_USER_FULFILLED':
+    case 'FETCH_PROJECTS_OF_USER_FULFILLED':
       return {
         ...state,
         error: null,
@@ -37,7 +37,7 @@ export default (state = INITIAL_STATE, action) => {
         fetched: true,
         projects: action.payload.data//TODO test
       }
-    case 'GET_PROJECTS_OF_USER_REJECTED':
+    case 'FETCH_PROJECTS_OF_USER_REJECTED':
       return {
         ...state,
         error: action.payload,

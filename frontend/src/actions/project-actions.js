@@ -2,13 +2,13 @@ import axios from 'axios'
 
 const API = 'http://localhost:4000/api'
 
-export const getProject = (pid, token) => ({
-  type: 'GET_PROJECT',
+export const fetchProject = (pid, token) => ({
+  type: 'FETCH_PROJECT',
   payload: axios.get(`${API}/projects/:${pid}`, { headers: { token } })
 })
 
-export const getProjectsOfUser = (uid, token) => ({
-  type: 'GET_PROJECTS_OF_USER',
+export const fetchProjectsOfUser = (uid, token) => ({
+  type: 'FETCH_PROJECTS_OF_USER',
   payload: axios.get(`${API}/users/${uid}/projects`, { headers: { token } })
 })
 

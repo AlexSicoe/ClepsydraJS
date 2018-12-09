@@ -4,7 +4,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import RaisedButton from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
 import { logout } from '../actions/user-actions'
-import { postProject, getProject, getProjectsOfUser } from '../actions/project-actions'
+import { postProject, fetchProject, fetchProjectsOfUser } from '../actions/project-actions'
 
 const mapStateToProps = (state) => {
   return {
@@ -25,19 +25,25 @@ const mapStateToProps = (state) => {
 
 const mapDispatch = {
   onPostProject: postProject,
-  onGetProject: getProject,
-  onGetProjectsOfUser: getProjectsOfUser,
+  onFetchProject: fetchProject,
+  onFetchProjectsOfUser: fetchProjectsOfUser,
   onLogout: logout,
 }
 
 class HomeScreen extends Component {
+
+  componentWillMount() {
+    const { uid, token } = this.props
+    this.props.onFetchProjectsOfUser(uid, token)
+  }
+
   render() {
-    const { username, uid, token, projects } = this.props
+    const { username, uid, projects } = this.props
     // const projects = [
     //   { id: 1, name: "p1" },
     //   { id: 2, name: "p2" },
     // ]
-    this.props.onGetProjectsOfUser(uid, token)
+
     const mappedProjects = projects.map(p =>
       <li key={p.id}>{p.name}</li>
     )
@@ -45,10 +51,6 @@ class HomeScreen extends Component {
 
     return (
       <>
-        <Router>
-
-        </Router>
-
         <MuiThemeProvider>
           Hello {username}
           <br />

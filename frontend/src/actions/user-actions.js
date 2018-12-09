@@ -40,8 +40,8 @@ export const logout = () => ({
   type: 'LOGOUT', //TODO logout from server as well
 })
 
-export const getUser = (id, token) => ({
-  type: 'GET_USER',
+export const fetchUser = (id, token) => ({
+  type: 'FETCH_USER',
   payload: axios.get(`${API}/users/${id}`, { headers: { token } })
 })
 
