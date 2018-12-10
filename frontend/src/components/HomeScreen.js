@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import RaisedButton from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
-import { logout } from '../actions/user-actions'
+import { resetApp } from '../actions/root-actions'
 import { postProject, fetchProject, fetchProjectsOfUser } from '../actions/project-actions'
 
 const mapStateToProps = (state) => {
@@ -27,7 +27,7 @@ const mapDispatch = {
   onPostProject: postProject,
   onFetchProject: fetchProject,
   onFetchProjectsOfUser: fetchProjectsOfUser,
-  onLogout: logout,
+  onLogout: resetApp,
 }
 
 class HomeScreen extends Component {

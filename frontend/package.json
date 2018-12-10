@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "axios": "^0.18.0",
+    "is-promise": "^2.1.0",
+    "lodash": "^4.17.11",
     "material-ui": "^0.20.2",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
