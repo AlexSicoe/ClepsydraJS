@@ -10,17 +10,17 @@ export const POST = `${SCOPE}POST`
 export const fetchProject = (pid, token) => ({
   type: FETCH,
   payload: axios.get(`${API}/projects/:${pid}`, { headers: { token } }),
-  meta: { globalError: true }
+  meta: { globalMessage: true }
 })
 
 export const fetchProjectsOfUser = (uid, token) => ({
   type: FETCH_ALL_FROM_USER,
   payload: axios.get(`${API}/users/${uid}/projects`, { headers: { token } }),
-  meta: { globalError: true }
+  meta: { globalMessage: true }
 })
 
 export const postProject = (uid, project, token) => ({
   type: POST,
   payload: axios.post(`${API}/users/${uid}/projects`, project, { headers: { token } }),
-  meta: { globalError: true }
+  meta: { globalMessage: true }
 })

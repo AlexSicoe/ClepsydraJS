@@ -10,7 +10,7 @@ export const fetchUser = (id, token) => ({
   type: FETCH,
   payload: axios.get(`${API}/users/${id}`, { headers: { token } }),
   meta: {
-    globalError: true
+    globalMessage: true
   }
 })
 
@@ -18,7 +18,7 @@ export const putUser = (id, data, token) => ({
   type: PUT,
   payload: axios.put(`${API}/users/${id}`, data, { headers: { token } }),
   meta: {
-    globalError: true
+    globalMessage: true
   }
 })
 
@@ -26,6 +26,6 @@ export const deleteUser = (id, token) => ({
   type: DELETE,
   payload: axios.delete(`${API}/users/${id}`, { headers: { token } }),
   meta: {
-    globalError: true
+    globalMessage: true
   }
 })

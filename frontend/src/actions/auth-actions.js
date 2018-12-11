@@ -13,7 +13,7 @@ export const register = (credentials) => ({
   type: REGISTER,
   payload: axios.post(`${ADMIN}/register`, credentials),
   meta: {
-    globalError: true
+    globalMessage: true
   }
 })
 
@@ -21,7 +21,7 @@ export const login = (credentials) => ({
   type: LOGIN,
   payload: axios.post(`${AUTH}/login`, credentials),
   meta: {
-    globalError: true
+    globalMessage: true
   }
 })
 

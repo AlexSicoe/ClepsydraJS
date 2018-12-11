@@ -1,4 +1,4 @@
-import { PENDING, FULFILLED, REJECTED } from 'redux-promise-middleware'
+import { PENDING, FULFILLED, REJECTED } from 'redux-promise-middleware';
 import { REGISTER, LOGIN } from './../actions/auth-actions';
 
 const INITIAL_STATE = {
@@ -26,13 +26,10 @@ export default (state = INITIAL_STATE, action) => {
         error: null,
         fetching: false,
         fetched: true,
-
-        // message: action.payload.data.message,
       }
     case REGISTER + '_' + REJECTED:
       return {
         ...state,
-        // message: action.payload.response.data.message,
         error: action.payload,
         fetching: false,
         fetched: false,
@@ -55,7 +52,6 @@ export default (state = INITIAL_STATE, action) => {
 
         token: action.payload.data.token,
         uid: action.payload.data.uid,
-        // message: action.payload.data.message,
       }
 
     case LOGIN + '_' + REJECTED:
@@ -64,7 +60,6 @@ export default (state = INITIAL_STATE, action) => {
         error: action.payload,
         fetching: false,
         fetched: false,
-        // message: action.payload.response.data.message,
       }
 
 
