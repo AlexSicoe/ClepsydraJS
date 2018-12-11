@@ -3,15 +3,12 @@ import AuthScreen from './AuthScreen'
 import './App.css'
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { getUser } from '../actions/user-actions'
 
 import HomeScreen from './HomeScreen'
 
 
-
-
 const mapStateToProps = (state) => ({
-	token: state.user.token,
+	token: state.auth.token,
 })
 
 const mapDispatch = {

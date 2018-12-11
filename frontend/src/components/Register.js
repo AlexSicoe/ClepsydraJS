@@ -3,19 +3,18 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import AppBar from 'material-ui/AppBar'
 import RaisedButton from 'material-ui/RaisedButton'
 import TextField from 'material-ui/TextField'
-import { register, setUsername, setPassword, setEmail } from '../actions/user-actions'
 import { connect } from 'react-redux'
-import displayMessage from '../utils/displayMessage'
+
+import { register } from '../actions/auth-actions'
+import { setUsername, setPassword, setEmail } from '../actions/auth-form-actions'
 
 
 const mapStateToProps = (state) => ({
-  username: state.user.username,
-  password: state.user.password,
-  email: state.user.email,
-  error: state.user.error,
+  username: state.authForm.username,
+  password: state.authForm.password,
+  email: state.authForm.email,
   fetching: state.user.fetching,
   fetched: state.user.fetched,
-  message: state.user.message,
 })
 
 const mapDispatch = {
@@ -26,12 +25,7 @@ const mapDispatch = {
 }
 
 class Register extends Component {
-
-
   render() {
-    let { message } = this.props
-    displayMessage(message)
-
     return (
       <div>
         <MuiThemeProvider>

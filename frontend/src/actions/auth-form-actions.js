@@ -1,6 +1,8 @@
-const SET_USERNAME = 'AUTH_FORM::SET_USERNAME'
-const SET_PASSWORD = 'AUTH_FORM::SET_PASSWORD'
-const SET_EMAIL = 'AUTH_FORM::SET_EMAIL'
+
+const SCOPE = 'AUTH_FORM::'
+export const SET_USERNAME = `${SCOPE}SET_USERNAME`
+export const SET_PASSWORD = `${SCOPE}SET_PASSWORD`
+export const SET_EMAIL = `${SCOPE}SET_EMAIL`
 
 
 export const setUsername = (username) => ({

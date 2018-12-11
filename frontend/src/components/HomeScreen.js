@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import RaisedButton from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
@@ -8,15 +7,11 @@ import { postProject, fetchProject, fetchProjectsOfUser } from '../actions/proje
 
 const mapStateToProps = (state) => {
   return {
-    username: state.user.username,
-    uid: state.user.uid,
+    token: state.auth.token,
+    authError: state.auth.error, //if this exists, reset app
+    uid: state.auth.uid,
 
-    email: state.user.email,
-    token: state.user.token,
-    error: state.user.error,
-    fetching: state.user.fetching,
-    fetched: state.user.fetched,
-    message: state.user.message,
+    username: state.user.username,
 
     projects: state.projects.projects
 
@@ -38,7 +33,9 @@ class HomeScreen extends Component {
   }
 
   render() {
-    const { username, uid, projects } = this.props
+   
+
+    const { authError, username, uid, projects } = this.props
     // const projects = [
     //   { id: 1, name: "p1" },
     //   { id: 2, name: "p2" },
@@ -50,6 +47,7 @@ class HomeScreen extends Component {
     const mockProject = { name: "MOCK PROJECT" }
 
     return (
+      authError ? this.props.onLogout() : //TODO test
       <>
         <MuiThemeProvider>
           Hello {username}

@@ -1,105 +1,29 @@
+import { FETCH } from './../actions/user-actions'
+import { PENDING, FULFILLED, REJECTED } from 'redux-promise-middleware'
+
+
 const INITIAL_STATE = {
   error: null,
   fetching: false,
   fetched: false,
 
-  username: '',
-  password: '',
+  username: null,
   email: '',
 
   uid: null,
-  token: null,
   message: null
 }
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case 'CLEAR_MESSAGE':
-      return {
-        ...state,
-        error: null,
-        message: null,
-      }
-
-    case 'SET_USERNAME':
-      return {
-        ...state,
-        username: action.payload
-      }
-    case 'SET_PASSWORD':
-      return {
-        ...state,
-        password: action.payload
-      }
-    case 'SET_EMAIL':
-      return {
-        ...state,
-        email: action.payload
-      }
-
-    case 'REGISTER_PENDING':
+    case FETCH + PENDING:
       return {
         ...state,
         error: null,
         fetching: true,
         fetched: false,
       }
-    case 'REGISTER_FULFILLED':
-      return {
-        ...state,
-        error: null,
-        fetching: false,
-        fetched: true,
-
-        message: action.payload.data.message,
-      }
-    case 'REGISTER_REJECTED':
-      return {
-        ...state,
-        message: action.payload.response.data.message,
-        error: action.payload,
-        fetching: false,
-        fetched: false,
-      }
-
-
-    case 'LOGIN_PENDING':
-      return {
-        ...state,
-        error: null,
-        fetching: true,
-        fetched: false,
-      }
-    case 'LOGIN_FULFILLED':
-      return {
-        ...state,
-        error: null,
-        fetching: false,
-        fetched: true,
-
-        token: action.payload.data.token,
-        uid: action.payload.data.uid,
-        message: action.payload.data.message,
-      }
-
-    case 'LOGIN_REJECTED':
-      return {
-        ...state,
-        error: action.payload,
-        fetching: false,
-        fetched: false,
-        message: action.payload.response.data.message,
-      }
-
-
-    case 'FETCH_USER_PENDING':
-      return {
-        ...state,
-        error: null,
-        fetching: true,
-        fetched: false,
-      }
-    case 'FETCH_USER_FULFILLED':
+    case FETCH + FULFILLED:
       return {
         ...state,
         error: null,
@@ -107,11 +31,10 @@ export default (state = INITIAL_STATE, action) => {
         fetched: true,
 
         username: action.payload.data.username,
-        password: action.payload.data.password, //TODO really? 
         email: action.payload.data.email,
-        token: action.payload.data.token,
+        uid: action.payload.data.uid,
       }
-    case 'FETCH_USER_REJECTED':
+    case FETCH + REJECTED:
       return {
         ...state,
         error: action.payload,
@@ -121,7 +44,6 @@ export default (state = INITIAL_STATE, action) => {
         username: '',
         password: '',
         email: '',
-        token: null,
       }
 
     default:

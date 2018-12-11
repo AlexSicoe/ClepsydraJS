@@ -10,13 +10,6 @@ const INITIAL_STATE = {
 }
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case 'CLEAR_MESSAGE':
-      return {
-        ...state,
-        error: null,
-        message: null,
-      }
-      
     case 'FETCH_PROJECT_PENDING':
     case 'FETCH_PROJECT_FULFILLED':
     case 'FETCH_PROJECT_REJECTED':

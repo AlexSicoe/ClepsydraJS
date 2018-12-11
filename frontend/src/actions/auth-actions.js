@@ -5,16 +5,23 @@ const ADMIN = `${SERVER}/admin`
 const AUTH = `${SERVER}/auth`
 const API = `${SERVER}/api`
 
-const REGISTER = 'AUTH::REGISTER'
-const LOGIN = 'AUTH::LOGIN'
+const SCOPE = 'AUTH::'
+export const REGISTER = `${SCOPE}REGISTER`
+export const LOGIN = `${SCOPE}LOGIN`
 
 export const register = (credentials) => ({
   type: REGISTER,
-  payload: axios.post(`${ADMIN}/register`, credentials)
+  payload: axios.post(`${ADMIN}/register`, credentials),
+  meta: {
+    globalError: true
+  }
 })
 
 export const login = (credentials) => ({
   type: LOGIN,
-  payload: axios.post(`${AUTH}/login`, credentials)
+  payload: axios.post(`${AUTH}/login`, credentials),
+  meta: {
+    globalError: true
+  }
 })
 

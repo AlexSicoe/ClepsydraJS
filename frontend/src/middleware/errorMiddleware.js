@@ -1,16 +1,20 @@
 import isPromise from 'is-promise'
 
-export default () => next => action => {
+export default () => next => async action => {
   if (!isPromise(action.payload)) {
     return next(action)
   }
 
   if (action.meta.globalError === true) {
     //TODO show error in modal 
-    return next(action).catch(error => {
-      console.warn(`Global error: ${error}.`)
-      return error
-    })
+    try {
+      await next(action)
+    } catch (e) {
+      console.warn(`${e}.`)
+      console.warn(`Message: ${e.response.data.message}`)
+      
+      return e
+    }
   }
 
   return next(action)

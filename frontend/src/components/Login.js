@@ -4,22 +4,21 @@ import RaisedButton from 'material-ui/RaisedButton'
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import React, { Component } from 'react'
 import TextField from 'material-ui/TextField'
-import { login, setUsername, setPassword, setEmail } from '../actions/user-actions'
 import { connect } from 'react-redux'
-import displayMessage from '../utils/displayMessage'
+
+import { login } from '../actions/auth-actions'
+import { setUsername, setPassword, setEmail } from '../actions/auth-form-actions'
 
 
 import HomeScreen from './HomeScreen'
 
 const mapStateToProps = (state) => ({
-	username: state.user.username,
-	password: state.user.password,
-	email: state.user.email,
-	token: state.user.token,
-	error: state.user.error,
-	fetching: state.user.fetching,
-	fetched: state.user.fetched,
-	message: state.user.message,
+	username: state.authForm.username,
+	password: state.authForm.password,
+	email: state.authForm.email,
+	token: state.auth.token,
+	fetching: state.auth.fetching,
+	fetched: state.auth.fetched,
 })
 
 const mapDispatch = {
@@ -31,11 +30,9 @@ const mapDispatch = {
 
 class Login extends Component {
 	render() {
-		let { message, token, error } = this.props
-		displayMessage(message)
-
+		let { token } = this.props
 		return (
-			token && !error ? <RedirectToHomeScreen /> : //TODO modify
+			token ? <RedirectToHomeScreen /> :
 				<>
 					<MuiThemeProvider>
 						<div>
