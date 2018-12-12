@@ -120,7 +120,7 @@ authRouter.post('/login', async (req, res, next) => {
     refreshToken(user)
     await user.save()
     res.status(200).send({
-      message: 'you are in',
+      message: 'you\'re in',
       token: user.token,
       uid: user.id
     })

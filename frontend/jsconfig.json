@@ -3,7 +3,6 @@
     "target": "es2018",
     // "checkJs": true,
     // "allowSyntheticDefaultImports": true,
-    "baseUrl": "./src",
     "jsx": "preserve"
   }
 }

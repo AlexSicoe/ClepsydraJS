@@ -4,6 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
 import { resetApp } from '../actions/root-actions'
 import { postProject, fetchProject, fetchProjectsOfUser } from '../actions/project-actions'
+import { fetchUser } from '../actions/user-actions';
 
 const mapStateToProps = (state) => {
   return {
@@ -13,12 +14,13 @@ const mapStateToProps = (state) => {
 
     username: state.user.username,
 
-    projects: state.projects.projects
+    projects: state.projects
 
   }
 }
 
 const mapDispatch = {
+  onFetchUser: fetchUser,
   onPostProject: postProject,
   onFetchProject: fetchProject,
   onFetchProjectsOfUser: fetchProjectsOfUser,
@@ -29,11 +31,12 @@ class HomeScreen extends Component {
 
   componentWillMount() {
     const { uid, token } = this.props
+    this.props.onFetchUser(uid, token)
     this.props.onFetchProjectsOfUser(uid, token)
   }
 
   render() {
-   
+
 
     const { authError, username, uid, projects } = this.props
     // const projects = [
@@ -48,28 +51,28 @@ class HomeScreen extends Component {
 
     return (
       authError ? this.props.onLogout() : //TODO test
-      <>
-        <MuiThemeProvider>
-          Hello {username}
+        <>
+          <MuiThemeProvider>
+            Hello {username}
+            <br />
+            Here's a list of your projects:
           <br />
-          Here's a list of your projects:
-          <br />
-          <ol>{mappedProjects}</ol>
-          <br />
-          <RaisedButton
-            label="Add Project"
-            primary={true}
-            style={style}
-            onClick={() =>
-              this.props.onPostProject(uid, mockProject)} />
-          <br />
-          <RaisedButton
-            label="Log out"
-            primary={true}
-            style={style}
-            onClick={() => this.props.onLogout()} />
-        </MuiThemeProvider>
-      </>
+            <ol>{mappedProjects}</ol>
+            <br />
+            <RaisedButton
+              label="Add Project"
+              primary={true}
+              style={style}
+              onClick={() =>
+                this.props.onPostProject(uid, mockProject)} />
+            <br />
+            <RaisedButton
+              label="Log out"
+              primary={true}
+              style={style}
+              onClick={() => this.props.onLogout()} />
+          </MuiThemeProvider>
+        </>
     )
   }
 

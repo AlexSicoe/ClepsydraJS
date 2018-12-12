@@ -1,52 +1,41 @@
-import { FETCH } from './../actions/user-actions'
-import { PENDING, FULFILLED, REJECTED } from 'redux-promise-middleware'
-
+import typeToReducer from 'type-to-reducer';
+import { FETCH } from './../actions/user-actions';
 
 const INITIAL_STATE = {
-  error: null,
   fetching: false,
+  error: false,
   fetched: false,
 
   username: null,
-  email: '',
-
+  email: null,
   uid: null,
-  message: null
 }
 
-export default (state = INITIAL_STATE, action) => {
-  switch (action.type) {
-    case FETCH + PENDING:
-      return {
+const reducerMap = {
+  [FETCH]: {
+    PENDING: (state, action) => ({
+      ...state,
+      fetching: true,
+      error: false,
+      fetched: false,
+    }),
+    REJECTED: (state, action) => ({
+      ...state,
+      fetching: false,
+      error: true,
+      fetched: false,
+    }),
+    FULFILLED: (state, action) =>
+      state.id !== action.payload.data.id ? state : ({
         ...state,
-        error: null,
-        fetching: true,
-        fetched: false,
-      }
-    case FETCH + FULFILLED:
-      return {
-        ...state,
-        error: null,
         fetching: false,
+        error: false,
         fetched: true,
 
         username: action.payload.data.username,
         email: action.payload.data.email,
         uid: action.payload.data.uid,
-      }
-    case FETCH + REJECTED:
-      return {
-        ...state,
-        error: action.payload,
-        fetching: false,
-        fetched: false,
-
-        username: '',
-        password: '',
-        email: '',
-      }
-
-    default:
-      return state
-  }
+      })
+  },
 }
+export default typeToReducer(reducerMap, INITIAL_STATE)

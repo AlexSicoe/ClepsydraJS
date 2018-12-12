@@ -1,69 +1,59 @@
-import { PENDING, FULFILLED, REJECTED } from 'redux-promise-middleware';
+import typeToReducer from 'type-to-reducer'
 import { REGISTER, LOGIN } from './../actions/auth-actions';
 
 const INITIAL_STATE = {
-  error: null,
   fetching: false,
+  error: false,
   fetched: false,
 
   uid: null,
   token: null,
-  message: null
 }
 
-export default (state = INITIAL_STATE, action) => {
-  switch (action.type) {
-    case REGISTER + '_' + PENDING:
-      return {
-        ...state,
-        error: null,
-        fetching: true,
-        fetched: false,
-      }
-    case REGISTER + '_' + FULFILLED:
-      return {
-        ...state,
-        error: null,
-        fetching: false,
-        fetched: true,
-      }
-    case REGISTER + '_' + REJECTED:
-      return {
-        ...state,
-        error: action.payload,
-        fetching: false,
-        fetched: false,
-      }
+const reducerMap = {
+  [REGISTER]: {
+    PENDING: (state, action) => ({
+      ...state,
+      fetching: true,
+      error: false,
+      fetched: false,
+    }),
+    REJECTED: (state, action) => ({
+      ...state,
+      fetching: false,
+      error: true,
+      fetched: false,
+    }),
+    FULFILLED: (state, action) => ({
+      ...state,
+      fetching: false,
+      error: false,
+      fetched: true,
+    })
+  },
+  [LOGIN]: {
+    PENDING: (state, action) => ({
+      ...state,
+      fetching: true,
+      error: false,
+      fetched: false,
+    }),
+    REJECTED: (state, action) => ({
+      ...state,
+      fetching: false,
+      error: true,
+      fetched: false,
+    }),
+    FULFILLED: (state, action) => ({
+      ...state,
+      fetching: false,
+      error: false,
+      fetched: true,
 
-
-    case LOGIN + '_' + PENDING:
-      return {
-        ...state,
-        error: null,
-        fetching: true,
-        fetched: false,
-      }
-    case LOGIN + '_' + FULFILLED:
-      return {
-        ...state,
-        error: null,
-        fetching: false,
-        fetched: true,
-
-        token: action.payload.data.token,
-        uid: action.payload.data.uid,
-      }
-
-    case LOGIN + '_' + REJECTED:
-      return {
-        ...state,
-        error: action.payload,
-        fetching: false,
-        fetched: false,
-      }
-
-
-    default:
-      return state
+      token: action.payload.data.token,
+      uid: action.payload.data.uid,
+    })
   }
 }
+
+export default typeToReducer(reducerMap, INITIAL_STATE)
