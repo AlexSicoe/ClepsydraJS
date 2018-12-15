@@ -6,5 +6,5 @@ import reducers from '../reducers'
 import messageMiddleware from '../middleware/messageMiddleware';
 import { composeWithDevTools } from 'redux-devtools-extension'
 
-const middleware = applyMiddleware(messageMiddleware, promiseMiddleware(), thunk, logger)
+const middleware = applyMiddleware(messageMiddleware, thunk, promiseMiddleware(), logger)
 export default createStore(reducers, composeWithDevTools(middleware))

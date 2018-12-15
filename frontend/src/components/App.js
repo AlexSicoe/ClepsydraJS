@@ -6,13 +6,12 @@ import { connect } from 'react-redux'
 
 import HomeScreen from './HomeScreen'
 
-
 const mapStateToProps = (state) => ({
 	token: state.auth.token,
 })
 
 const mapDispatch = {
-
+	
 }
 
 

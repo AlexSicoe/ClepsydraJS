@@ -4,7 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
 
 const mapStateToProps = (state) => {
-  let { token } = state.user
+  let { token } = state.auth
   return {
     token,
   }

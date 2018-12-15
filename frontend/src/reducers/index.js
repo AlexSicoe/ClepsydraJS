@@ -1,12 +1,17 @@
 import { combineReducers } from 'redux'
-import user from './user-reducer'
-import projects from './projects-reducer'
 import auth from './auth-reducer'
 import authForm from './auth-form-reducer'
 import { RESET_APP } from './../actions/root-actions';
+import orm from '../redux-orm/orm'
+import { createReducer } from 'redux-orm'
+import entities from '../redux-orm/entitiesReducer';
+
 
 const appReducer = combineReducers({
-  auth, authForm, user, projects
+  auth,
+  authForm,
+  entities
+  // orm: createReducer(orm), //TODO test
 })
 
 const rootReducer = (state, action) => {

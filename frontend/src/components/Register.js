@@ -13,8 +13,8 @@ const mapStateToProps = (state) => ({
   username: state.authForm.username,
   password: state.authForm.password,
   email: state.authForm.email,
-  fetching: state.user.fetching,
-  fetched: state.user.fetched,
+  fetching: state.auth.fetching,
+  fetched: state.auth.fetched,
 })
 
 const mapDispatch = {

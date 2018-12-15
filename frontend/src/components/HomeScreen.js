@@ -4,7 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
 import { resetApp } from '../actions/root-actions'
 import { postProject, fetchProject, fetchProjectsOfUser } from '../actions/project-actions'
-import { fetchUser } from '../actions/user-actions';
+import { fetchUser } from '../actions/user-actions'
 
 const mapStateToProps = (state) => {
   return {
@@ -12,18 +12,11 @@ const mapStateToProps = (state) => {
     authError: state.auth.error, //if this exists, reset app
     uid: state.auth.uid,
 
-    username: state.user.username,
-
-    projects: state.projects
-
   }
 }
 
 const mapDispatch = {
   onFetchUser: fetchUser,
-  onPostProject: postProject,
-  onFetchProject: fetchProject,
-  onFetchProjectsOfUser: fetchProjectsOfUser,
   onLogout: resetApp,
 }
 
@@ -32,17 +25,17 @@ class HomeScreen extends Component {
   componentWillMount() {
     const { uid, token } = this.props
     this.props.onFetchUser(uid, token)
-    this.props.onFetchProjectsOfUser(uid, token)
   }
 
   render() {
 
 
-    const { authError, username, uid, projects } = this.props
-    // const projects = [
-    //   { id: 1, name: "p1" },
-    //   { id: 2, name: "p2" },
-    // ]
+    const { authError, uid } = this.props
+    const username = 'John DOe'
+    const projects = [
+      { id: 1, name: "p1" },
+      { id: 2, name: "p2" },
+    ]
 
     const mappedProjects = projects.map(p =>
       <li key={p.id}>{p.name}</li>

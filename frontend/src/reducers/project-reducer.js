@@ -24,16 +24,15 @@ const reducerMap = {
       error: true,
       fetched: false,
     }),
-    FULFILLED: (state, action) =>
-      state.id !== action.payload.data.id ? state : ({
-        ...state,
-        fetching: false,
-        error: false,
-        fetched: true,
+    FULFILLED: (state, action) => ({
+      ...state,
+      fetching: false,
+      error: false,
+      fetched: true,
 
-        id: action.payload.data.id,
-        name: action.payload.data.name,
-      })
+      id: action.payload.data.id,
+      name: action.payload.data.name,
+    })
   },
   [POST]: {
     PENDING: (state, action) => ({
@@ -53,7 +52,6 @@ const reducerMap = {
       fetching: false,
       error: false,
       fetched: true,
-      //TODO?
     })
   }
 }
