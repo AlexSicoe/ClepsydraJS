@@ -3,7 +3,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import RaisedButton from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
 import { resetApp } from '../actions/root-actions'
-import { postProject, fetchProject, fetchProjectsOfUser } from '../actions/project-actions'
+import { postProject, fetchProjectsFromUser } from '../actions/project-actions'
 import { fetchUser } from '../actions/user-actions'
 
 const mapStateToProps = (state) => {
@@ -11,12 +11,12 @@ const mapStateToProps = (state) => {
     token: state.auth.token,
     authError: state.auth.error, //if this exists, reset app
     uid: state.auth.uid,
-
   }
 }
 
-const mapDispatch = {
+const mapDispatchToProps = {
   onFetchUser: fetchUser,
+  onFetchProjectsFromUser: fetchProjectsFromUser,
   onLogout: resetApp,
 }
 
@@ -25,6 +25,7 @@ class HomeScreen extends Component {
   componentWillMount() {
     const { uid, token } = this.props
     this.props.onFetchUser(uid, token)
+    this.props.onFetchProjectsFromUser(uid, token)
   }
 
   render() {
@@ -77,4 +78,4 @@ const style = {
 
 
 
-export default connect(mapStateToProps, mapDispatch)(HomeScreen)
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)

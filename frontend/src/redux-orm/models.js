@@ -1,15 +1,21 @@
+//@flow
+
 import { Model, attr, fk, oneToOne, many } from 'redux-orm'
 
-// export class Auth extends Model { }
-export class User extends Model {
-  // static reducer()
-}
+export type _User = { id: number, username: string }
+export type _Project = { id: number, name: string }
+export type _UserProject = { id: number, role: string }
+export type _Sprint = { id: number, name: string }
+export type _Stage = { id: number, name: string }
+export type _Task = { id: number, name: string }
+
+
+export class User extends Model { }
 User.modelName = 'User'
 User.fields = {
   id: attr(),
   username: attr(),
-  email: attr(),
-  project: many('Project', 'users')
+  project: many('Project', 'users', 'UserProject')
 }
 
 
@@ -18,8 +24,7 @@ Project.modelName = 'Project'
 Project.fields = {
   id: attr(),
   name: attr(),
-  user: many('User', 'projects') //optional?
-
+  user: many('User', 'projects', 'UserProject') //optional?
 }
 
 export class Sprint extends Model { }
@@ -38,7 +43,6 @@ Stage.fields = {
   name: attr(),
   sprint: fk('Sprint', 'stages')
 }
-
 
 export class Task extends Model { }
 Task.modelName = 'Task'

@@ -3,7 +3,6 @@ import axios from 'axios'
 const API = 'http://localhost:4000/api'
 const SCOPE = 'USER::'
 export const CREATE = `${SCOPE}CREATE`
-
 export const FETCH = `${SCOPE}FETCH`
 export const PUT = `${SCOPE}PUT`
 export const DELETE = `${SCOPE}DELETE`
@@ -13,21 +12,14 @@ export const createUser = (payload) => ({
   payload
 })
 
-export const fetchUser = (id, token) => (dispatch) => {
-  const response = dispatch({
+export const fetchUser = (id, token) => async dispatch => {
+  const res = await dispatch({
     type: FETCH,
     payload: axios.get(`${API}/users/${id}`, { headers: { token } }),
-    meta: {
-      globalMessage: true
-    }
+    meta: { globalMessage: true }
   })
-
-  response.then((payload) => {
-    dispatch(createUser(payload.value.data))
-  })
+  dispatch(createUser(res.action.payload.data))
 }
-
-
 
 export const putUser = (id, data, token) => ({
   type: PUT,
