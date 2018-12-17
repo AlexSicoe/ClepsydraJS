@@ -1,16 +1,16 @@
+// @flow
+
 import { createSelector } from 'redux-orm'
 import orm from './orm'
 
-const dbStateSelector = (state) => state.db
-
-const authorSelector = createSelector(
+export const userSelector = createSelector(
   orm,
-  dbStateSelector,
-  session => session.Author.all().toModelArray()
-    .map(author =>
+  (state) => state.entities,
+  ({ User }) => User.all().toModelArray()
+    .map(user =>
       ({
-        ...author.ref,
-        books: author.books.toRefArray().map(book => book.name)
+        ...user.ref,
+        projects: user.projects.toRefArray().map(p => p.name)
       })
     )
 )

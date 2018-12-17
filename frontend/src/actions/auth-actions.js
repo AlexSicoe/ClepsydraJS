@@ -3,7 +3,7 @@ import axios from 'axios'
 const SERVER = 'http://localhost:4000'
 const ADMIN = `${SERVER}/admin`
 const AUTH = `${SERVER}/auth`
-const API = `${SERVER}/api`
+// const API = `${SERVER}/api`
 
 const SCOPE = 'AUTH::'
 export const REGISTER = `${SCOPE}REGISTER`
