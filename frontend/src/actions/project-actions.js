@@ -1,4 +1,4 @@
-//@flow
+// @flow
 import axios from 'axios'
 
 import type { _Project } from '../redux-orm/models'

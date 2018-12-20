@@ -2,12 +2,12 @@ import React, { Component } from 'react'
 import Theme from 'material-ui/styles/MuiThemeProvider';
 import Button from 'material-ui/RaisedButton';
 import { connect } from 'react-redux';
-import { userSelector } from '../redux-orm/selectors'
+import { getUsers } from '../redux-orm/selectors'
 import { resetApp } from '../actions/root-actions'
 
 const mapStateToProps = (state) => ({
   uid: state.auth.uid,
-  users: userSelector(state)
+  users: getUsers(state)
 })
 
 const mapDispatchToProps = {
