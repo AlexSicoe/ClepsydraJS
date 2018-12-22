@@ -7,9 +7,9 @@ import { resetApp } from '../actions/root-actions'
 import { PropTypes } from 'prop-types';
 
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, ownProps) => ({
   uid: state.auth.uid,
-  users: getUsers(state)
+  users: getUsers(state),
 })
 
 const mapDispatchToProps = {
@@ -18,24 +18,9 @@ const mapDispatchToProps = {
 
 
 class HomeView extends Component {
-  componentWillMount() {
-
-  }
-
   render() {
-    let projects = [
-      { id: 1, name: "p1" },
-      { id: 2, name: "p2" },
-    ]
-
     const { uid, users } = this.props
     const localUser = users.find(user => user.id === uid)
-
-
-
-    if (localUser)
-      console.log(localUser)
-
 
     return (
       localUser ? //TODO, await fetching
@@ -100,7 +85,7 @@ function ListViewMap({ projects }) {
 
   return (
     <div className='listView'>
-      <ol>{mappedProjects}</ol>
+      <ul>{mappedProjects}</ul>
     </div>
   )
 }

@@ -1,9 +1,10 @@
 import axios from 'axios'
+import { createProject } from './project-actions';
 
 const API = 'http://localhost:4000/api'
 export const USER$CREATE = 'USER::CREATE'
 export const USER$UPDATE = 'USER::UPDATE'
-export const USER$REMOVE= 'USER::REMOVE'
+export const USER$REMOVE = 'USER::REMOVE'
 export const USER$ADD_PROJECT = 'USER::ADD_PROJECT'
 export const USER$REMOVE_PROJECT = 'USER::REMOVE_PROJECT'
 
@@ -27,7 +28,10 @@ export const fetchUser = (id, token) => async dispatch => {
     payload: axios.get(`${API}/users/${id}`, { headers: { token } }),
     meta: { globalMessage: true }
   })
-  dispatch(createUser(res.action.payload.data))
+  const user = res.action.payload.data
+  dispatch(createUser(user))
+  // user.projects.forEach(p => dispatch(createProject(p)))
+  // user.projects.forEach(p => dispatch(addUserToProject(p.id, user)))
 }
 
 export const putUser = (id, data, token) => ({
