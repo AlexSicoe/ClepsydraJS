@@ -1,14 +1,18 @@
 import React, { Component } from 'react'
+import Theme from 'material-ui/styles/MuiThemeProvider';
+import Button from 'material-ui/RaisedButton';
 import { connect } from 'react-redux'
 import { resetApp } from '../actions/root-actions'
 import { fetchProjectsFromUser } from '../actions/project-actions'
 import { fetchUser } from '../actions/user-actions'
-import HomeView from './HomeView'
+import { getUsers } from '../redux-orm/selectors'
+import { PropTypes } from 'prop-types';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
   authError: state.auth.error, //if this exists, reset app
   uid: state.auth.uid,
+  users: getUsers(state),
 })
 
 const mapDispatchToProps = {
@@ -29,18 +33,72 @@ class HomeScreen extends Component {
   }
 
   render() {
-    // const { authError, onLogout } = this.props
-
-
+    const { uid, users } = this.props
+    const localUser = users.find(user => user.id === uid)
 
     return (
-      //authError ? onLogout() :
-
-      <HomeView />
-
+      localUser ? //TODO, await fetching
+        <Theme>
+          <>
+            Hello {localUser.username}!
+          <br />
+            Here's a list of your projects:
+            <br />
+            <ListView projects={localUser.projects} />
+            <br />
+            <Button
+              label="Add Project"
+              primary={true}
+              style={style}
+            // onClick={() =>
+            //   this.props.onPostProject(uid, mockProject)
+            //   } 
+            />
+            <br />
+            <Button
+              label="Log out"
+              primary={true}
+              style={style}
+              onClick={() => this.props.onLogout()} />
+          </>
+        </Theme >
+        : <></>
     )
   }
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)                    
+const style = {
+  margin: 15
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)    
+
+function ListView({ projects }) {
+
+  ListView.propTypes = {
+    projects: PropTypes.array
+  }
+
+  return (
+    <>
+      {
+        projects.length ?
+          <ListViewMap projects={projects} /> :
+          'You don\'t have any projects!'
+      }
+    </>
+  )
+}
+
+function ListViewMap({ projects }) {
+  const mappedProjects = projects.map(p =>
+    <li key={p.id}>{p.name}</li>)
+
+  return (
+    <div className='listView'>
+      <ul>{mappedProjects}</ul>
+    </div>
+  )
+}
