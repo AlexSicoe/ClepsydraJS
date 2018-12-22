@@ -15,7 +15,7 @@ User.modelName = 'User'
 User.fields = {
   id: attr(),
   username: attr(),
-  project: many('Project', 'users', 'UserProject')
+  project: many('Project', 'users')
 }
 
 
@@ -24,7 +24,7 @@ Project.modelName = 'Project'
 Project.fields = {
   id: attr(),
   name: attr(),
-  user: many('User', 'projects', 'UserProject') //optional?
+  user: many('User', 'projects')
 }
 
 export class Sprint extends Model { }

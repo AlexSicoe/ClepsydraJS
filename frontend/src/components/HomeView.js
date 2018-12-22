@@ -4,6 +4,7 @@ import Button from 'material-ui/RaisedButton';
 import { connect } from 'react-redux';
 import { getUsers } from '../redux-orm/selectors'
 import { resetApp } from '../actions/root-actions'
+import { ListView } from './ListView';
 
 const mapStateToProps = (state) => ({
   uid: state.auth.uid,
@@ -32,36 +33,33 @@ class HomeView extends Component {
 
 
     if (localUser)
-      console.log(localUser)
+      console.log(localUser.projects)
 
-    const mappedProjects = projects.map(p =>
-      <li key={p.id}>{p.name}</li>
-    )
 
     return (
       localUser ? //TODO, await fetching
         <Theme>
-          Hello {localUser.username}!
+          <>
+            Hello {localUser.username}!
           <br />
-          Here's a list of your projects:
-          <br />
-          <ol>{mappedProjects}</ol>
-          <br />
-          <Button
-            label="Add Project"
-            primary={true}
-            style={style}
-          // onClick={() =>
-          //   this.props.onPostProject(uid, mockProject)
-          //   } 
-          />
-          <br />
-          <Button
-            label="Log out"
-            primary={true}
-            style={style}
-            onClick={() => this.props.onLogout()} />
-        </Theme>
+            <ListView items={localUser.projects} />
+            <br />
+            <Button
+              label="Add Project"
+              primary={true}
+              style={style}
+            // onClick={() =>
+            //   this.props.onPostProject(uid, mockProject)
+            //   } 
+            />
+            <br />
+            <Button
+              label="Log out"
+              primary={true}
+              style={style}
+              onClick={() => this.props.onLogout()} />
+          </>
+        </Theme >
         : <></>
     )
   }
@@ -74,3 +72,5 @@ export default connect(mapStateToProps, mapDispatchToProps)(HomeView)
 const style = {
   margin: 15
 }
+
+

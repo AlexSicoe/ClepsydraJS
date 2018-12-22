@@ -5,9 +5,8 @@ const ADMIN = `${SERVER}/admin`
 const AUTH = `${SERVER}/auth`
 // const API = `${SERVER}/api`
 
-const SCOPE = 'AUTH::'
-export const REGISTER = `${SCOPE}REGISTER`
-export const LOGIN = `${SCOPE}LOGIN`
+export const REGISTER = 'AUTH::REGISTER'
+export const LOGIN = 'AUTH::LOGIN'
 
 export const register = (credentials) => ({
   type: REGISTER,

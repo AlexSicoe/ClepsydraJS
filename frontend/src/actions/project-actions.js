@@ -1,42 +1,46 @@
 // @flow
 import axios from 'axios'
 
-import type { _Project } from '../redux-orm/models'
+import { addProjectToUser } from './user-actions';
 
-const API: string = 'http://localhost:4000/api'
-const SCOPE: string = 'PROJECT::'
-export const CREATE: string = `${SCOPE}CREATE`
-export const FETCH: string = `${SCOPE}FETCH`
-export const FETCH_ALL_FROM_USER: string = `${SCOPE}FETCH_ALL_FROM_USER`
-export const POST: string = `${SCOPE}POST`
+const API = 'http://localhost:4000/api'
+export const PROJECT$CREATE = 'PROJECT::CREATE'
+export const PROJECT$FETCH = 'PROJECT::FETCH'
+export const PROJECT$FETCH_ALL_FROM_USER = 'PROJECT::FETCH_ALL_FROM_USER'
+export const PROJECT$POST = 'PROJECT::POST'
 
-export const createProject = (payload: *) => ({
-  type: CREATE,
+export const createProject = (payload) => ({
+  type: PROJECT$CREATE,
   payload
 })
 
-export const fetchProject = (pid: number, token: string) => async (dispatch: *) => {
+
+export const fetchProject = (pid, token) => async (dispatch) => {
   const res = await dispatch({
-    type: FETCH,
+    type: PROJECT$FETCH,
     payload: axios.get(`${API}/projects/:${pid}`, { headers: { token } }),
     meta: { globalMessage: true }
   })
   dispatch(createProject(res.action.payload.data))
 }
 
-export const fetchProjectsFromUser = (uid: number, token: string) => async (dispatch: *) => {
+export const fetchProjectsFromUser = (uid, token) => async (dispatch) => {
   const res = await dispatch({
-    type: FETCH_ALL_FROM_USER,
+    type: PROJECT$FETCH_ALL_FROM_USER,
     payload: axios.get(`${API}/users/${uid}/projects`, { headers: { token } }),
     meta: { globalMessage: true }
   })
-  const projects: Array<_Project> = res.action.payload.data
-  projects.forEach(p => dispatch(createProject(p)))
-
+  const projects: Array<*> = res.action.payload.data
+  projects.forEach(p => {
+    dispatch(createProject(p))
+    // dispatch(addProjectToUser(uid, p))
+  })
 }
 
-export const postProject = (uid: number, project: *, token: string) => ({
-  type: POST,
+
+
+export const postProject = (uid, project, token) => ({
+  type: PROJECT$POST,
   payload: axios.post(`${API}/users/${uid}/projects`, project, { headers: { token } }),
   meta: { globalMessage: true }
 })
