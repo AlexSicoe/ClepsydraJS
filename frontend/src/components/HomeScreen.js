@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import Theme from 'material-ui/styles/MuiThemeProvider';
-import Button from 'material-ui/RaisedButton';
+import Theme from 'material-ui/styles/MuiThemeProvider'
+import Button from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
-import { resetApp } from '../actions/root-actions'
 import { fetchProjectsFromUser } from '../actions/project-actions'
 import { fetchUser } from '../actions/user-actions'
 import { getUsers } from '../redux-orm/selectors'
 import { PropTypes } from 'prop-types';
+import Logout from './Logout';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -18,7 +18,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   onFetchUser: fetchUser,
   onFetchProjectsFromUser: fetchProjectsFromUser,
-  onLogout: resetApp,
 }
 
 class HomeScreen extends Component {
@@ -55,11 +54,7 @@ class HomeScreen extends Component {
             //   } 
             />
             <br />
-            <Button
-              label="Log out"
-              primary={true}
-              style={style}
-              onClick={() => this.props.onLogout()} />
+            <Logout />
           </>
         </Theme >
         : <></>
@@ -73,7 +68,7 @@ const style = {
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)    
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 
 function ListView({ projects }) {
 
