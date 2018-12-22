@@ -1,20 +1,34 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
-export function ListView({ items, emptyListMessage = "The list is empty!" }) {
-  return (<>
-    {items.length ?
-      <ListViewMap items={items} /> :
-      <>{emptyListMessage}</>}
-  </>);
+export function ListView({
+  items,
+  emptyListMessage = "The list is empty!",
+}) {
+
+  ListView.propTypes = {
+    items: PropTypes.array
+  }
+
+  return (
+    <>
+      {items.length ?
+        <ListViewMap items={items} /> :
+        emptyListMessage
+      }
+    </>
+  )
 }
 
 
+
 function ListViewMap({ items }) {
-  const mappedItems = items.map(p => <li key={p.id}>{p.name}</li>);
+  const mappedItems = items.map(item =>
+    <li key={item.id}>{item.name}</li>)
+
   return (
     <div className='listView'>
-      Here's a list of your projects:
-    <br />
       <ol>{mappedItems}</ol>
-    </div>);
+    </div>
+  )
 }

@@ -42,6 +42,8 @@ class HomeView extends Component {
           <>
             Hello {localUser.username}!
           <br />
+            Here's a list of your projects:
+            <br />
             <ListView items={localUser.projects} />
             <br />
             <Button
