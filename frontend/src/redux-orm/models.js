@@ -2,14 +2,6 @@
 
 import { Model, attr, fk, oneToOne, many } from 'redux-orm'
 
-export type _User = { id: number, username: string }
-export type _Project = { id: number, name: string }
-export type _UserProject = { id: number, role: string }
-export type _Sprint = { id: number, name: string }
-export type _Stage = { id: number, name: string }
-export type _Task = { id: number, name: string }
-
-
 export class User extends Model { }
 User.modelName = 'User'
 User.fields = {

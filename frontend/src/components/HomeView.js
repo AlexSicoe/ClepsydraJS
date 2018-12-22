@@ -4,7 +4,8 @@ import Button from 'material-ui/RaisedButton';
 import { connect } from 'react-redux';
 import { getUsers } from '../redux-orm/selectors'
 import { resetApp } from '../actions/root-actions'
-import { ListView } from './ListView';
+import { PropTypes } from 'prop-types';
+
 
 const mapStateToProps = (state) => ({
   uid: state.auth.uid,
@@ -33,7 +34,7 @@ class HomeView extends Component {
 
 
     if (localUser)
-      console.log(localUser.projects)
+      console.log(localUser)
 
 
     return (
@@ -44,7 +45,7 @@ class HomeView extends Component {
           <br />
             Here's a list of your projects:
             <br />
-            <ListView items={localUser.projects} />
+            <ListView projects={localUser.projects} />
             <br />
             <Button
               label="Add Project"
@@ -76,3 +77,30 @@ const style = {
 }
 
 
+function ListView({ projects }) {
+
+  ListView.propTypes = {
+    projects: PropTypes.array
+  }
+
+  return (
+    <>
+      {
+        projects.length ?
+          <ListViewMap projects={projects} /> :
+          'You don\'t have any projects!'
+      }
+    </>
+  )
+}
+
+function ListViewMap({ projects }) {
+  const mappedProjects = projects.map(p =>
+    <li key={p.id}>{p.name}</li>)
+
+  return (
+    <div className='listView'>
+      <ol>{mappedProjects}</ol>
+    </div>
+  )
+}

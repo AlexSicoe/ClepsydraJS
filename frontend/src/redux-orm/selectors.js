@@ -7,10 +7,12 @@ const getEntities = (state) => state.entities
 export const getUsers = createSelector(
   orm,
   getEntities,
-  ({ User }) => User.all().toModelArray().map(user =>
+  ({ User, ProjectUser }) => User.all().toModelArray().map(user =>
     ({
       ...user.ref,
-      projects: user.projects.toRefArray().map(p => p.name)
+      projects: ProjectUser.all().toRefArray()
+        .filter(joint => joint.toUserId === user.ref.id)
+        .map(joint => joint.fromProjectId)
     })
   )
 )

@@ -24,7 +24,7 @@ class HomeScreen extends Component {
     if (!token) { onLogout() }
     else {
       this.props.onFetchUser(uid, token)
-      this.props.onFetchProjectsFromUser(uid, token)
+      // this.props.onFetchProjectsFromUser(uid, token)
     }
   }
 

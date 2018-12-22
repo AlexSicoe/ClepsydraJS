@@ -21,7 +21,7 @@ const model = require('./model')
 
 
 const PORT = 4000
-const TOKEN_LIFETIME = 3600000 //in seconds
+const TOKEN_LIFETIME = 3600 //in seconds
 const TOKEN_BYTES = 64
 
 const ERR_MSG_USER = 'cannot find user'
