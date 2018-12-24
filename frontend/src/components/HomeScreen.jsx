@@ -5,8 +5,8 @@ import { connect } from 'react-redux'
 import { fetchProjectsFromUser } from '../actions/project-actions'
 import { fetchUser } from '../actions/user-actions'
 import { getUsers } from '../redux-orm/selectors'
-import { PropTypes } from 'prop-types';
-import Logout from './Logout';
+import { PropTypes } from 'prop-types'
+import LogoutButton from './LogoutButton'
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -54,7 +54,7 @@ class HomeScreen extends Component {
             //   } 
             />
             <br />
-            <Logout />
+            <LogoutButton />
           </>
         </Theme >
         : <></>

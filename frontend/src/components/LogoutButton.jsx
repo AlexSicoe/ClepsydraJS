@@ -8,7 +8,7 @@ const mapDispatchToProps = {
   onLogout: resetApp,
 }
 
-function Logout(props) {
+function LogoutButton(props) {
   return (
     <>
       <Button
@@ -24,4 +24,4 @@ const style = {
   margin: 15
 }
 
-export default connect(null, mapDispatchToProps)(Logout)
+export default connect(null, mapDispatchToProps)(LogoutButton)
