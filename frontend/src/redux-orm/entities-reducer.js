@@ -5,7 +5,7 @@ import {
   USER$REMOVE,
   USER$ADD_PROJECT,
   USER$REMOVE_PROJECT
-} from '../actions/user-actions';
+} from '../actions/user-actions'
 import { PROJECT$CREATE } from '../actions/project-actions';
 
 const INITIAL_STATE = orm.getEmptyState()

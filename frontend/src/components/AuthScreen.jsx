@@ -17,7 +17,9 @@ export default class AuthScreen extends Component {
   render() {
     return (
       <div className="loginScreen">
-        {this.state.isDisplayingLogin ? this.renderLogin() : this.renderRegister()}
+        {this.state.isDisplayingLogin ?
+          this.renderLogin() :
+          this.renderRegister()}
       </div>
     )
   }
@@ -30,7 +32,6 @@ export default class AuthScreen extends Component {
           loginMessage="Not Registered yet? Go to Registration"
           buttonLabel="Register"
           handleClick={this.handleClick}
-
         />
       </>
     )

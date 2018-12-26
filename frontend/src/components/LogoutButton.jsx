@@ -12,7 +12,7 @@ function LogoutButton(props) {
   return (
     <>
       <Button
-        label="Log out"
+        label="Logout"
         primary={true}
         style={style}
         onClick={() => props.onLogout()} />

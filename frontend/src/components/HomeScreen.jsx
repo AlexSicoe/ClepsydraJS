@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
 import Theme from 'material-ui/styles/MuiThemeProvider'
-import Button from 'material-ui/RaisedButton'
+import RaisedButton from 'material-ui/RaisedButton'
+import AppBar from 'material-ui/AppBar'
 import { connect } from 'react-redux'
-import { fetchProjectsFromUser } from '../actions/project-actions'
-import { fetchUser } from '../actions/user-actions'
 import { getUsers } from '../redux-orm/selectors'
 import { PropTypes } from 'prop-types'
+
 import LogoutButton from './LogoutButton'
+import { fetchProjectsFromUser } from '../actions/project-actions'
+import { fetchUser } from '../actions/user-actions'
+import { resetApp } from '../actions/root-actions'
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -18,6 +21,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   onFetchUser: fetchUser,
   onFetchProjectsFromUser: fetchProjectsFromUser,
+  onLogout: resetApp
 }
 
 class HomeScreen extends Component {
@@ -39,13 +43,17 @@ class HomeScreen extends Component {
       localUser ? //TODO, await fetching
         <Theme>
           <>
+            <AppBar title="Home" >
+              <LogoutButton />
+            </AppBar>
+            
             Hello {localUser.username}!
-          <br />
+            <br />
             Here's a list of your projects:
             <br />
             <ListView projects={localUser.projects} />
             <br />
-            <Button
+            <RaisedButton
               label="Add Project"
               primary={true}
               style={style}
@@ -54,7 +62,7 @@ class HomeScreen extends Component {
             //   } 
             />
             <br />
-            <LogoutButton />
+
           </>
         </Theme >
         : <></>

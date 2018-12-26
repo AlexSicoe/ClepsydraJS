@@ -33,33 +33,31 @@ class Login extends Component {
 		let { token } = this.props
 		return (
 			token ? <RedirectToHomeScreen /> :
-				<>
-					<MuiThemeProvider>
-						<div>
-							<AppBar title="Login" />
-							<TextField
-								hintText="Enter your Username"
-								floatingLabelText="Username"
-								onChange={(event, newValue) =>
-									this.props.onSetUsername(newValue)
-								} />
-							<br />
-							<TextField
-								type="password"
-								hintText="Enter your password"
-								floatingLabelText="Password"
-								onChange={(event, newValue) =>
-									this.props.onSetPassword(newValue)
-								} />
-							<br />
-							<RaisedButton
-								label="Submit"
-								primary={true}
-								style={style}
-								onClick={(event) => this.handleClick(event)} />
-						</div>
-					</MuiThemeProvider>
-				</>
+				<MuiThemeProvider>
+					<>
+						<AppBar title="Login" />
+						<TextField
+							hintText="Enter your Username"
+							floatingLabelText="Username"
+							onChange={(event, newValue) =>
+								this.props.onSetUsername(newValue)
+							} />
+						<br />
+						<TextField
+							type="password"
+							hintText="Enter your password"
+							floatingLabelText="Password"
+							onChange={(event, newValue) =>
+								this.props.onSetPassword(newValue)
+							} />
+						<br />
+						<RaisedButton
+							label="Submit"
+							primary={true}
+							style={style}
+							onClick={(event) => this.handleClick(event)} />
+					</>
+				</MuiThemeProvider>
 		)
 	}
 
