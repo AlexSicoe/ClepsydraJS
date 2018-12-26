@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import AppBar from 'material-ui/AppBar'
-import RaisedButton from 'material-ui/RaisedButton'
-import TextField from 'material-ui/TextField'
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import { withStyles } from '@material-ui/core/styles'
+import styles from '../material-styles'
+
 import { connect } from 'react-redux'
 
 import { register } from '../actions/auth-actions'
 import { setUsername, setPassword, setEmail } from '../actions/auth-form-actions'
+import SimpleAppBar from './dumb/SimpleAppBar';
 
 
 const mapStateToProps = (state) => ({
@@ -27,40 +29,36 @@ const mapDispatch = {
 class Register extends Component {
   render() {
     return (
-      <div>
-        <MuiThemeProvider>
-          <div>
-            <AppBar title="Register" />
-            <TextField
-              hintText="Enter your Username"
-              floatingLabelText="Username"
-              onChange={(event, newValue) =>
-                this.props.onSetUsername(newValue)
-              } />
-            <br />
-            <TextField
-              hintText="Enter your Email"
-              type="email"
-              floatingLabelText="Email"
-              onChange={(event, newValue) =>
-                this.props.onSetEmail(newValue)
-              } />
-            <br />
-            <TextField
-              type="password"
-              hintText="Enter your password"
-              floatingLabelText="Password"
-              onChange={(event, newValue) =>
-                this.props.onSetPassword(newValue)
-              } />
-            <br />
-            <RaisedButton label="Submit"
-              primary={true}
-              style={style}
-              onClick={(event) => this.handleClick(event)} />
-          </div>
-        </MuiThemeProvider>
-      </div>
+      <>
+        <SimpleAppBar title="Register" />
+        <TextField
+          placeholder="Username"
+          onChange={(event) =>
+            this.props.onSetUsername(event.target.value)
+          } />
+        <br />
+        <TextField
+          placeholder="Email"
+          type="email"
+          onChange={(event) =>
+            this.props.onSetEmail(event.target.value)
+          } />
+        <br />
+        <TextField
+          placeholder="Password"
+          type="password"
+          onChange={(event) =>
+            this.props.onSetPassword(event.target.value)
+          } />
+        <br />
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={(event) => this.handleClick(event)}
+        >
+          Submit
+        </Button>
+      </>
     )
   }
 
@@ -71,8 +69,6 @@ class Register extends Component {
   }
 }
 
-const style = {
-  margin: 15
-}
 
-export default connect(mapStateToProps, mapDispatch)(Register)
+const reduxContainer = connect(mapStateToProps, mapDispatch)(Register)
+export default withStyles(styles)(reduxContainer)

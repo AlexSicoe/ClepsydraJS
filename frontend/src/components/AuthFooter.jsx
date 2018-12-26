@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import RaisedButton from 'material-ui/RaisedButton'
+import React from 'react'
+import Button from '@material-ui/core/Button'
 import { connect } from 'react-redux'
+import { withStyles } from '@material-ui/core/styles'
+import styles from '../material-styles'
 
 const mapStateToProps = (state) => {
   let { token } = state.auth
@@ -20,20 +21,19 @@ const AuthFooter = (props) => {
     (
       <>
         {props.loginMessage}
-        <MuiThemeProvider>
-          <div>
-            <RaisedButton label={props.buttonLabel}
-              primary={true}
-              style={style}
-              onClick={(event) => props.handleClick(event)} />
-          </div>
-        </MuiThemeProvider>
+        <div>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={(event) => props.handleClick(event)}
+          >
+            {props.buttonLabel}
+          </Button>
+        </div>
       </>
     ) : (<></>)
 
 }
-export default connect(mapStateToProps, mapDispatch)(AuthFooter)
 
-const style = {
-  margin: 15
-}
+const reduxContainer = connect(mapStateToProps, mapDispatch)(AuthFooter)
+export default withStyles(styles)(reduxContainer)

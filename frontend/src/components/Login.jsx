@@ -1,16 +1,18 @@
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import AppBar from 'material-ui/AppBar'
-import RaisedButton from 'material-ui/RaisedButton'
-import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import React, { Component } from 'react'
-import TextField from 'material-ui/TextField'
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import { withStyles } from '@material-ui/core/styles'
+
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
 
+import styles from '../material-styles'
 import { login } from '../actions/auth-actions'
 import { setUsername, setPassword, setEmail } from '../actions/auth-form-actions'
-
-
 import HomeScreen from './HomeScreen'
+import SimpleAppBar from './dumb/SimpleAppBar';
+
+
 
 const mapStateToProps = (state) => ({
 	username: state.authForm.username,
@@ -33,31 +35,29 @@ class Login extends Component {
 		let { token } = this.props
 		return (
 			token ? <RedirectToHomeScreen /> :
-				<MuiThemeProvider>
-					<>
-						<AppBar title="Login" />
-						<TextField
-							hintText="Enter your Username"
-							floatingLabelText="Username"
-							onChange={(event, newValue) =>
-								this.props.onSetUsername(newValue)
-							} />
-						<br />
-						<TextField
-							type="password"
-							hintText="Enter your password"
-							floatingLabelText="Password"
-							onChange={(event, newValue) =>
-								this.props.onSetPassword(newValue)
-							} />
-						<br />
-						<RaisedButton
-							label="Submit"
-							primary={true}
-							style={style}
-							onClick={(event) => this.handleClick(event)} />
-					</>
-				</MuiThemeProvider>
+				<>
+					<SimpleAppBar title="Login" />
+					<TextField
+						placeholder="Username"
+						onChange={(event) =>
+							this.props.onSetUsername(event.target.value)
+						} />
+					<br />
+					<TextField
+						type="Password"
+						placeholder="Password"
+						onChange={(event) =>
+							this.props.onSetPassword(event.target.value)
+						} />
+					<br />
+					<Button
+						color="primary"
+						variant="contained"
+						onClick={(event) => this.handleClick(event)}
+					>
+						Submit
+					</Button>
+				</>
 		)
 	}
 
@@ -69,14 +69,12 @@ class Login extends Component {
 
 }
 
-const style = {
-	margin: 15
-}
+const reduxContainer = connect(mapStateToProps, mapDispatch)(Login)
+export default withStyles(styles)(reduxContainer)
 
 
-
-const RedirectToHomeScreen = (props) =>
-	(
+function RedirectToHomeScreen(props) {
+	return (
 		<Router>
 			<>
 				<Switch>
@@ -86,6 +84,5 @@ const RedirectToHomeScreen = (props) =>
 			</>
 		</Router>
 	)
+}
 
-
-export default connect(mapStateToProps, mapDispatch)(Login)

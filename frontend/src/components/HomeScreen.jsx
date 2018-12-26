@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import Theme from 'material-ui/styles/MuiThemeProvider'
-import RaisedButton from 'material-ui/RaisedButton'
-import AppBar from 'material-ui/AppBar'
+import { withStyles } from '@material-ui/core/styles'
+import Button from '@material-ui/core/Button'
 import { connect } from 'react-redux'
 import { getUsers } from '../redux-orm/selectors'
 import { PropTypes } from 'prop-types'
@@ -10,6 +9,8 @@ import LogoutButton from './LogoutButton'
 import { fetchProjectsFromUser } from '../actions/project-actions'
 import { fetchUser } from '../actions/user-actions'
 import { resetApp } from '../actions/root-actions'
+import styles from '../material-styles'
+import SimpleAppBar from './dumb/SimpleAppBar';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -41,42 +42,37 @@ class HomeScreen extends Component {
 
     return (
       localUser ? //TODO, await fetching
-        <Theme>
-          <>
-            <AppBar title="Home" >
-              <LogoutButton />
-            </AppBar>
-            
-            Hello {localUser.username}!
-            <br />
-            Here's a list of your projects:
-            <br />
-            <ListView projects={localUser.projects} />
-            <br />
-            <RaisedButton
-              label="Add Project"
-              primary={true}
-              style={style}
-            // onClick={() =>
-            //   this.props.onPostProject(uid, mockProject)
-            //   } 
-            />
-            <br />
+        <>
+          <SimpleAppBar title="Home">
+            <LogoutButton />
+          </SimpleAppBar>
 
-          </>
-        </Theme >
+          Hello {localUser.username}!
+            <br />
+          Here's a list of your projects:
+            <br />
+          <ListView projects={localUser.projects} />
+          <br />
+          <Button
+            color="primary"
+            variant="contained"
+          // onClick={() =>
+          //   this.props.onPostProject(uid, mockProject)
+          //   } 
+          >
+            Add Project
+          </Button>
+          <br />
+        </>
         : <></>
     )
   }
 }
 
 
-const style = {
-  margin: 15
-}
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
+const reduxContainer = connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
+export default withStyles(styles)(reduxContainer)
 
 function ListView({ projects }) {
 
