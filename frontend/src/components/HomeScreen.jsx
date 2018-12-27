@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import Button from '@material-ui/core/Button'
 import { connect } from 'react-redux'
 import { getUsers } from '../redux-orm/selectors'
-import { PropTypes } from 'prop-types'
 
 import LogoutButton from './LogoutButton'
 import { fetchProjectsFromUser } from '../actions/project-actions'
 import { fetchUser } from '../actions/user-actions'
 import { resetApp } from '../actions/root-actions'
-import SimpleAppBar from './view/SimpleAppBar';
+import SimpleAppBar from './view/SimpleAppBar'
+import SimpleList from './view/SimpleList'
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -46,10 +46,12 @@ class HomeScreen extends Component {
           </SimpleAppBar>
 
           Hello {localUser.username}!
-            <br />
-          Here's a list of your projects:
-            <br />
-          <ListView projects={localUser.projects} />
+          <br />
+          <SimpleList
+            items={localUser.projects}
+            subheader="Project List"
+            emptyMessage="You have no projects. Please create one"
+          />
           <br />
           <Button
             color="primary"
@@ -67,34 +69,4 @@ class HomeScreen extends Component {
   }
 }
 
-
-
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
-
-function ListView({ projects }) {
-
-  ListView.propTypes = {
-    projects: PropTypes.array
-  }
-
-  return (
-    <>
-      {
-        projects.length ?
-          <ListViewMap projects={projects} /> :
-          'You don\'t have any projects!'
-      }
-    </>
-  )
-}
-
-function ListViewMap({ projects }) {
-  const mappedProjects = projects.map(p =>
-    <li key={p.id}>{p.name}</li>)
-
-  return (
-    <div className='listView'>
-      <ul>{mappedProjects}</ul>
-    </div>
-  )
-}
