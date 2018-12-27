@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { withStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import { connect } from 'react-redux'
 import { getUsers } from '../redux-orm/selectors'
@@ -9,8 +8,7 @@ import LogoutButton from './LogoutButton'
 import { fetchProjectsFromUser } from '../actions/project-actions'
 import { fetchUser } from '../actions/user-actions'
 import { resetApp } from '../actions/root-actions'
-import styles from '../material-styles'
-import SimpleAppBar from './dumb/SimpleAppBar';
+import SimpleAppBar from './view/SimpleAppBar';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -71,8 +69,7 @@ class HomeScreen extends Component {
 
 
 
-const reduxContainer = connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
-export default withStyles(styles)(reduxContainer)
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 
 function ListView({ projects }) {
 

@@ -1,16 +1,15 @@
 import React, { Component } from 'react'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
-import { withStyles } from '@material-ui/core/styles'
+
 
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import styles from '../material-styles'
 import { login } from '../actions/auth-actions'
 import { setUsername, setPassword, setEmail } from '../actions/auth-form-actions'
 import HomeScreen from './HomeScreen'
-import SimpleAppBar from './dumb/SimpleAppBar';
+import SimpleAppBar from './view/SimpleAppBar';
 
 
 
@@ -69,8 +68,7 @@ class Login extends Component {
 
 }
 
-const reduxContainer = connect(mapStateToProps, mapDispatch)(Login)
-export default withStyles(styles)(reduxContainer)
+export default connect(mapStateToProps, mapDispatch)(Login)
 
 
 function RedirectToHomeScreen(props) {

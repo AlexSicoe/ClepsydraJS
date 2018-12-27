@@ -1,14 +1,11 @@
 import React, { Component } from 'react'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
-import { withStyles } from '@material-ui/core/styles'
-import styles from '../material-styles'
-
 import { connect } from 'react-redux'
 
 import { register } from '../actions/auth-actions'
 import { setUsername, setPassword, setEmail } from '../actions/auth-form-actions'
-import SimpleAppBar from './dumb/SimpleAppBar';
+import SimpleAppBar from './view/SimpleAppBar';
 
 
 const mapStateToProps = (state) => ({
@@ -70,5 +67,4 @@ class Register extends Component {
 }
 
 
-const reduxContainer = connect(mapStateToProps, mapDispatch)(Register)
-export default withStyles(styles)(reduxContainer)
+export default connect(mapStateToProps, mapDispatch)(Register)
