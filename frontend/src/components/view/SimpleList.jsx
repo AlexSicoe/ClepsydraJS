@@ -19,14 +19,14 @@ function SimpleList({
   items,
   subheader,
   emptyMessage = 'Empty List',
-  onClickItem }) {
+  onItemClick }) {
   return (
     <div className={classes.root}>
 
       <List component="nav" subheader={subheader} >
         {!items.length ? <> <br /> {emptyMessage} </> :
           items.map(item =>
-            <ListItem divider button key={item.id} onClick={() => onClickItem(item)}>
+            <ListItem divider button key={item.id} onClick={() => onItemClick(item)}>
               <ListItemText primary={item.name} />
             </ListItem>)
         }

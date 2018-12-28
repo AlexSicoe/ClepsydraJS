@@ -4,12 +4,12 @@ import { connect } from 'react-redux'
 import { getUsers } from '../redux-orm/selectors'
 
 import LogoutButton from './LogoutButton'
-import { fetchProjectsFromUser, fetchProject } from '../actions/project-actions'
 import { fetchUser } from '../actions/user-actions'
 import { resetApp } from '../actions/root-actions'
 import SimpleAppBar from './view/SimpleAppBar'
 import SimpleList from './view/SimpleList'
 import { selectProject } from './../actions/project-actions';
+import ProjectScreen from './ProjectScreen';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -20,57 +20,77 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   onFetchUser: fetchUser,
-  onFetchProjectsFromUser: fetchProjectsFromUser,
   onLogout: resetApp,
   onSelectProject: selectProject
 }
 
 class HomeScreen extends Component {
 
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      showProjectScreen: false,
+    }
+
+    this.handleItemClick = this.handleItemClick.bind(this)
+  }
+
+
   componentWillMount() {
     const { uid, token, onLogout } = this.props
     if (!token) { onLogout() }
     else {
       this.props.onFetchUser(uid, token)
-      // this.props.onFetchProjectsFromUser(uid, token)
     }
   }
 
+  handleItemClick(p) {
+    const { onSelectProject } = this.props
+    onSelectProject(p.id)
+    this.setState({
+      showProjectScreen: true
+    })
+  }
+
+
   render() {
-    const { uid, users, token, onSelectProject } = this.props
+    const { uid, users } = this.props
     const localUser = users.find(user => user.id === uid)
+    const { showProjectScreen } = this.state
+
+    if (!localUser) //TODO, await fetching
+      return <></>
+
+    if (showProjectScreen)
+      return <ProjectScreen />
 
     return (
-      localUser ? //TODO, await fetching
-        <>
-          <SimpleAppBar title="Home">
-            <LogoutButton />
-          </SimpleAppBar>
+      <>
+        <SimpleAppBar title="Home">
+          <LogoutButton />
+        </SimpleAppBar>
 
-          Hello {localUser.username}!
+        Hello {localUser.username}!
           <br />
-          <SimpleList
-            items={localUser.projects}
-            subheader="Project List"
-            emptyMessage="You have no projects. Please create one"
-            onClickItem={(p) => {
-              // console.log('Project ID: ', p.id)
-              onSelectProject(p.id)
-            }}
-          />
-          <br />
-          <Button
-            color="primary"
-            variant="contained"
-          // onClick={() =>
-          //   this.props.onPostProject(uid, mockProject)
-          //   } 
-          >
-            Add Project
+        <SimpleList
+          items={localUser.projects}
+          subheader="Project List"
+          emptyMessage="You have no projects. Please create one"
+          onItemClick={(p) => this.handleItemClick(p)}
+        />
+        <br />
+        <Button
+          color="primary"
+          variant="contained"
+        // onClick={() =>
+        //   this.props.onPostProject(uid, mockProject)
+        //   } 
+        >
+          Add Project
           </Button>
-          <br />
-        </>
-        : <></>
+        <br />
+      </>
     )
   }
 }

@@ -17,12 +17,16 @@ export const createProject = (payload) => ({
 
 
 export const fetchProject = (pid, token) => async (dispatch) => {
-  const res = await dispatch({
-    type: PROJECT$FETCH,
-    payload: axios.get(`${API}/projects/:${pid}`, { headers: { token } }),
-    meta: { globalMessage: true }
-  })
-  dispatch(createProject(res.action.payload.data))
+  try {
+    const res = await dispatch({
+      type: PROJECT$FETCH,
+      payload: axios.get(`${API}/projects/${pid}`, { headers: { token } }),
+      meta: { globalMessage: true }
+    })
+    dispatch(createProject(res.action.payload.data))
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 export const fetchProjectsFromUser = (uid, token) => async (dispatch) => {
