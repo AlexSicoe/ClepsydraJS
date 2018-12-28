@@ -51,6 +51,7 @@ class HomeScreen extends Component {
             items={localUser.projects}
             subheader="Project List"
             emptyMessage="You have no projects. Please create one"
+            onClickItem={(item) => console.log(item.id)}
           />
           <br />
           <Button

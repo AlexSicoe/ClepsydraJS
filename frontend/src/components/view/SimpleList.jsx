@@ -4,7 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
 
 const styles = theme => ({
   root: {
@@ -15,26 +14,24 @@ const styles = theme => ({
 })
 
 
-function SimpleList({ classes, items, subheader, emptyMessage }) {
-
-
+function SimpleList({ classes, items, subheader, emptyMessage, onClickItem }) {
   return (
     <div className={classes.root}>
 
       <List component="nav" subheader={subheader} >
         {!items.length ? <> <br /> {emptyMessage} </> :
           items.map(item =>
-            <ListItem divider button key={item.id}>
+            <ListItem divider button key={item.id} onClick={() => onClickItem(item)}>
               <ListItemText primary={item.name} />
             </ListItem>)
         }
       </List>
     </div>
-  );
+  )
 }
 
 SimpleList.propTypes = {
   classes: PropTypes.object.isRequired,
-};
+}
 
 export default withStyles(styles)(SimpleList);
