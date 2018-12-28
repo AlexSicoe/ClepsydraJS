@@ -14,7 +14,12 @@ const styles = theme => ({
 })
 
 
-function SimpleList({ classes, items, subheader, emptyMessage, onClickItem }) {
+function SimpleList({
+  classes,
+  items,
+  subheader,
+  emptyMessage = 'Empty List',
+  onClickItem }) {
   return (
     <div className={classes.root}>
 

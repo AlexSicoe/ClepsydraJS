@@ -4,11 +4,12 @@ import { connect } from 'react-redux'
 import { getUsers } from '../redux-orm/selectors'
 
 import LogoutButton from './LogoutButton'
-import { fetchProjectsFromUser } from '../actions/project-actions'
+import { fetchProjectsFromUser, fetchProject } from '../actions/project-actions'
 import { fetchUser } from '../actions/user-actions'
 import { resetApp } from '../actions/root-actions'
 import SimpleAppBar from './view/SimpleAppBar'
 import SimpleList from './view/SimpleList'
+import { selectProject } from './../actions/project-actions';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -20,7 +21,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   onFetchUser: fetchUser,
   onFetchProjectsFromUser: fetchProjectsFromUser,
-  onLogout: resetApp
+  onLogout: resetApp,
+  onSelectProject: selectProject
 }
 
 class HomeScreen extends Component {
@@ -35,7 +37,7 @@ class HomeScreen extends Component {
   }
 
   render() {
-    const { uid, users } = this.props
+    const { uid, users, token, onSelectProject } = this.props
     const localUser = users.find(user => user.id === uid)
 
     return (
@@ -51,7 +53,10 @@ class HomeScreen extends Component {
             items={localUser.projects}
             subheader="Project List"
             emptyMessage="You have no projects. Please create one"
-            onClickItem={(item) => console.log(item.id)}
+            onClickItem={(p) => {
+              // console.log('Project ID: ', p.id)
+              onSelectProject(p.id)
+            }}
           />
           <br />
           <Button

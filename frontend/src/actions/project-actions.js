@@ -8,6 +8,7 @@ export const PROJECT$CREATE = 'PROJECT::CREATE'
 export const PROJECT$FETCH = 'PROJECT::FETCH'
 export const PROJECT$FETCH_ALL_FROM_USER = 'PROJECT::FETCH_ALL_FROM_USER'
 export const PROJECT$POST = 'PROJECT::POST'
+export const PROJECT$SELECT = 'PROJECT::SELECT'
 
 export const createProject = (payload) => ({
   type: PROJECT$CREATE,
@@ -43,4 +44,10 @@ export const postProject = (uid, project, token) => ({
   type: PROJECT$POST,
   payload: axios.post(`${API}/users/${uid}/projects`, project, { headers: { token } }),
   meta: { globalMessage: true }
+})
+
+
+export const selectProject = (pid) => ({
+  type: PROJECT$SELECT,
+  payload: pid,
 })
