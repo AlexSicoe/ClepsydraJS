@@ -22,7 +22,7 @@ const mapStateToProps = (state) => ({
 	fetched: state.auth.fetched,
 })
 
-const mapDispatch = {
+const mapDispatchToProps = {
 	onLogin: login,
 	onSetUsername: setUsername,
 	onSetPassword: setPassword,
@@ -68,7 +68,7 @@ class Login extends Component {
 
 }
 
-export default connect(mapStateToProps, mapDispatch)(Login)
+export default connect(mapStateToProps, mapDispatchToProps)(Login)
 
 
 function RedirectToHomeScreen(props) {

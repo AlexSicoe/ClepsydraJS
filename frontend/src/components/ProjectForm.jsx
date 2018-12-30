@@ -4,15 +4,26 @@ import Button from '@material-ui/core/Button';
 import SimpleAppBar from './view/SimpleAppBar'
 import LogoutButton from './LogoutButton'
 import TextField from '@material-ui/core/TextField';
+import { connect } from 'react-redux';
+import { postProject } from './../actions/project-actions';
 
-export default class ProjectDetails extends Component {
+
+const mapStateToProps = (state) => ({
+  token: state.auth.token,
+  uid: state.auth.uid,
+})
+
+const mapDispatchToProps = {
+  onPostProject: postProject
+}
+
+class ProjectForm extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
       projectName: '',
     }
-
   }
 
   handleChange(event) {
@@ -21,6 +32,14 @@ export default class ProjectDetails extends Component {
     })
   }
 
+  handleOK() {
+    const { projectName } = this.state
+    const { token, uid, closeProjectForm, onPostProject } = this.props
+
+    const project = { name: projectName }
+    onPostProject(uid, project, token)
+    closeProjectForm()
+  }
 
   render() {
     return (
@@ -47,7 +66,7 @@ export default class ProjectDetails extends Component {
           <Button
             color="primary"
             variant="contained"
-            onClick={() => console.log(this.state)}
+            onClick={() => this.handleOK()}
           >
             OK
           </Button>
@@ -56,3 +75,6 @@ export default class ProjectDetails extends Component {
     )
   }
 }
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectForm)
