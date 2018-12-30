@@ -23,7 +23,9 @@ export const getProjects = createSelector(
   ({ Project }) => Project.all().toModelArray().map(project =>
     ({
       ...project.ref,
-      users: project.users.toRefArray().map(u => u.name)
+      users: project.users.toRefArray()
+        // .filter(joint => joint.toProjectId === project.ref.id)
+        // .map(joint => joint.fromUserId)
     })
   )
 )
@@ -34,6 +36,7 @@ export const getSprints = createSelector(
   ({ Sprint }) => Sprint.all().toModelArray().map(sprint =>
     ({
       ...sprint.ref,
+      stages: sprint.stages.toRefArray().map(s => s.name)
     })
   )
 )

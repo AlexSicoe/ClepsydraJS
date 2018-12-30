@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { fetchProject } from './../actions/project-actions'
+import Button from '@material-ui/core/Button'
 import SimpleAppBar from './view/SimpleAppBar'
 import SimpleList from './view/SimpleList'
 import LogoutButton from './LogoutButton'
@@ -33,7 +34,6 @@ class ProjectScreen extends Component {
   }
 
   render() {
-    // this.handleFetch()
     const { pid, projects } = this.props
     const selectedProject = projects.find(p => p.id === pid)
 
@@ -45,6 +45,16 @@ class ProjectScreen extends Component {
           <LogoutButton />
         </SimpleAppBar>
         {JSON.stringify(selectedProject)}
+
+        <div>
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={() => this.props.closeProjectScreen()}
+          >
+            Back
+          </Button>
+        </div>
       </>
     )
   }

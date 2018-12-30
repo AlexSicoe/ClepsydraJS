@@ -8,8 +8,9 @@ import { fetchUser } from '../actions/user-actions'
 import { resetApp } from '../actions/root-actions'
 import SimpleAppBar from './view/SimpleAppBar'
 import SimpleList from './view/SimpleList'
-import { selectProject } from './../actions/project-actions';
-import ProjectScreen from './ProjectScreen';
+import { selectProject } from './../actions/project-actions'
+import ProjectScreen from './ProjectScreen'
+import ProjectForm from './ProjectForm'
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -31,9 +32,10 @@ class HomeScreen extends Component {
 
     this.state = {
       showProjectScreen: false,
+      showProjectForm: false,
     }
 
-    this.handleItemClick = this.handleItemClick.bind(this)
+    // this.closeProjectForm = this.closeProjectForm.bind(this)
   }
 
 
@@ -48,22 +50,30 @@ class HomeScreen extends Component {
   handleItemClick(p) {
     const { onSelectProject } = this.props
     onSelectProject(p.id)
-    this.setState({
-      showProjectScreen: true
-    })
+    this.setState({ showProjectScreen: true })
   }
 
+  closeProjectScreen() {
+    this.setState({ showProjectScreen: false })
+  }
+
+  closeProjectForm() {
+    this.setState({ showProjectForm: false })
+  }
 
   render() {
     const { uid, users } = this.props
     const localUser = users.find(user => user.id === uid)
-    const { showProjectScreen } = this.state
+    const { showProjectScreen, showProjectForm } = this.state
 
     if (!localUser) //TODO, await fetching
       return <></>
 
     if (showProjectScreen)
-      return <ProjectScreen />
+      return <ProjectScreen closeProjectScreen={this.closeProjectScreen.bind(this)} />
+
+    if (showProjectForm)
+      return <ProjectForm closeProjectForm={this.closeProjectForm.bind(this)} />
 
     return (
       <>
@@ -79,16 +89,15 @@ class HomeScreen extends Component {
           emptyMessage="You have no projects. Please create one"
           onItemClick={(p) => this.handleItemClick(p)}
         />
-        <br />
-        <Button
-          color="primary"
-          variant="contained"
-        // onClick={() =>
-        //   this.props.onPostProject(uid, mockProject)
-        //   } 
-        >
-          Add Project
+        <div>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={() => this.setState({ ...this.state, showProjectForm: true })}
+          >
+            Add Project
           </Button>
+        </div>
         <br />
       </>
     )
