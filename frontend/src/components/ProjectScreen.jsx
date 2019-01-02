@@ -39,13 +39,13 @@ class ProjectScreen extends Component {
     console.log(u)
   }
 
-  handleItemView(u) {
-    return (
+  handleItemView(onItemClick) {
+    return u => (
       <ListItem
         divider
         button
         key={u.id}
-        onClick={() => this.handleItemClick(u)} //
+        onClick={() => onItemClick(u)} //
       >
         <ListItemText primary={u.username} />
       </ListItem>
@@ -72,8 +72,8 @@ class ProjectScreen extends Component {
           items={selectedProject.users}
           subheader=""
           emptyMessage="No users"
-          // onItemClick={(u) => this.handleItemClick(u)}
-          onItemView={(u) => this.handleItemView(u)}
+          onItemClick={(u) => this.handleItemClick(u)}
+          onItemView={(onItemClick) => (u) => this.handleItemView(onItemClick)(u)}
         />
         <Button
           color="secondary"
