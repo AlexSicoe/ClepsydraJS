@@ -39,8 +39,8 @@ class ProjectScreen extends Component {
     console.log(u)
   }
 
-  handleItemView(onItemClick) {
-    return u => (
+  handleItemView(onItemClick, u) {
+    return (
       <ListItem
         divider
         button
@@ -73,7 +73,7 @@ class ProjectScreen extends Component {
           subheader=""
           emptyMessage="No users"
           onItemClick={(u) => this.handleItemClick(u)}
-          onItemView={(onItemClick) => (u) => this.handleItemView(onItemClick)(u)}
+          onItemView={(onItemClick, u) => this.handleItemView(onItemClick, u)}
         />
         <Button
           color="secondary"

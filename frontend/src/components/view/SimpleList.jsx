@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import _ from 'lodash'
 
 const styles = theme => ({
   root: {
@@ -13,7 +14,7 @@ const styles = theme => ({
   },
 })
 
-const defaultItemView = (onItemClick) => item => (
+const defaultItemView = (onItemClick, item) => (
   <ListItem
     divider
     button
@@ -35,7 +36,7 @@ function SimpleList({
     <div className={classes.root}>
       <List component="nav" subheader={subheader} >
         {!items.length ? <> <br /> {emptyMessage} </> :
-          items.map(onItemView(onItemClick))
+          items.map(_.curry(onItemView)(onItemClick))
         }
       </List>
     </div>
