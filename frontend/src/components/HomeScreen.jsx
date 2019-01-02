@@ -32,10 +32,7 @@ class HomeScreen extends Component {
 
     this.state = {
       showProjectScreen: false,
-      showProjectForm: false,
     }
-
-    // this.closeProjectForm = this.closeProjectForm.bind(this)
   }
 
 
@@ -57,14 +54,12 @@ class HomeScreen extends Component {
     this.setState({ showProjectScreen: false })
   }
 
-  closeProjectForm() {
-    this.setState({ showProjectForm: false })
-  }
+
 
   render() {
     const { uid, users } = this.props
     const localUser = users.find(user => user.id === uid)
-    const { showProjectScreen, showProjectForm } = this.state
+    const { showProjectScreen } = this.state
 
     if (!localUser) //TODO, await fetching
       return <></>
@@ -72,8 +67,7 @@ class HomeScreen extends Component {
     if (showProjectScreen)
       return <ProjectScreen closeProjectScreen={this.closeProjectScreen.bind(this)} />
 
-    if (showProjectForm)
-      return <ProjectForm closeProjectForm={this.closeProjectForm.bind(this)} />
+
 
     return (
       <>
@@ -89,15 +83,7 @@ class HomeScreen extends Component {
           emptyMessage="You have no projects. Please create one"
           onItemClick={(p) => this.handleItemClick(p)}
         />
-        <div>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={() => this.setState({ ...this.state, showProjectForm: true })}
-          >
-            Add Project
-          </Button>
-        </div>
+        <AddProjectButton />
         <br />
       </>
     )
@@ -105,3 +91,42 @@ class HomeScreen extends Component {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
+
+
+class AddProjectButton extends Component {
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      showProjectForm: false,
+    }
+  }
+
+  handleButton() {
+    this.setState({ showProjectForm: true })
+  }
+
+  closeProjectForm() {
+    this.setState({ showProjectForm: false })
+  }
+
+  render() {
+    const { showProjectForm } = this.state
+
+    if (showProjectForm)
+      return <ProjectForm closeProjectForm={this.closeProjectForm.bind(this)} />
+
+    return (
+      <div>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={() => this.handleButton()}
+        >
+          Add Project
+          </Button>
+      </div>
+    )
+  }
+}

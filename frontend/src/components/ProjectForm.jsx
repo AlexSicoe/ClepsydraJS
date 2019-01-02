@@ -1,11 +1,8 @@
 import React, { Component } from 'react'
-import Button from '@material-ui/core/Button';
-
-import SimpleAppBar from './view/SimpleAppBar'
-import LogoutButton from './LogoutButton'
-import TextField from '@material-ui/core/TextField';
-import { connect } from 'react-redux';
-import { postProject } from './../actions/project-actions';
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import { connect } from 'react-redux'
+import { postProject } from './../actions/project-actions'
 
 
 const mapStateToProps = (state) => ({
@@ -44,9 +41,6 @@ class ProjectForm extends Component {
   render() {
     return (
       <>
-        <SimpleAppBar title="Project Form">
-          <LogoutButton />
-        </SimpleAppBar>
         <TextField
           placeholder="Project Name"
           onChange={(event) => this.handleChange(event)}
