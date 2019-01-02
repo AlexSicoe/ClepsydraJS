@@ -48,6 +48,8 @@ class ProjectScreen extends Component {
         onClick={() => onItemClick(u)} //
       >
         <ListItemText primary={u.username} />
+        <ListItemText secondary={u.email} />
+        <ListItemText secondary={u.userProject.role} />
       </ListItem>
     )
   }
@@ -70,7 +72,7 @@ class ProjectScreen extends Component {
 
         <SimpleList
           items={selectedProject.users}
-          subheader=""
+          subheader="Users"
           emptyMessage="No users"
           onItemClick={(u) => this.handleItemClick(u)}
           onItemView={(onItemClick, u) => this.handleItemView(onItemClick, u)}
