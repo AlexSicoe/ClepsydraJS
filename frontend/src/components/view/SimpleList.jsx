@@ -14,21 +14,33 @@ const styles = theme => ({
 })
 
 
+
+
 function SimpleList({
   classes,
   items,
   subheader,
   emptyMessage = 'Empty List',
-  onItemClick }) {
+  onItemClick,
+  onItemView = defaultItemView
+}) {
+  function defaultItemView(item) {
+    return (
+      <ListItem
+        divider
+        button
+        key={item.id}
+        onClick={() => onItemClick(item)}>
+        <ListItemText primary={item.name} />
+      </ListItem>
+    )
+  }
   return (
     <div className={classes.root}>
 
       <List component="nav" subheader={subheader} >
         {!items.length ? <> <br /> {emptyMessage} </> :
-          items.map(item =>
-            <ListItem divider button key={item.id} onClick={() => onItemClick(item)}>
-              <ListItemText primary={item.name} />
-            </ListItem>)
+          items.map(onItemView)
         }
       </List>
     </div>

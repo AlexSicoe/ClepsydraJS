@@ -54,8 +54,6 @@ class HomeScreen extends Component {
     this.setState({ showProjectScreen: false })
   }
 
-
-
   render() {
     const { uid, users } = this.props
     const localUser = users.find(user => user.id === uid)

@@ -6,6 +6,8 @@ import SimpleAppBar from './view/SimpleAppBar'
 import SimpleList from './view/SimpleList'
 import LogoutButton from './LogoutButton'
 import { getProjects } from '../redux-orm/selectors'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemText from '@material-ui/core/ListItemText'
 
 
 const mapStateToProps = (state) => ({
@@ -33,28 +35,53 @@ class ProjectScreen extends Component {
     // this.handleFetch()
   }
 
+  handleItemClick(u) {
+    console.log(u)
+  }
+
+  handleItemView(u) {
+    return (
+      <ListItem
+        divider
+        button
+        key={u.id}
+        onClick={() => this.handleItemClick(u)} //
+      >
+        <ListItemText primary={u.username} />
+      </ListItem>
+    )
+  }
+
   render() {
     const { pid, projects } = this.props
     const selectedProject = projects.find(p => p.id === pid)
 
     console.log(selectedProject)
 
+    if (!selectedProject)
+      return <>Loading project</> //TODO what if it doesn't exist in redux or on server anymore?
+
     return (
       <>
-        <SimpleAppBar title="ProjectScreen">
+        <SimpleAppBar title={selectedProject.name}>
           <LogoutButton />
         </SimpleAppBar>
-        {JSON.stringify(selectedProject)}
 
-        <div>
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={() => this.props.closeProjectScreen()}
-          >
-            Back
+
+        <SimpleList
+          items={selectedProject.users}
+          subheader=""
+          emptyMessage="No users"
+          // onItemClick={(u) => this.handleItemClick(u)}
+          onItemView={(u) => this.handleItemView(u)}
+        />
+        <Button
+          color="secondary"
+          variant="contained"
+          onClick={() => this.props.closeProjectScreen()}
+        >
+          Back
           </Button>
-        </div>
       </>
     )
   }
