@@ -20,12 +20,12 @@ export const getUsers = createSelector(
 export const getProjects = createSelector(
   orm,
   getEntities,
-  ({ Project }) => Project.all().toModelArray().map(project =>
+  ({ Project, UserProject }) => Project.all().toModelArray().map(project =>
     ({
       ...project.ref,
-      users: project.users.toRefArray()
-        // .filter(joint => joint.toProjectId === project.ref.id)
-        // .map(joint => joint.fromUserId)
+      users: UserProject.all().toRefArray()
+      .filter(joint => joint.toProjectId === project.ref.id)
+      .map(joint => joint.fromUserId)
     })
   )
 )

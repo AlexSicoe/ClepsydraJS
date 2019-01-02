@@ -41,7 +41,7 @@ class ProjectScreen extends Component {
 
     return (
       <>
-        <SimpleAppBar title="ProjectView">
+        <SimpleAppBar title="ProjectScreen">
           <LogoutButton />
         </SimpleAppBar>
         {JSON.stringify(selectedProject)}
