@@ -11,6 +11,7 @@ import SimpleList from './view/SimpleList'
 import { selectProject } from './../actions/project-actions'
 import ProjectScreen from './ProjectScreen'
 import ProjectForm from './ProjectForm'
+import { basicStyle, borderStyle } from './styles/styles';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -24,6 +25,7 @@ const mapDispatchToProps = {
   onLogout: resetApp,
   onSelectProject: selectProject
 }
+
 
 class HomeScreen extends Component {
 
@@ -75,13 +77,19 @@ class HomeScreen extends Component {
 
         Hello {localUser.username}!
           <br />
-        <SimpleList
-          items={localUser.projects}
-          subheader="Project List"
-          emptyMessage="You have no projects. Please create one"
-          onItemClick={(p) => this.handleItemClick(p)}
-        />
-        <AddProjectButton />
+        <p>
+          <span style={{ ...basicStyle, ...borderStyle }}>
+            <SimpleList
+              items={localUser.projects}
+              subheader="Project List"
+              emptyMessage="You have no projects. Please create one"
+              onItemClick={(p) => this.handleItemClick(p)}
+            />
+          </span>
+          <span style={basicStyle}>
+            <AddProjectButton />
+          </span>
+        </p>
         <br />
       </>
     )
