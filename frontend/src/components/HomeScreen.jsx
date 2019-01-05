@@ -150,14 +150,13 @@ class UFO extends Component {
     }
   }
 
-
   componentDidMount() {
     const path = 'http://localhost:4000'
     const { uid } = this.props
     const socket = socketIOClient(path)
-    // socket.emit('req/user/read', uid)
     socket.emit('storeClientInfo', uid)
-    socket.on('userFetched', data => this.setState({ response: data }))
+    socket.emit('fetchUser', uid)
+    socket.on('userFetched', user => this.setState({ response: user }))
   }
 
   render() {
