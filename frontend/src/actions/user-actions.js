@@ -25,13 +25,11 @@ export const addProjectToUser = (uid, project) => ({
 export const fetchUser = (id, token) => async dispatch => {
   const res = await dispatch({
     type: USER$FETCH,
-    payload: axios.get(`${API}/users/${id}`, { headers: { token } }),
+    payload: axios.get(`${API}/users/${id}`, { headers: { token, authId: id } }),
     meta: { globalMessage: true }
   })
   const user = res.action.payload.data
   dispatch(createUser(user))
-  // user.projects.forEach(p => dispatch(createProject(p)))
-  // user.projects.forEach(p => dispatch(addUserToProject(p.id, user)))
 }
 
 export const putUser = (id, data, token) => ({

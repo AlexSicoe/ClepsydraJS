@@ -18,7 +18,7 @@ import socketIOClient from 'socket.io-client'
 const mapStateToProps = (state) => ({
   token: state.auth.token,
   authError: state.auth.error, //if this exists, reset app
-  uid: state.auth.uid,
+  authId: state.auth.authId,
   users: getUsers(state),
 })
 
@@ -41,10 +41,10 @@ class HomeScreen extends Component {
 
 
   componentWillMount() {
-    const { uid, token, onLogout } = this.props
+    const { authId, token, onLogout } = this.props
     if (!token) { onLogout() }
     else {
-      this.props.onFetchUser(uid, token)
+      this.props.onFetchUser(authId, token)
     }
   }
 
@@ -59,8 +59,8 @@ class HomeScreen extends Component {
   }
 
   render() {
-    const { uid, users } = this.props
-    const localUser = users.find(user => user.id === uid)
+    const { authId, users } = this.props
+    const localUser = users.find(user => user.id === authId)
     const { showProjectScreen } = this.state
 
     if (!localUser) //TODO, await fetching
@@ -91,7 +91,7 @@ class HomeScreen extends Component {
           <AddProjectButton />
         </div>
         <div>
-          <UFO uid={uid} />
+          <UFO authId={authId} />
         </div>
         <br />
       </>
@@ -153,10 +153,10 @@ class UFO extends Component {
 
   componentDidMount() {
     const path = 'http://localhost:4000'
-    const { uid } = this.props
+    const { authId } = this.props
     const socket = socketIOClient(path)
-    // socket.emit('req/user/read', uid)
-    socket.emit('storeClientInfo', uid)
+    // socket.emit('req/user/read', authId)
+    socket.emit('storeClientInfo', authId)
     socket.on('userFetched', data => this.setState({ response: data }))
   }
 

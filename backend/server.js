@@ -50,7 +50,9 @@ app.use('/admin', adminRouter)
 app.use('/auth', authRouter)
 app.use('/api', apiRouter)
 
-const { User, Project, UserProject, Sprint, Stage, Task } = model
+const { Token, User, Project, UserProject, Sprint, Stage, Task } = model
+User.hasMany(Token)
+Token.belongsTo(User)
 User.belongsToMany(Project, { through: UserProject })
 Project.belongsToMany(User, { through: UserProject })
 Project.hasMany(Task, { onDelete: 'cascade', hooks: true })
@@ -95,8 +97,8 @@ let clients = []
 io.on('connection', (socket) => {
   console.log('Client connected (id ' + socket.id + ')')
 
-  socket.on('storeClientInfo', uid => {
-    clients.push({ uid, socketId: socket.id })
+  socket.on('storeClientInfo', authId => {
+    clients.push({ authId, socketId: socket.id })
     console.log(clients)
   })
 
@@ -142,19 +144,27 @@ console.warn(`server listening on port ${PORT}`)
 
 
 
-
-
 apiRouter.use(async (req, res, next) => {
-  let { token } = req.headers
+  let { token, authId } = req.headers
   try {
-    let user = await User.scope('withCredentials').findOne({ where: { token } })
-    if (!user) {
-      res.status(403).send({ message: 'invalid user' })
+    let user = await User.findByPk(authId)
+    let serverToken = await user.getTokens({ where: { key: token } })
+    serverToken = serverToken[0]
+    if (!serverToken) {
+      res.status(403).send({ message: 'invalid auth' })
       return
     }
-    const timeDiff = moment().diff(user.expiry, 'seconds')
+
+    console.log(user)
+    console.log(serverToken)
+    
+    const timeDiff = moment().diff(serverToken.expiry, 'seconds')
     console.warn(`${timeDiff}seconds`)
     if (timeDiff >= 0) {
+      await serverToken.destroy()
+      // await user.removeToken(serverToken)
+     
+      console.log('DEBUG: deleted expired token')
       res.status(403).send({ message: 'authentication expired' })
       return
     }
@@ -165,9 +175,18 @@ apiRouter.use(async (req, res, next) => {
 })
 
 
-const refreshToken = (user) => {
-  user.expiry = moment().add(TOKEN_LIFETIME, 'seconds')
-  user.token = crypto.randomBytes(TOKEN_BYTES).toString('hex')
+const generateToken = async (user) => {
+  let key = crypto.randomBytes(TOKEN_BYTES).toString('hex')
+  let expiry = moment().add(TOKEN_LIFETIME, 'seconds')
+
+  try {
+    let token = await Token.create({key, expiry})
+    await user.addToken(token)
+  } catch (e) {
+    console.log('ERROR: while generating token. ', e)
+  }
+  
+  return key
 }
 
 
@@ -201,12 +220,12 @@ authRouter.post('/login', async (req, res, next) => {
       res.status(401).send({ message: 'mail and password do not match' })
       return
     }
-    refreshToken(user)
-    await user.save()
+    let token = await generateToken(user)
+    // await user.save()
     res.status(200).send({
       message: 'you\'re in',
-      token: user.token,
-      uid: user.id
+      token: token,
+      authId: user.id
     })
   } catch (err) {
     next(err)
