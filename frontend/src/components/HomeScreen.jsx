@@ -11,7 +11,9 @@ import SimpleList from './view/SimpleList'
 import { selectProject } from './../actions/project-actions'
 import ProjectScreen from './ProjectScreen'
 import ProjectForm from './ProjectForm'
-import { basicStyle, borderStyle } from './styles/styles';
+import { basicStyle, borderStyle } from './styles/styles'
+
+import socketIOClient from 'socket.io-client'
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -77,19 +79,20 @@ class HomeScreen extends Component {
 
         Hello {localUser.username}!
           <br />
-        <p>
-          <span style={{ ...basicStyle, ...borderStyle }}>
-            <SimpleList
-              items={localUser.projects}
-              subheader="Project List"
-              emptyMessage="You have no projects. Please create one"
-              onItemClick={(p) => this.handleItemClick(p)}
-            />
-          </span>
-          <span style={basicStyle}>
-            <AddProjectButton />
-          </span>
-        </p>
+        <div style={{ ...basicStyle, ...borderStyle }}>
+          <SimpleList
+            items={localUser.projects}
+            subheader="Project List"
+            emptyMessage="You have no projects. Please create one"
+            onItemClick={(p) => this.handleItemClick(p)}
+          />
+        </div>
+        <div style={basicStyle}>
+          <AddProjectButton />
+        </div>
+        <div>
+          <UFO uid={uid} />
+        </div>
         <br />
       </>
     )
@@ -132,6 +135,36 @@ class AddProjectButton extends Component {
         >
           Add Project
           </Button>
+      </div>
+    )
+  }
+}
+
+
+class UFO extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      response: null,
+    }
+  }
+
+
+  componentDidMount() {
+    const path = 'http://localhost:4000'
+    const { uid } = this.props
+    const socket = socketIOClient(path)
+    // socket.emit('req/user/read', uid)
+    socket.emit('storeClientInfo', uid)
+    socket.on('userFetched', data => this.setState({ response: data }))
+  }
+
+  render() {
+    console.log(this.state)
+    return (
+      <div>
+        {JSON.stringify(this.state)}
       </div>
     )
   }

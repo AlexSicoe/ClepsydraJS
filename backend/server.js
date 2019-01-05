@@ -1,5 +1,7 @@
 'use strict'
 require('dotenv').config()
+const http = require('http')
+const socketIo = require('socket.io')
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
@@ -32,10 +34,14 @@ const ERR_MSG_SPRINT = 'cannot find sprint'
 const ERR_MSG_STAGE = 'cannot find stage'
 
 
+
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cors())
+
+
+
 
 let adminRouter = express.Router()
 let authRouter = express.Router()
@@ -57,6 +63,84 @@ Stage.hasMany(Task)
 Task.belongsTo(Stage)
 User.hasMany(Task)
 Task.belongsTo(User)
+
+
+
+
+const server = http.createServer(app)
+const io = socketIo(server)
+
+app.get('/', (req, res) => res.send('Hello World'))
+
+const emitUser = async (uid, sockets) => {
+  try {
+    let user = await User.findByPk(uid, { include: [Project] })
+    if (user) {
+      sockets.forEach(s =>
+        io.to(s).emit('userFetched', user)
+      )
+    } else {
+      sockets.forEach(s =>
+        io.to(s).emit('userFetched', { message: ERR_MSG_USER })
+      )
+    }
+  } catch (err) {
+    console.log('Error: ', err)
+  }
+}
+
+
+let clients = []
+
+io.on('connection', (socket) => {
+  console.log('Client connected (id ' + socket.id + ')')
+
+  socket.on('storeClientInfo', uid => {
+    clients.push({ uid, socketId: socket.id })
+    console.log(clients)
+  })
+
+
+  socket.emit('hello', {
+    greeting: 'Hello Alex'
+  })
+
+
+  // socket.on('req/user/read', uid => readUser(socket, uid))
+
+
+  // function emitUser(uid) {
+  //   readUser(socket, uid)
+  // }
+  // emitUser(1)
+
+
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected...', socket.id)
+
+    for (let i = 0; i < clients.length; i++) {
+      var c = clients[i]
+      if (c.socketId === socket.id) {
+        clients.splice(i, 1)
+        break
+      }
+    }
+
+    console.log(clients)
+    // handleDisconnect()
+  })
+
+  socket.on('error', (err) => {
+    console.log('received error from client:', socket.id)
+    console.log(err)
+  })
+})
+
+server.listen(PORT)
+console.warn(`server listening on port ${PORT}`)
+
+
 
 
 
@@ -144,7 +228,7 @@ apiRouter.get('/users', async (req, res, next) => {
 
 apiRouter.get('/users/:uid', async (req, res, next) => {
   try {
-    let user = await User.findById(req.params.uid, { include: [Project] })
+    let user = await User.findByPk(req.params.uid, { include: [Project] })
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
@@ -157,7 +241,7 @@ apiRouter.get('/users/:uid', async (req, res, next) => {
 
 apiRouter.put('/users/:uid', async (req, res, next) => {
   try {
-    let user = await User.findById(req.params.uid)
+    let user = await User.findByPk(req.params.uid)
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
@@ -173,7 +257,7 @@ apiRouter.put('/users/:uid', async (req, res, next) => {
 
 apiRouter.delete('/users/:uid', async (req, res, next) => {
   try {
-    let user = await User.findById(req.params.uid)
+    let user = await User.findByPk(req.params.uid)
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
@@ -188,7 +272,7 @@ apiRouter.delete('/users/:uid', async (req, res, next) => {
 apiRouter.get('/users/:uid/projects', async (req, res, next) => {
   //get projects from a certain user
   try {
-    let user = await User.findById(req.params.uid)
+    let user = await User.findByPk(req.params.uid)
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
@@ -206,15 +290,20 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
   let through = {
     role: 'Admin'
   }
-
+  let { uid } = req.params
   try {
-    let user = await User.findById(req.params.uid)
+    let user = await User.findByPk(uid)
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
     }
     let project = await Project.create(req.body)
     await user.addProject(project, { through })
+
+    //TODO optimize
+    let sockets = clients.filter(c => c.uid == uid).map(c => c.socketId)
+    emitUser(uid, sockets)
+
     res.status(201).send({ message: 'created project' })
   }
   catch (err) {
@@ -233,7 +322,7 @@ apiRouter.get('/projects', async (req, res, next) => {
 
 apiRouter.get('/projects/:pid', async (req, res, next) => {
   try {
-    let project = await Project.findById(req.params.pid, { include: [User] })
+    let project = await Project.findByPk(req.params.pid, { include: [User] })
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -246,7 +335,7 @@ apiRouter.get('/projects/:pid', async (req, res, next) => {
 
 apiRouter.put('/projects/:pid', async (req, res, next) => {
   try {
-    let project = await Project.findById(req.params.pid)
+    let project = await Project.findByPk(req.params.pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -261,7 +350,7 @@ apiRouter.put('/projects/:pid', async (req, res, next) => {
 
 apiRouter.delete('/projects/:pid', async (req, res, next) => {
   try {
-    let project = await Project.findById(req.params.pid)
+    let project = await Project.findByPk(req.params.pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -275,7 +364,7 @@ apiRouter.delete('/projects/:pid', async (req, res, next) => {
 
 apiRouter.get('/projects/:pid/users', async (req, res, next) => {
   try {
-    let project = await Project.findById(req.params.pid)
+    let project = await Project.findByPk(req.params.pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -294,8 +383,8 @@ apiRouter.post('/projects/:pid/users/:uid', async (req, res, next) => {
   }
 
   try {
-    const findProject = Project.findById(req.params.pid)
-    const findUser = User.findById(req.params.uid)
+    const findProject = Project.findByPk(req.params.pid)
+    const findUser = User.findByPk(req.params.uid)
     const [project, user] = await Promise.all([findProject, findUser])
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
@@ -342,8 +431,8 @@ apiRouter.put('/projects/:pid/users/:uid', async (req, res, next) => {
 apiRouter.delete('/projects/:pid/users/:uid', async (req, res, next) => {
   //removes user from project
   try {
-    const findProject = Project.findById(req.params.pid)
-    const findUser = User.findById(req.params.uid)
+    const findProject = Project.findByPk(req.params.pid)
+    const findUser = User.findByPk(req.params.uid)
     const [project, user] = await Promise.all([findProject, findUser])
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
@@ -364,7 +453,7 @@ apiRouter.delete('/projects/:pid/users/:uid', async (req, res, next) => {
 
 apiRouter.get('/projects/:pid/sprints', async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.pid)
+    const project = await Project.findByPk(req.params.pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -378,7 +467,7 @@ apiRouter.get('/projects/:pid/sprints', async (req, res, next) => {
 
 apiRouter.post('/projects/:pid/sprints', async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.pid)
+    const project = await Project.findByPk(req.params.pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -393,7 +482,7 @@ apiRouter.post('/projects/:pid/sprints', async (req, res, next) => {
 
 apiRouter.put('/sprints/:sid', async (req, res, next) => {
   try {
-    const sprint = await Sprint.findById(req.params.sid)
+    const sprint = await Sprint.findByPk(req.params.sid)
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
       return
@@ -408,7 +497,7 @@ apiRouter.put('/sprints/:sid', async (req, res, next) => {
 apiRouter.delete('/sprints/:sid', async (req, res, next) => {
   //TODO remove from project with all its stages, atomically
   try {
-    const sprint = await Sprint.findById(req.params.sid)
+    const sprint = await Sprint.findByPk(req.params.sid)
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
       return
@@ -429,7 +518,7 @@ apiRouter.get('/sprints/:sid/stages', async (req, res, next) => {
   }
 
   try {
-    const sprint = await Sprint.findById(req.params.sid)
+    const sprint = await Sprint.findByPk(req.params.sid)
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
       return
@@ -449,7 +538,7 @@ apiRouter.post('/sprints/:sid/stages', async (req, res, next) => {
   }
 
   try {
-    const findSprint = Sprint.findById(req.params.sid)
+    const findSprint = Sprint.findByPk(req.params.sid)
     const findNr = Stage.max('position', options)
     let [sprint, nr] = await Promise.all([findSprint, findNr])
     if (!sprint) {
@@ -471,7 +560,7 @@ apiRouter.post('/sprints/:sid/stages', async (req, res, next) => {
 
 apiRouter.put('/stages/:stid', async (req, res, next) => {
   try {
-    const stage = await Stage.findById(req.params.stid)
+    const stage = await Stage.findByPk(req.params.stid)
     if (!stage) {
       res.status(404).send({ message: ERR_MSG_STAGE })
       return
@@ -485,7 +574,7 @@ apiRouter.put('/stages/:stid', async (req, res, next) => {
 
 apiRouter.delete('/stages/:stid', async (req, res, next) => {
   try {
-    const stage = await Stage.findById(req.params.stid)
+    const stage = await Stage.findByPk(req.params.stid)
     if (!stage) {
       res.status(404).send({ message: ERR_MSG_STAGE })
       return
@@ -501,8 +590,8 @@ apiRouter.delete('/stages/:stid', async (req, res, next) => {
 apiRouter.patch('/stages/:stid1/:stid2', async (req, res, next) => {
   //switch stages positions
   try {
-    const findStage1 = Stage.findById(req.params.stid1)
-    const findStage2 = Stage.findById(req.params.stid2)
+    const findStage1 = Stage.findByPk(req.params.stid1)
+    const findStage2 = Stage.findByPk(req.params.stid2)
     const [stage1, stage2] = await Promise.all([findStage1, findStage2])
     if (!(stage1 && stage2)) {
       res.status(404).send({ message: ERR_MSG_STAGE })
@@ -522,7 +611,7 @@ apiRouter.patch('/stages/:stid1/:stid2', async (req, res, next) => {
 
 apiRouter.get('/projects/:pid/tasks', async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.pid)
+    const project = await Project.findByPk(req.params.pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -536,7 +625,7 @@ apiRouter.get('/projects/:pid/tasks', async (req, res, next) => {
 
 apiRouter.post('/projects/:pid/tasks', async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.pid)
+    const project = await Project.findByPk(req.params.pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -552,7 +641,7 @@ apiRouter.post('/projects/:pid/tasks', async (req, res, next) => {
 
 apiRouter.put('/tasks/:tid', async (req, res, next) => {
   try {
-    const task = await Task.findById(req.params.tid)
+    const task = await Task.findByPk(req.params.tid)
     if (!task) {
       res.status(404).send({ message: ERR_MSG_TASK })
       return
@@ -567,7 +656,7 @@ apiRouter.put('/tasks/:tid', async (req, res, next) => {
 
 apiRouter.delete('/tasks/:tid', async (req, res, next) => {
   try {
-    const task = await Task.findById(req.params.tid)
+    const task = await Task.findByPk(req.params.tid)
     if (!task) {
       res.status(404).send({ message: ERR_MSG_TASK })
       return
@@ -588,8 +677,8 @@ apiRouter.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   }
 
   try {
-    const findSprint = Sprint.findById(req.params.sid)
-    const findTask = Task.findById(req.params.tid)
+    const findSprint = Sprint.findByPk(req.params.sid)
+    const findTask = Task.findByPk(req.params.tid)
     const [sprint, task] = await Promise.all([findSprint, findTask])
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
@@ -618,8 +707,8 @@ apiRouter.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
 apiRouter.delete('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   //if task belongs to a stage within this sprint, remove it
   try {
-    const findSprint = Sprint.findById(req.params.sid)
-    const findTask = Task.findById(req.params.tid)
+    const findSprint = Sprint.findByPk(req.params.sid)
+    const findTask = Task.findByPk(req.params.tid)
     const [sprint, task] = await Promise.all([findSprint, findTask])
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
@@ -651,8 +740,8 @@ apiRouter.delete('/sprints/:sid/tasks/:tid', async (req, res, next) => {
 apiRouter.post('/tasks/:tid/users/:uid', async (req, res, next) => {
   //assign task to user
   try {
-    const findTask = Task.findById(req.params.tid)
-    const findUser = User.findById(req.params.uid)
+    const findTask = Task.findByPk(req.params.tid)
+    const findUser = User.findByPk(req.params.uid)
     const [task, user] = await Promise.all([findTask, findUser])
     if (!task) {
       res.status(404).send({ message: ERR_MSG_TASK })
@@ -673,8 +762,8 @@ apiRouter.post('/tasks/:tid/users/:uid', async (req, res, next) => {
 apiRouter.delete('/tasks/:tid/users/:uid', async (req, res, next) => {
   //unassign task from user
   try {
-    const findTask = Task.findById(req.params.tid)
-    const findUser = User.findById(req.params.uid)
+    const findTask = Task.findByPk(req.params.tid)
+    const findUser = User.findByPk(req.params.uid)
     const [task, user] = await Promise.all([findTask, findUser])
     if (!task) {
       res.status(404).send({ message: ERR_MSG_TASK })
@@ -695,9 +784,9 @@ apiRouter.patch('/stages/:stid1/:stid2/tasks/:tid', async (req, res, next) => {
   //move task from one stage to another
   //TODO transaction
   try {
-    const findStage1 = Stage.findById(req.params.stid1)
-    const findStage2 = Stage.findById(req.params.stid2)
-    const findTask = Task.findById(req.params.tid)
+    const findStage1 = Stage.findByPk(req.params.stid1)
+    const findStage2 = Stage.findByPk(req.params.stid2)
+    const findTask = Task.findByPk(req.params.tid)
     const [stage1, stage2, task] = await Promise.all([
       findStage1, findStage2, findTask])
     if (!(stage1 && stage2)) {
@@ -734,9 +823,9 @@ apiRouter.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
   }
 
   try {
-    const findSprint1 = Sprint.findById(req.params.sid1)
-    const findSprint2 = Sprint.findById(req.params.sid2)
-    const findTask = Task.findById(req.params.tid)
+    const findSprint1 = Sprint.findByPk(req.params.sid1)
+    const findSprint2 = Sprint.findByPk(req.params.sid2)
+    const findTask = Task.findByPk(req.params.tid)
     const [sprint1, sprint2, task] = await Promise.all([
       findSprint1, findSprint2, findTask
     ])
@@ -777,8 +866,3 @@ app.use((err, req, res, next) => {
   console.warn(err, message)
   res.status(500).send({ message: 'some error' })
 })
-
-
-console.warn(`server listening on port ${PORT}`)
-app.listen(PORT)
-
