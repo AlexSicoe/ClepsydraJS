@@ -75,6 +75,17 @@ app.get('/', (req, res) => res.send('Hello World'))
 
 
 let clients = []
+function handleDisconnect(socket) {
+    for (let i = 0; i < clients.length; i++) {
+        var c = clients[i]
+        if (c.socketId === socket.id) {
+            clients.splice(i, 1)
+            break
+        }
+    }
+    console.log(clients)
+}
+
 
 const emitUser = async (uid, sockets) => {
     try {
@@ -103,25 +114,12 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log('Client disconnected...', socket.id)
-
-        for (let i = 0; i < clients.length; i++) {
-            var c = clients[i]
-            if (c.socketId === socket.id) {
-                clients.splice(i, 1)
-                break
-            }
-        }
-        console.log(clients)
-        // handleDisconnect()
+        handleDisconnect(socket)
     })
 
     socket.on('error', (err) => {
         console.log('received error from client:', socket.id)
         console.log(err)
-    })
-
-    socket.on('fetchUser', uid => {
-        emitUser(uid, [socket.id])
     })
 })
 
@@ -207,6 +205,7 @@ apiRouter.get('/', (req, res) => {
     res.send({ message: 'Welcome to our wonderful REST API !!!' })
 })
 
+//not used
 apiRouter.get('/users', async (req, res, next) => {
     try {
         let users = await User.findAll()
@@ -224,7 +223,10 @@ apiRouter.get('/users/:uid', async (req, res, next) => {
             res.status(404).send({ message: ERR_MSG_USER })
             return
         }
+
         res.status(200).json(user)
+
+
     } catch (err) {
         next(err)
     }

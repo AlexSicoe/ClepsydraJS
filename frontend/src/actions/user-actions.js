@@ -1,9 +1,9 @@
 import axios from 'axios'
-import { createProject } from './project-actions';
+import { emitClientInfo } from './socket-actions'
+import { socket } from './socket-actions'
 
 const API = 'http://localhost:4000/api'
-export const USER$CREATE = 'USER::CREATE'
-export const USER$UPDATE = 'USER::UPDATE'
+export const USER$UPSERT = 'USER::UPSERT'
 export const USER$REMOVE = 'USER::REMOVE'
 export const USER$ADD_PROJECT = 'USER::ADD_PROJECT'
 export const USER$REMOVE_PROJECT = 'USER::REMOVE_PROJECT'
@@ -12,8 +12,9 @@ export const USER$FETCH = 'USER::FETCH'
 export const USER$PUT = 'USER::PUT'
 export const USER$DELETE = 'USER::DELETE'
 
-export const createUser = (payload) => ({
-  type: USER$CREATE,
+
+export const upsertUser = (payload) => ({
+  type: USER$UPSERT,
   payload
 })
 
@@ -29,9 +30,9 @@ export const fetchUser = (id, token) => async dispatch => {
     meta: { globalMessage: true }
   })
   const user = res.action.payload.data
-  dispatch(createUser(user))
-  // user.projects.forEach(p => dispatch(createProject(p)))
-  // user.projects.forEach(p => dispatch(addUserToProject(p.id, user)))
+  dispatch(upsertUser(user))
+  emitClientInfo(id)
+  socket.on('userFetched', user => dispatch(upsertUser(user)))
 }
 
 export const putUser = (id, data, token) => ({

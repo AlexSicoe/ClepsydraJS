@@ -13,7 +13,6 @@ import ProjectScreen from './ProjectScreen'
 import ProjectForm from './ProjectForm'
 import { basicStyle, borderStyle } from './styles/styles'
 
-import socketIOClient from 'socket.io-client'
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -90,9 +89,6 @@ class HomeScreen extends Component {
         <div style={basicStyle}>
           <AddProjectButton />
         </div>
-        <div>
-          <UFO uid={uid} />
-        </div>
         <br />
       </>
     )
@@ -135,35 +131,6 @@ class AddProjectButton extends Component {
         >
           Add Project
           </Button>
-      </div>
-    )
-  }
-}
-
-
-class UFO extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      response: null,
-    }
-  }
-
-  componentDidMount() {
-    const path = 'http://localhost:4000'
-    const { uid } = this.props
-    const socket = socketIOClient(path)
-    socket.emit('storeClientInfo', uid)
-    socket.emit('fetchUser', uid)
-    socket.on('userFetched', user => this.setState({ response: user }))
-  }
-
-  render() {
-    console.log(this.state)
-    return (
-      <div>
-        {JSON.stringify(this.state)}
       </div>
     )
   }
