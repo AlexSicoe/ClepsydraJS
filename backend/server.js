@@ -74,16 +74,16 @@ app.get('/', (req, res) => res.send('Hello World'))
 
 
 
-let clients = []
+let clientManager = []
 function handleDisconnect(socket) {
-    for (let i = 0; i < clients.length; i++) {
-        var c = clients[i]
+    for (let i = 0; i < clientManager.length; i++) {
+        var c = clientManager[i]
         if (c.socketId === socket.id) {
-            clients.splice(i, 1)
+            clientManager.splice(i, 1)
             break
         }
     }
-    console.log(clients)
+    console.log(clientManager)
 }
 
 
@@ -108,8 +108,8 @@ io.on('connection', (socket) => {
     console.log('Client connected (id ' + socket.id + ')')
 
     socket.on('storeClientInfo', uid => {
-        clients.push({ uid, socketId: socket.id })
-        console.log(clients)
+        clientManager.push({ uid, socketId: socket.id })
+        console.log(clientManager)
     })
 
     socket.on('disconnect', () => {
@@ -205,15 +205,7 @@ apiRouter.get('/', (req, res) => {
     res.send({ message: 'Welcome to our wonderful REST API !!!' })
 })
 
-//not used
-apiRouter.get('/users', async (req, res, next) => {
-    try {
-        let users = await User.findAll()
-        res.status(200).json(users)
-    } catch (err) {
-        next(err)
-    }
-})
+
 
 apiRouter.get('/users/:uid', async (req, res, next) => {
     try {
@@ -262,22 +254,6 @@ apiRouter.delete('/users/:uid', async (req, res, next) => {
     }
 })
 
-apiRouter.get('/users/:uid/projects', async (req, res, next) => {
-    //get projects from a certain user
-    try {
-        let user = await User.findByPk(req.params.uid)
-        if (!user) {
-            res.status(404).send({ message: ERR_MSG_USER })
-            return
-        }
-        let projects = await user.getProjects() //TODO include role?
-        res.status(200).json(projects)
-    }
-    catch (err) {
-        next(err)
-    }
-})
-
 apiRouter.post('/users/:uid/projects', async (req, res, next) => {
     //user makes a project
     let through = {
@@ -294,7 +270,10 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
         await user.addProject(project, { through })
 
         //TODO optimize
-        let sockets = clients.filter(c => c.uid == uid).map(c => c.socketId)
+        let sockets = clientManager
+            .filter(c => c.uid == uid)
+            .map(c => c.socketId)
+
         emitUser(uid, sockets)
 
         res.status(201).send({ message: 'created project' })
@@ -304,18 +283,10 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
     }
 })
 
-apiRouter.get('/projects', async (req, res, next) => {
-    try {
-        let projects = await Project.findAll()
-        res.status(200).json(projects)
-    } catch (err) {
-        next(err)
-    }
-})
-
 apiRouter.get('/projects/:pid', async (req, res, next) => {
     try {
-        let project = await Project.findByPk(req.params.pid, { include: [User] })
+        const { pid } = req.params
+        let project = await Project.findByPk(pid, { include: [User, Sprint, Task] })
         if (!project) {
             res.status(404).send({ message: ERR_MSG_PROJECT })
             return
@@ -350,20 +321,6 @@ apiRouter.delete('/projects/:pid', async (req, res, next) => {
         }
         await project.destroy()
         res.status(200).send({ message: 'removed project' })
-    } catch (err) {
-        next(err)
-    }
-})
-
-apiRouter.get('/projects/:pid/users', async (req, res, next) => {
-    try {
-        let project = await Project.findByPk(req.params.pid)
-        if (!project) {
-            res.status(404).send({ message: ERR_MSG_PROJECT })
-            return
-        }
-        let users = await project.getUsers()
-        res.status(200).json(users)
     } catch (err) {
         next(err)
     }
@@ -444,15 +401,24 @@ apiRouter.delete('/projects/:pid/users/:uid', async (req, res, next) => {
     }
 })
 
-apiRouter.get('/projects/:pid/sprints', async (req, res, next) => {
+apiRouter.get('/sprints/:sid', async (req, res, next) => {
+    const StageWithOptions = {
+        model: Stage,
+        order: [['position', 'ASC']],
+        include: [Task],
+        separate: true
+    }
+
     try {
-        const project = await Project.findByPk(req.params.pid)
-        if (!project) {
-            res.status(404).send({ message: ERR_MSG_PROJECT })
+        const { sid } = req.params
+        const sprint = await Sprint.findByPk(sid, {
+            include: [StageWithOptions]
+        })
+        if (!sprint) {
+            res.status(404).send({ message: ERR_MSG_SPRINT })
             return
         }
-        const sprints = await project.getSprints()
-        res.status(200).json(sprints)
+        res.status(200).json(sprint)
     } catch (err) {
         next(err)
     }
@@ -497,27 +463,6 @@ apiRouter.delete('/sprints/:sid', async (req, res, next) => {
         }
         await sprint.destroy()
         res.status(200).send({ message: 'sprint removed' })
-    } catch (err) {
-        next(err)
-    }
-})
-
-apiRouter.get('/sprints/:sid/stages', async (req, res, next) => {
-    const withOptions = {
-        order: [
-            ['position', 'ASC']
-        ],
-        include: [Task]
-    }
-
-    try {
-        const sprint = await Sprint.findByPk(req.params.sid)
-        if (!sprint) {
-            res.status(404).send({ message: ERR_MSG_SPRINT })
-            return
-        }
-        const stages = await sprint.getStages(withOptions)
-        res.status(200).json(stages)
     } catch (err) {
         next(err)
     }
@@ -579,7 +524,7 @@ apiRouter.delete('/stages/:stid', async (req, res, next) => {
     }
 })
 
-//TODO test and refactor
+//TODO refactor
 apiRouter.patch('/stages/:stid1/:stid2', async (req, res, next) => {
     //switch stages positions
     try {
@@ -597,20 +542,6 @@ apiRouter.patch('/stages/:stid1/:stid2', async (req, res, next) => {
         const update2 = stage2.update({ position: pos2 })
         await Promise.all([update1, update2])
         res.status(200).send({ message: 'positions switched' })
-    } catch (err) {
-        next(err)
-    }
-})
-
-apiRouter.get('/projects/:pid/tasks', async (req, res, next) => {
-    try {
-        const project = await Project.findByPk(req.params.pid)
-        if (!project) {
-            res.status(404).send({ message: ERR_MSG_PROJECT })
-            return
-        }
-        const tasks = await project.getTasks()
-        res.status(200).json(tasks)
     } catch (err) {
         next(err)
     }
@@ -854,7 +785,7 @@ apiRouter.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
     }
 })
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     let message = err.status == 500 ? 'some error' : err.message
     console.warn(err, message)
     res.status(500).send({ message: 'some error' })
