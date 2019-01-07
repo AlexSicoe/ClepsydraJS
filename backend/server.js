@@ -87,22 +87,9 @@ function handleDisconnect(socket) {
 }
 
 
-const emitUser = async (uid, sockets) => {
-    try {
-        let user = await User.findByPk(uid, { include: [Project] })
-        if (user) {
-            sockets.forEach(s =>
-                io.to(s).emit('userFetched', user)
-            )
-        } else {
-            sockets.forEach(s =>
-                io.to(s).emit('error', { message: ERR_MSG_USER })
-            )
-        }
-    } catch (err) {
-        console.log('Error: ', err)
-    }
-}
+
+
+
 
 io.on('connection', (socket) => {
     console.log('Client connected (id ' + socket.id + ')')
@@ -205,20 +192,30 @@ apiRouter.get('/', (req, res) => {
     res.send({ message: 'Welcome to our wonderful REST API !!!' })
 })
 
-
+const emitUser = async (uid, socketIds) => {
+    try {
+        let user = await User.findByPk(uid, { include: [Project, Task] })
+        if (!user) {
+            socketIds.forEach(s =>
+                io.to(s).emit('error', { message: ERR_MSG_USER })
+            )
+        }
+        socketIds.forEach(s =>
+            io.to(s).emit('userFetched', user)
+        )
+    } catch (err) {
+        console.log('Error: ', err)
+    }
+}
 
 apiRouter.get('/users/:uid', async (req, res, next) => {
     try {
-        let user = await User.findByPk(req.params.uid, { include: [Project] })
-
+        let user = await User.findByPk(req.params.uid, { include: [Project, Task] })
         if (!user) {
             res.status(404).send({ message: ERR_MSG_USER })
             return
         }
-
         res.status(200).json(user)
-
-
     } catch (err) {
         next(err)
     }
@@ -237,8 +234,6 @@ apiRouter.put('/users/:uid', async (req, res, next) => {
         next(err)
     }
 })
-
-
 
 apiRouter.delete('/users/:uid', async (req, res, next) => {
     try {
@@ -273,7 +268,6 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
         let sockets = clientManager
             .filter(c => c.uid == uid)
             .map(c => c.socketId)
-
         emitUser(uid, sockets)
 
         res.status(201).send({ message: 'created project' })
@@ -282,6 +276,22 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
         next(err)
     }
 })
+
+const emitProject = async (pid, socketIds) => {
+    try {
+        let project = await Project.findByPk(pid, { include: [User, Sprint, Task] })
+        if (!project) {
+            socketIds.forEach(s =>
+                io.to(s).emit('error', { message: ERR_MSG_PROJECT })
+            )
+        }
+        socketIds.forEach(s =>
+            io.to(s).emit('projectFetched', project)
+        )
+    } catch (err) {
+        console.log('Error: ', err)
+    }
+}
 
 apiRouter.get('/projects/:pid', async (req, res, next) => {
     try {
@@ -320,6 +330,8 @@ apiRouter.delete('/projects/:pid', async (req, res, next) => {
             return
         }
         await project.destroy()
+
+        //TODO emitUser to all users who are part of this project
         res.status(200).send({ message: 'removed project' })
     } catch (err) {
         next(err)
@@ -349,6 +361,9 @@ apiRouter.post('/projects/:pid/users/:uid', async (req, res, next) => {
             return
         }
         await project.addUser(user, { through })
+
+            //TODO emitUser to whom was added
+            //TODO emitProject to members    
         res.status(200).send({ message: 'added user to project' })
     } catch (err) {
         next(err)
