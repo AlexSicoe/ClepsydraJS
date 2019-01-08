@@ -61,8 +61,8 @@ class Login extends Component {
 	}
 
 	handleClick(event) {
-		let { username, email, password } = this.props
-		let credentials = { username, email, password }
+		let { username, password } = this.props
+		let credentials = { username, password }
 		this.props.onLogin(credentials)
 	}
 

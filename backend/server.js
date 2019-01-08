@@ -18,7 +18,9 @@ const sequelize = new Sequelize(process.env.DB, process.env.DB_USER, process.env
 })
 exports.sequelize = sequelize
 const Op = Sequelize.Op
+
 const model = require('./model')
+const isMail = require('./util/isMail')
 
 
 
@@ -85,11 +87,6 @@ function handleDisconnect(socket) {
     }
     console.log(clientManager)
 }
-
-
-
-
-
 
 io.on('connection', (socket) => {
     console.log('Client connected (id ' + socket.id + ')')
@@ -167,13 +164,15 @@ adminRouter.post('/register', async (req, res, next) => {
 })
 
 authRouter.post('/login', async (req, res, next) => {
-    const { username, password } = req.body
-    const whereCredentialsMatch = { where: { username, password } }
+    const { username: mailOrName, password } = req.body
+    const whereCredentialsMatch = isMail(mailOrName) ?
+        { where: { email: mailOrName, password } } :
+        { where: { username: mailOrName, password } }
 
     try {
         let user = await User.findOne(whereCredentialsMatch)
         if (!user) {
-            res.status(401).send({ message: 'mail and password do not match' })
+            res.status(401).send({ message: 'username or pasword don\'t match' })
             return
         }
         refreshToken(user)
@@ -338,15 +337,21 @@ apiRouter.delete('/projects/:pid', async (req, res, next) => {
     }
 })
 
-apiRouter.post('/projects/:pid/users/:uid', async (req, res, next) => {
+apiRouter.post('/projects/:pid', async (req, res, next) => {
     //adds user to project
     const through = {
         role: 'User'
     }
 
+    const { pid } = req.params
+    const { mailOrName } = req.body
+    const mailOrNameMatch = isMail(mailOrName) ? 
+    {email: mailOrName} :  
+    {username: mailOrName}
+
     try {
-        const findProject = Project.findByPk(req.params.pid)
-        const findUser = User.findByPk(req.params.uid)
+        const findProject = Project.findByPk(pid)
+        const findUser = User.findOne({where: mailOrNameMatch})
         const [project, user] = await Promise.all([findProject, findUser])
         if (!project) {
             res.status(404).send({ message: ERR_MSG_PROJECT })
@@ -362,8 +367,8 @@ apiRouter.post('/projects/:pid/users/:uid', async (req, res, next) => {
         }
         await project.addUser(user, { through })
 
-            //TODO emitUser to whom was added
-            //TODO emitProject to members    
+        //TODO emitUser to whom was added
+        //TODO emitProject to members    
         res.status(200).send({ message: 'added user to project' })
     } catch (err) {
         next(err)

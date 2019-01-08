@@ -1,13 +1,13 @@
 import orm from './orm'
 import {
-  USER$CREATE,
-  USER$UPDATE,
   USER$UPSERT,
-  USER$REMOVE,
-  USER$ADD_PROJECT,
-  USER$REMOVE_PROJECT,
+  USER$DESTROY,
+
 } from '../actions/user-actions'
-import { PROJECT$CREATE as PROJECT$UPSERT } from '../actions/project-actions';
+import {
+  PROJECT$UPSERT,
+  PROJECT$DESTROY,
+} from '../actions/project-actions';
 
 const INITIAL_STATE = orm.getEmptyState()
 
@@ -20,35 +20,35 @@ export default (dbState = INITIAL_STATE, action) => {
     case USER$UPSERT:
       User.upsert(action.payload)
       break
-    case USER$REMOVE:
+    case USER$DESTROY:
       User.withId(action.payload.id).delete()
       break
 
     case PROJECT$UPSERT:
       Project.upsert(action.payload)
       break
-    case 'PROJECT::REMOVE':
+    case PROJECT$DESTROY:
       Project.withId(action.payload.id).delete()
       break
 
     case 'SRPINT::UPSERT':
       Sprint.upsert(action.payload)
       break
-    case 'SPRINT::REMOVE':
+    case 'SPRINT::DESTROY':
       Sprint.withId(action.payload.id).delete()
       break
 
     case 'STAGE::UPSERT':
       Stage.upsert(action.payload)
       break
-    case 'STAGE::REMOVE':
+    case 'STAGE::DESTROY':
       Stage.withId(action.payload.id).delete()
       break
 
     case 'TASK::UPSERT':
       Task.upsert(action.payload)
       break
-    case 'TASK::REMOVE':
+    case 'TASK::DESTROY':
       Task.withId(action.payload.id).delete()
       break
 

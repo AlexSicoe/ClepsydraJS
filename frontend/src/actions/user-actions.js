@@ -3,24 +3,28 @@ import { emitClientInfo } from './socket-actions'
 import { socket } from './socket-actions'
 
 const API = 'http://localhost:4000/api'
+export const USER$SELECT = 'USER::SELECT'
 export const USER$UPSERT = 'USER::UPSERT'
-export const USER$REMOVE = 'USER::REMOVE'
-export const USER$ADD_PROJECT = 'USER::ADD_PROJECT'
-export const USER$REMOVE_PROJECT = 'USER::REMOVE_PROJECT'
+export const USER$DESTROY = 'USER::DESTROY'
 
 export const USER$FETCH = 'USER::FETCH'
 export const USER$PUT = 'USER::PUT'
 export const USER$DELETE = 'USER::DELETE'
 
 
+export const selectUser = (uid) => ({
+  type: USER$SELECT,
+  payload: uid
+})
+
 export const upsertUser = (payload) => ({
   type: USER$UPSERT,
   payload
 })
 
-export const addProjectToUser = (uid, project) => ({
-  type: USER$ADD_PROJECT,
-  payload: { uid, project }
+export const destroyUser = (uid) => ({
+  trype: USER$DESTROY,
+  payload: uid
 })
 
 export const fetchUser = (id, token) => async dispatch => {
@@ -38,15 +42,11 @@ export const fetchUser = (id, token) => async dispatch => {
 export const putUser = (id, data, token) => ({
   type: USER$PUT,
   payload: axios.put(`${API}/users/${id}`, data, { headers: { token } }),
-  meta: {
-    globalMessage: true
-  }
+  meta: { globalMessage: true }
 })
 
 export const deleteUser = (id, token) => ({
   type: USER$DELETE,
   payload: axios.delete(`${API}/users/${id}`, { headers: { token } }),
-  meta: {
-    globalMessage: true
-  }
+  meta: { globalMessage: true }
 })

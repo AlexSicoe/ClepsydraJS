@@ -108,7 +108,7 @@ class AddProjectButton extends Component {
     }
   }
 
-  handleButton() {
+  openProjectForm() {
     this.setState({ showProjectForm: true })
   }
 
@@ -120,18 +120,16 @@ class AddProjectButton extends Component {
     const { showProjectForm } = this.state
 
     if (showProjectForm)
-      return <ProjectForm closeProjectForm={this.closeProjectForm.bind(this)} />
+      return <ProjectForm closeForm={this.closeProjectForm.bind(this)} />
 
     return (
-      <div>
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={() => this.handleButton()}
-        >
-          Add Project
-          </Button>
-      </div>
+      <Button
+        color="primary"
+        variant="contained"
+        onClick={() => this.openProjectForm()}
+      >
+        Add Project
+      </Button>
     )
   }
 }

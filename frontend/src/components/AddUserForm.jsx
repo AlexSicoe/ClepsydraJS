@@ -2,24 +2,23 @@ import React, { Component } from 'react'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import { connect } from 'react-redux'
-import { postProject } from './../actions/project-actions'
-
+import { addUserToProject } from '../actions/project-actions';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
-  uid: state.auth.uid,
+  pid: state.project.selected,
 })
 
 const mapDispatchToProps = {
-  onPostProject: postProject
+  onAddUserToProject: addUserToProject
 }
 
-class ProjectForm extends Component {
+class AddUserForm extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      projectName: '',
+      mailOrName: '',
     }
   }
 
@@ -30,11 +29,10 @@ class ProjectForm extends Component {
   }
 
   handleOK() {
-    const { projectName } = this.state
-    const { token, uid, closeForm, onPostProject } = this.props
+    const { mailOrName } = this.state
+    const { pid, token, closeForm, onAddUserToProject } = this.props
 
-    const project = { name: projectName }
-    onPostProject(uid, project, token)
+    onAddUserToProject(pid, mailOrName, token)
     closeForm()
   }
 
@@ -44,9 +42,9 @@ class ProjectForm extends Component {
     return (
       <>
         <TextField
-          placeholder="Project Name"
+          placeholder="Username or mail address"
           onChange={(event) => this.handleChange(event)}
-          name="projectName"
+          name="mailOrName"
         />
         <br />
         <br />
@@ -72,5 +70,4 @@ class ProjectForm extends Component {
   }
 }
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(ProjectForm)
+export default connect(mapStateToProps, mapDispatchToProps)(AddUserForm)

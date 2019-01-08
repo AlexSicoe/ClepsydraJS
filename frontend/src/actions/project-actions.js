@@ -1,20 +1,34 @@
 // @flow
 import axios from 'axios'
 
-import { addProjectToUser } from './user-actions';
-
 const API = 'http://localhost:4000/api'
-export const PROJECT$CREATE = 'PROJECT::CREATE'
-export const PROJECT$FETCH = 'PROJECT::FETCH'
-export const PROJECT$FETCH_ALL_FROM_USER = 'PROJECT::FETCH_ALL_FROM_USER'
-export const PROJECT$POST = 'PROJECT::POST'
 export const PROJECT$SELECT = 'PROJECT::SELECT'
+export const PROJECT$UPSERT = 'PROJECT::UPSERT'
+export const PROJECT$DESTROY = 'PROJECT::DESTROY'
 
-export const createProject = (payload) => ({
-  type: PROJECT$CREATE,
+export const PROJECT$FETCH = 'PROJECT::FETCH'
+export const PROJECT$POST = 'PROJECT::POST'
+export const PROJECT$PUT = 'PROJECT::PUT'
+export const PROJECT$DELETE = 'PROJECT::DELETE'
+export const PROJECT$ADD_USER = 'PROJECT::ADD_USER'
+export const PROJECT$REMOVE_USER = 'PROJECT::REMOVE_USER'
+
+
+
+export const selectProject = (pid) => ({
+  type: PROJECT$SELECT,
+  payload: pid,
+})
+
+export const upsertProject = (payload) => ({
+  type: PROJECT$UPSERT,
   payload
 })
 
+export const destroyProject = (pid) => ({
+  type: PROJECT$DESTROY,
+  payload: pid
+})
 
 export const fetchProject = (pid, token) => async (dispatch) => {
   try {
@@ -23,26 +37,11 @@ export const fetchProject = (pid, token) => async (dispatch) => {
       payload: axios.get(`${API}/projects/${pid}`, { headers: { token } }),
       meta: { globalMessage: true }
     })
-    dispatch(createProject(res.action.payload.data))
+    dispatch(upsertProject(res.action.payload.data))
   } catch (err) {
     console.log(err)
   }
 }
-
-export const fetchProjectsFromUser = (uid, token) => async (dispatch) => {
-  const res = await dispatch({
-    type: PROJECT$FETCH_ALL_FROM_USER,
-    payload: axios.get(`${API}/users/${uid}/projects`, { headers: { token } }),
-    meta: { globalMessage: true }
-  })
-  const projects: Array<*> = res.action.payload.data
-  projects.forEach(p => {
-    dispatch(createProject(p))
-    // dispatch(addProjectToUser(uid, p))
-  })
-}
-
-
 
 export const postProject = (uid, project, token) => ({
   type: PROJECT$POST,
@@ -50,8 +49,26 @@ export const postProject = (uid, project, token) => ({
   meta: { globalMessage: true }
 })
 
+export const putProject = (pid, project, token) => ({
+  type: PROJECT$PUT,
+  payload: axios.put(`${API}/projects/${pid}`, project, { headers: { token } }),
+  meta: { globalMessage: true }
+})
 
-export const selectProject = (pid) => ({
-  type: PROJECT$SELECT,
-  payload: pid,
+export const deleteProject = (pid, token) => ({
+  type: PROJECT$DELETE,
+  payload: axios.delete(`${API}/projects/${pid}`, { headers: { token } }),
+  meta: { globalMessage: true }
+})
+
+export const addUserToProject = (pid, mailOrName, token) => ({
+  type: PROJECT$ADD_USER,
+  payload: axios.post(`${API}/projects/${pid}`, { mailOrName }, { headers: { token } }),
+  meta: { globalMessage: true }
+})
+
+export const removeUserFromProject = (pid, uid, token) => ({
+  type: PROJECT$REMOVE_USER,
+  payload: axios.delete(`${API}/projects/${pid}/users/${uid}`, { headers: { token } }),
+  meta: { globalMessage: true }
 })
