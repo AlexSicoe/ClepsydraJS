@@ -1,5 +1,7 @@
 // @flow
 import axios from 'axios'
+import { emitClientInfo } from './socket-actions'
+import { socket } from './socket-actions'
 
 const API = 'http://localhost:4000/api'
 export const PROJECT$SELECT = 'PROJECT::SELECT'
@@ -37,10 +39,14 @@ export const fetchProject = (pid, token) => async (dispatch) => {
       payload: axios.get(`${API}/projects/${pid}`, { headers: { token } }),
       meta: { globalMessage: true }
     })
-    dispatch(upsertProject(res.action.payload.data))
+    const project = res.action.payload.data
+    dispatch(upsertProject(project))
+    // emitClientInfo(id)
+    socket.on('projectFetched', p => dispatch(upsertProject(p)))
   } catch (err) {
     console.log(err)
   }
+
 }
 
 export const postProject = (uid, project, token) => ({
@@ -63,7 +69,7 @@ export const deleteProject = (pid, token) => ({
 
 export const addUserToProject = (pid, mailOrName, token) => ({
   type: PROJECT$ADD_USER,
-  payload: axios.post(`${API}/projects/${pid}`, { mailOrName }, { headers: { token } }),
+  payload: axios.post(`${API}/projects/${pid}/users`, { mailOrName }, { headers: { token } }),
   meta: { globalMessage: true }
 })
 

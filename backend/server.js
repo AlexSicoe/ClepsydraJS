@@ -113,9 +113,6 @@ console.warn(`server listening on port ${PORT}`)
 
 
 
-
-
-
 apiRouter.use(async (req, res, next) => {
     let { token } = req.headers
     try {
@@ -191,7 +188,7 @@ apiRouter.get('/', (req, res) => {
     res.send({ message: 'Welcome to our wonderful REST API !!!' })
 })
 
-const emitUser = async (uid, socketIds) => {
+const emitUser = async (uid, socketIds, notification) => {
     try {
         let user = await User.findByPk(uid, { include: [Project, Task] })
         if (!user) {
@@ -200,7 +197,7 @@ const emitUser = async (uid, socketIds) => {
             )
         }
         socketIds.forEach(s =>
-            io.to(s).emit('userFetched', user)
+            io.to(s).emit('userFetched', user, notification)
         )
     } catch (err) {
         console.log('Error: ', err)
@@ -265,7 +262,7 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
 
         //TODO optimize
         let sockets = clientManager
-            .filter(c => c.uid == uid)
+            .filter(c => c.uid === uid)
             .map(c => c.socketId)
         emitUser(uid, sockets)
 
@@ -337,7 +334,7 @@ apiRouter.delete('/projects/:pid', async (req, res, next) => {
     }
 })
 
-apiRouter.post('/projects/:pid', async (req, res, next) => {
+apiRouter.post('/projects/:pid/users', async (req, res, next) => {
     //adds user to project
     const through = {
         role: 'User'
@@ -345,13 +342,13 @@ apiRouter.post('/projects/:pid', async (req, res, next) => {
 
     const { pid } = req.params
     const { mailOrName } = req.body
-    const mailOrNameMatch = isMail(mailOrName) ? 
-    {email: mailOrName} :  
-    {username: mailOrName}
+    const mailOrNameMatch = isMail(mailOrName) ?
+        { email: mailOrName } :
+        { username: mailOrName }
 
     try {
         const findProject = Project.findByPk(pid)
-        const findUser = User.findOne({where: mailOrNameMatch})
+        const findUser = User.findOne({ where: mailOrNameMatch })
         const [project, user] = await Promise.all([findProject, findUser])
         if (!project) {
             res.status(404).send({ message: ERR_MSG_PROJECT })
@@ -367,8 +364,26 @@ apiRouter.post('/projects/:pid', async (req, res, next) => {
         }
         await project.addUser(user, { through })
 
-        //TODO emitUser to whom was added
-        //TODO emitProject to members    
+        //emitUser to whom was added
+        let notification = {
+            type: 'info',
+            payload: `You've been invited into project: ${project.name}`,
+        }
+        let sockets = clientManager
+            .filter(c => c.uid === user.id)
+            .map(c => c.socketId)
+        emitUser(user.id, sockets, notification)
+
+        //emitProject to members
+        let members = await project.getUsers()
+        let memberIds = members.map(m => m.id)
+        sockets = clientManager
+            .filter(c => memberIds.find(m => m === c.uid))
+            .map(c => c.socketId)
+
+        emitProject(project.id, sockets)
+
+
         res.status(200).send({ message: 'added user to project' })
     } catch (err) {
         next(err)
@@ -805,7 +820,8 @@ apiRouter.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
     }
 })
 
-app.use((err, req, res) => {
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
     let message = err.status == 500 ? 'some error' : err.message
     console.warn(err, message)
     res.status(500).send({ message: 'some error' })

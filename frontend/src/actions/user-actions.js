@@ -36,7 +36,10 @@ export const fetchUser = (id, token) => async dispatch => {
   const user = res.action.payload.data
   dispatch(upsertUser(user))
   emitClientInfo(id)
-  socket.on('userFetched', user => dispatch(upsertUser(user)))
+  socket.on('userFetched', (user, notification) => {
+    console.log(notification) //TODO trigger snackbar
+    dispatch(upsertUser(user))
+  })
 }
 
 export const putUser = (id, data, token) => ({
