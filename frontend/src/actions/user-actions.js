@@ -23,7 +23,7 @@ export const upsertUser = (payload) => ({
 })
 
 export const destroyUser = (uid) => ({
-  trype: USER$DESTROY,
+  type: USER$DESTROY,
   payload: uid
 })
 

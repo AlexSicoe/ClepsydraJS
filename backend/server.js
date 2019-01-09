@@ -366,8 +366,9 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
 
         //emitUser to whom was added
         let notification = {
-            type: 'info',
-            payload: `You've been invited into project: ${project.name}`,
+            title: 'Invitation',
+            body: `You've been invited into project: ${project.name}`,
+            icon: 'info',
         }
         let sockets = clientManager
             .filter(c => c.uid === user.id)
