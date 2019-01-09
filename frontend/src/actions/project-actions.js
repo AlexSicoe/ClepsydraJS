@@ -1,6 +1,5 @@
 // @flow
 import axios from 'axios'
-import { emitClientInfo } from './socket-actions'
 import { socket } from './socket-actions'
 
 const API = 'http://localhost:4000/api'
@@ -78,3 +77,5 @@ export const removeUserFromProject = (pid, uid, token) => ({
   payload: axios.delete(`${API}/projects/${pid}/users/${uid}`, { headers: { token } }),
   meta: { globalMessage: true }
 })
+
+

@@ -75,35 +75,74 @@ const io = socketIo(server)
 app.get('/', (req, res) => res.send('Hello World'))
 
 
+let clientBook = new Map()
 
-let clientManager = []
-function handleDisconnect(socket) {
-    for (let i = 0; i < clientManager.length; i++) {
-        var c = clientManager[i]
-        if (c.socketId === socket.id) {
-            clientManager.splice(i, 1)
-            break
+
+function addClient(client, uid, book) {
+    let userClients = book.get(uid)
+    if (userClients) {
+        userClients.push(client)
+    } else {
+        book.set(uid, [client])
+    }
+    console.log('Client booked: ', client)
+    console.log(book)
+}
+
+function deleteClient(client, book) {
+    for (let [uid, userClients] of book.entries()) {
+        for (let i = 0; i < userClients.length; i++) {
+            if (userClients[i] === client) {
+                if (userClients.length === 1)
+                    book.delete(uid)
+                else
+                    userClients.splice(i, 1)
+                console.log('Client disconnected: ', client)
+                console.log(book)
+                return
+            }
         }
     }
-    console.log(clientManager)
+}
+
+function isOnline(uid, book) {
+    //todo observable
+    return !!book.get(uid)
+}
+
+function countUsersOnline(book) {
+    return book.size
+}
+////////////
+
+function toUser(uid) {
+    return clientBook.get(uid)
+}
+
+async function toProjectMembers(pid) {
+    let project = await Project.findByPk(pid)
+    let users = await project.getUsers()
+    return users.map(u => toUser(u.id))
 }
 
 io.on('connection', (socket) => {
-    console.log('Client connected (id ' + socket.id + ')')
+    console.log('Client connected: ' + socket.id)
 
-    socket.on('storeClientInfo', uid => {
-        clientManager.push({ uid, socketId: socket.id })
-        console.log(clientManager)
-    })
+    socket.on('storeClientInfo', uid =>
+        addClient(socket.id, uid, clientBook)
+    )
 
-    socket.on('disconnect', () => {
-        console.log('Client disconnected...', socket.id)
-        handleDisconnect(socket)
-    })
+    socket.on('disconnect', () =>
+        deleteClient(socket.id, clientBook)
+    )
 
-    socket.on('error', (err) => {
+    socket.on('error', (error) => {
         console.log('received error from client:', socket.id)
-        console.log(err)
+        console.log(error)
+    })
+
+    socket.on('isOnline', (uid) => {
+        socket.emit('isOnline', isOnline(uid, clientBook))
     })
 })
 
@@ -188,7 +227,7 @@ apiRouter.get('/', (req, res) => {
     res.send({ message: 'Welcome to our wonderful REST API !!!' })
 })
 
-const emitUser = async (uid, socketIds, notification) => {
+const emitUser = async (uid, notification, socketIds) => {
     try {
         let user = await User.findByPk(uid, { include: [Project, Task] })
         if (!user) {
@@ -260,11 +299,8 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
         let project = await Project.create(req.body)
         await user.addProject(project, { through })
 
-        //TODO optimize
-        let sockets = clientManager
-            .filter(c => c.uid === uid)
-            .map(c => c.socketId)
-        emitUser(uid, sockets)
+
+        emitUser(uid, null, toUser(uid))
 
         res.status(201).send({ message: 'created project' })
     }
@@ -370,20 +406,10 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
             body: `You've been invited into project: ${project.name}`,
             icon: 'info',
         }
-        let sockets = clientManager
-            .filter(c => c.uid === user.id)
-            .map(c => c.socketId)
-        emitUser(user.id, sockets, notification)
+        emitUser(user.id, notification, toUser(user.id))
 
         //emitProject to members
-        let members = await project.getUsers()
-        let memberIds = members.map(m => m.id)
-        sockets = clientManager
-            .filter(c => memberIds.find(m => m === c.uid))
-            .map(c => c.socketId)
-
-        emitProject(project.id, sockets)
-
+        emitProject(project.id, await toProjectMembers(project.id))
 
         res.status(200).send({ message: 'added user to project' })
     } catch (err) {
