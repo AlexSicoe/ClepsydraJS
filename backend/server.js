@@ -11,6 +11,7 @@ const Sequelize = require('sequelize')
 const sequelize = new Sequelize(process.env.DB, process.env.DB_USER, process.env.DB_PASS, {
   dialect: 'mysql',
   operatorsAliases: false,
+  logging: false,
   define: {
     timestamps: false,
     underscored: true
@@ -115,14 +116,14 @@ function countUsersOnline(book) {
 }
 ////////////
 
-function toUser(uid) {
-  return clientBook.get(uid)
+function toUser(uid, book) {
+  return book.get(uid)
 }
 
-async function toProjectMembers(pid) {
+async function toProjectMembers(pid, book) {
   let project = await Project.findByPk(pid)
   let users = await project.getUsers()
-  return users.map(u => toUser(u.id))
+  return users.map(u => toUser(u.id, book))
 }
 
 io.on('connection', (socket) => {
@@ -230,14 +231,9 @@ apiRouter.get('/', (req, res) => {
 const emitUser = async (uid, notification, socketIds) => {
   try {
     let user = await User.findByPk(uid, { include: [Project, Task] })
-    if (!user) {
-      socketIds.forEach(s =>
-        io.to(s).emit('error', { message: ERR_MSG_USER })
-      )
-    }
-    socketIds.forEach(s =>
+    for (let s of socketIds) {
       io.to(s).emit('userFetched', user, notification)
-    )
+    }
   } catch (err) {
     console.log('Error: ', err)
   }
@@ -298,10 +294,7 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
     }
     let project = await Project.create(req.body)
     await user.addProject(project, { through })
-
-
-    emitUser(uid, null, toUser(uid))
-
+    emitUser(user.id, null, toUser(user.id, clientBook))
     res.status(201).send({ message: 'created project' })
   }
   catch (err) {
@@ -312,14 +305,9 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
 const emitProject = async (pid, socketIds) => {
   try {
     let project = await Project.findByPk(pid, { include: [User, Sprint, Task] })
-    if (!project) {
-      socketIds.forEach(s =>
-        io.to(s).emit('error', { message: ERR_MSG_PROJECT })
-      )
-    }
-    socketIds.forEach(s =>
+    for (let s of socketIds) {
       io.to(s).emit('projectFetched', project)
-    )
+    }
   } catch (err) {
     console.log('Error: ', err)
   }
@@ -406,10 +394,10 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
       body: `You've been invited into project: ${project.name}`,
       icon: 'info',
     }
-    emitUser(user.id, notification, toUser(user.id))
+    emitUser(user.id, notification, toUser(user.id, clientBook))
 
     //emitProject to members
-    emitProject(project.id, await toProjectMembers(project.id))
+    emitProject(project.id, await toProjectMembers(project.id, clientBook))
 
     res.status(200).send({ message: 'added user to project' })
   } catch (err) {

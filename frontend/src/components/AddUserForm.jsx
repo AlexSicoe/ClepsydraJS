@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import { connect } from 'react-redux'
-import { addUserToProject } from '../actions/project-actions';
+import { addUserToProject } from '../actions/project-actions'
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,

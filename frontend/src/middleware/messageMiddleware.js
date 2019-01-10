@@ -1,5 +1,6 @@
 import isPromise from 'is-promise'
-import toastr from 'toastr'
+import notify from '../utils/notify'
+
 
 const serverSays = 'Server says:';
 export default () => next => async action => {
@@ -11,36 +12,28 @@ export default () => next => async action => {
     try {
       let res = await next(action)
       let { message } = res.action.payload.data
+
       if (message) {
-        console.warn(`Message: ${message}`)
-        toastr.success(message, serverSays)
+        notify({
+          title: serverSays,
+          body: message,
+          icon: 'success'
+        })
       }
+
       return res
     } catch (e) {
       let { message } = e.response.data
       console.warn(`${e}.`)
       console.warn(`Message: ${message}`)
-      toastr.error(message, serverSays)
+      notify({
+        title: serverSays,
+        body: message,
+        icon: 'error'
+      })
       return e
     }
   }
   return next(action)
 }
 
-toastr.options = {
-  "closeButton": false,
-  "debug": false,
-  "newestOnTop": false,
-  "progressBar": false,
-  "positionClass": "toast-bottom-right",
-  "preventDuplicates": false,
-  "onclick": null,
-  "showDuration": 150,
-  "hideDuration": 500,
-  "timeOut": 2500,
-  "extendedTimeOut": 500,
-  "showEasing": "swing",
-  "hideEasing": "linear",
-  "showMethod": "fadeIn",
-  "hideMethod": "fadeOut"
-}
