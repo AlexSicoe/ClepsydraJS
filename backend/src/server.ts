@@ -1,19 +1,22 @@
 'use strict'
+import { Request, Response } from 'express-serve-static-core';
 import http from 'http';
 import socketIo from 'socket.io';
-import express from 'express';
+import express, { NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import moment from 'moment';
 import crypto from 'crypto'
 import Sequelize from 'sequelize';
 import * as dotenv from "dotenv";
-
 let path = `${__dirname}/../.env`;
 dotenv.config({ path: path });
 
+import * as model from './model';
+import isMail from './util/isMail';
 
-export const sequelize = new Sequelize(process.env.DB!, process.env.DB_USER!, process.env.DB_PASS!, {
+
+const sequelize = new Sequelize(process.env.DB!, process.env.DB_USER!, process.env.DB_PASS!, {
   dialect: 'mysql',
   operatorsAliases: false,
   logging: false,
@@ -23,8 +26,14 @@ export const sequelize = new Sequelize(process.env.DB!, process.env.DB_USER!, pr
   }
 })
 const Op = Sequelize.Op
-import { User, Project, UserProject, Sprint, Stage, Task } from './model';
-import isMail from './util/isMail';
+
+
+const User = model.initUser(sequelize)
+const Project = model.initProject(sequelize)
+const UserProject = model.initUserProject(sequelize)
+const Stage = model.initStage(sequelize)
+const Sprint = model.initSprint(sequelize)
+const Task = model.initTask(sequelize)
 
 interface Notification {
   title: string;
@@ -121,14 +130,19 @@ function countUsersOnline(book: { size: Map<number, string[]> }) {
 }
 
 //////
-function toUser(uid: number) {
-  return clientBook.get(uid)
+function toUser(uid: any) {
+  return clientBook.get(Number(uid))
 }
 
-async function toProjectMembers(pid: number) {
-  let project: any = await Project.findByPk(pid)
-  let users: any[] = await project.getUsers()
-  return users.map((u: any) => toUser(u.id))
+async function toProjectMembers(pid: any) {
+  try {
+    let project: any = await Project.findByPk(pid)
+    let users = await project.getUsers()
+    return users.map((u: any) => toUser(u.id))
+
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 io.on('connection', (socket) => {
@@ -233,12 +247,13 @@ apiRouter.get('/', (req, res) => {
   res.send({ message: 'Welcome to our wonderful REST API !!!' })
 })
 
-const emitUser = async (uid: number, notification: Notification | null, socketIds: string[]) => {
+const emitUser = async (uid: any, notification: Notification | null, socketIds: string[] | undefined) => {
   try {
     let user = await User.findByPk(uid, { include: [Project, Task] })
-    for (let s of socketIds) {
-      io.to(s).emit('userFetched', user, notification)
-    }
+    if (socketIds)
+      for (let s of socketIds) {
+        io.to(s).emit('userFetched', user, notification)
+      }
   } catch (err) {
     console.log('Error: ', err)
   }
@@ -260,7 +275,7 @@ apiRouter.get('/users/:uid', async (req, res, next) => {
 
 apiRouter.put('/users/:uid', async (req, res, next) => {
   try {
-    let user: any = await User.findByPk(req.params.uid)
+    let user = await User.findByPk(req.params.uid)
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
@@ -274,7 +289,7 @@ apiRouter.put('/users/:uid', async (req, res, next) => {
 
 apiRouter.delete('/users/:uid', async (req, res, next) => {
   try {
-    let user: any = await User.findByPk(req.params.uid)
+    let user = await User.findByPk(req.params.uid)
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
@@ -335,7 +350,7 @@ apiRouter.get('/projects/:pid', async (req, res, next) => {
 
 apiRouter.put('/projects/:pid', async (req, res, next) => {
   try {
-    let project: any = await Project.findByPk(req.params.pid)
+    let project = await Project.findByPk(req.params.pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -350,13 +365,12 @@ apiRouter.put('/projects/:pid', async (req, res, next) => {
 
 apiRouter.delete('/projects/:pid', async (req, res, next) => {
   try {
-    let project: any = await Project.findByPk(req.params.pid)
+    let project = await Project.findByPk(req.params.pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
     }
     await project.destroy()
-
     //TODO emitUser to all users who are part of this project
     res.status(200).send({ message: 'removed project' })
   } catch (err) {
@@ -379,7 +393,7 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
   try {
     const findProject = Project.findByPk(pid)
     const findUser = User.findOne({ where: mailOrNameMatch })
-    const [project, user] = await Promise.all([findProject, findUser])
+    const [project, user]: any[] = await Promise.all([findProject, findUser])
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -394,7 +408,6 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
     }
     await project.addUser(user, { through })
 
-    //emitUser to whom was added
     let notification: Notification = {
       title: 'Invitation',
       body: `You've been invited into project: ${project.name}`,
@@ -402,7 +415,6 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
     }
     emitUser(user.id, notification, toUser(user.id))
 
-    //emitProject to members
     emitProject(project.id, await toProjectMembers(project.id))
 
     res.status(200).send({ message: 'added user to project' })
@@ -422,7 +434,7 @@ apiRouter.put('/projects/:pid/users/:uid', async (req, res, next) => {
   }
 
   try {
-    let through = await UserProject.findOne(whereDetailsMatch)
+    let through: any = await UserProject.findOne(whereDetailsMatch)
     if (!through) {
       res.status(404).send({ message: ERR_MSG_USER_PROJECT })
       return
@@ -439,7 +451,7 @@ apiRouter.delete('/projects/:pid/users/:uid', async (req, res, next) => {
   try {
     const findProject = Project.findByPk(req.params.pid)
     const findUser = User.findByPk(req.params.uid)
-    const [project, user] = await Promise.all([findProject, findUser])
+    const [project, user]: any[] = await Promise.all([findProject, findUser])
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -497,7 +509,7 @@ apiRouter.post('/projects/:pid/sprints', async (req, res, next) => {
 
 apiRouter.put('/sprints/:sid', async (req, res, next) => {
   try {
-    const sprint: any = await Sprint.findByPk(req.params.sid)
+    const sprint = await Sprint.findByPk(req.params.sid)
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
       return
@@ -512,7 +524,7 @@ apiRouter.put('/sprints/:sid', async (req, res, next) => {
 apiRouter.delete('/sprints/:sid', async (req, res, next) => {
   //TODO remove from project with all its stages, atomically
   try {
-    const sprint: any = await Sprint.findByPk(req.params.sid)
+    const sprint = await Sprint.findByPk(req.params.sid)
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
       return
@@ -534,7 +546,7 @@ apiRouter.post('/sprints/:sid/stages', async (req, res, next) => {
   try {
     const findSprint = Sprint.findByPk(req.params.sid)
     const findNr = Stage.max('position', options)
-    let [sprint, nr] = await Promise.all([findSprint, findNr])
+    let [sprint, nr]: any[] = await Promise.all([findSprint, findNr])
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
       return
@@ -568,7 +580,7 @@ apiRouter.put('/stages/:stid', async (req, res, next) => {
 
 apiRouter.delete('/stages/:stid', async (req, res, next) => {
   try {
-    const stage: any = await Stage.findByPk(req.params.stid)
+    const stage = await Stage.findByPk(req.params.stid)
     if (!stage) {
       res.status(404).send({ message: ERR_MSG_STAGE })
       return
@@ -621,7 +633,7 @@ apiRouter.post('/projects/:pid/tasks', async (req, res, next) => {
 
 apiRouter.put('/tasks/:tid', async (req, res, next) => {
   try {
-    const task: any = await Task.findByPk(req.params.tid)
+    const task = await Task.findByPk(req.params.tid)
     if (!task) {
       res.status(404).send({ message: ERR_MSG_TASK })
       return
@@ -636,7 +648,7 @@ apiRouter.put('/tasks/:tid', async (req, res, next) => {
 
 apiRouter.delete('/tasks/:tid', async (req, res, next) => {
   try {
-    const task: any = await Task.findByPk(req.params.tid)
+    const task = await Task.findByPk(req.params.tid)
     if (!task) {
       res.status(404).send({ message: ERR_MSG_TASK })
       return
@@ -659,7 +671,7 @@ apiRouter.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   try {
     const findSprint = Sprint.findByPk(req.params.sid)
     const findTask = Task.findByPk(req.params.tid)
-    const [sprint, task] = await Promise.all([findSprint, findTask])
+    const [sprint, task]: any[] = await Promise.all([findSprint, findTask])
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
       return
@@ -689,7 +701,7 @@ apiRouter.delete('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   try {
     const findSprint = Sprint.findByPk(req.params.sid)
     const findTask = Task.findByPk(req.params.tid)
-    const [sprint, task] = await Promise.all([findSprint, findTask])
+    const [sprint, task]: any[] = await Promise.all([findSprint, findTask])
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
       return
@@ -722,7 +734,7 @@ apiRouter.post('/tasks/:tid/users/:uid', async (req, res, next) => {
   try {
     const findTask = Task.findByPk(req.params.tid)
     const findUser = User.findByPk(req.params.uid)
-    const [task, user] = await Promise.all([findTask, findUser])
+    const [task, user]: any[] = await Promise.all([findTask, findUser])
     if (!task) {
       res.status(404).send({ message: ERR_MSG_TASK })
       return
@@ -744,7 +756,7 @@ apiRouter.delete('/tasks/:tid/users/:uid', async (req, res, next) => {
   try {
     const findTask = Task.findByPk(req.params.tid)
     const findUser = User.findByPk(req.params.uid)
-    const [task, user] = await Promise.all([findTask, findUser])
+    const [task, user]: any[] = await Promise.all([findTask, findUser])
     if (!task) {
       res.status(404).send({ message: ERR_MSG_TASK })
       return
@@ -767,7 +779,7 @@ apiRouter.patch('/stages/:stid1/:stid2/tasks/:tid', async (req, res, next) => {
     const findStage1 = Stage.findByPk(req.params.stid1)
     const findStage2 = Stage.findByPk(req.params.stid2)
     const findTask = Task.findByPk(req.params.tid)
-    const [stage1, stage2, task] = await Promise.all([
+    const [stage1, stage2, task]: any[] = await Promise.all([
       findStage1, findStage2, findTask])
     if (!(stage1 && stage2)) {
       res.status(404).send({ message: ERR_MSG_STAGE })
@@ -806,7 +818,7 @@ apiRouter.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
     const findSprint1 = Sprint.findByPk(req.params.sid1)
     const findSprint2 = Sprint.findByPk(req.params.sid2)
     const findTask = Task.findByPk(req.params.tid)
-    const [sprint1, sprint2, task] = await Promise.all([
+    const [sprint1, sprint2, task]: any[] = await Promise.all([
       findSprint1, findSprint2, findTask
     ])
     if (!(sprint1 && sprint2)) {
@@ -846,7 +858,7 @@ interface ErrorShape {
   message: string;
 }
 
-app.use((err: ErrorShape, req: any, res: any, next: any) => {
+app.use((err: ErrorShape, req: Request, res: Response, next: NextFunction) => {
   let message = err.status == 500 ? 'some error' : err.message
   console.warn(err, message)
   res.status(500).send({ message: 'some error' })
