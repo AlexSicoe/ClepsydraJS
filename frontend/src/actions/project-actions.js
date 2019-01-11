@@ -1,6 +1,7 @@
 // @flow
 import axios from 'axios'
 import { socket } from './socket-actions'
+import { PROJECT } from '../utils/events'
 
 const API = 'http://localhost:4000/api'
 export const PROJECT$SELECT = 'PROJECT::SELECT'
@@ -40,12 +41,10 @@ export const fetchProject = (pid, token) => async (dispatch) => {
     })
     const project = res.action.payload.data
     dispatch(upsertProject(project))
-    // emitClientInfo(id)
-    socket.on('projectFetched', p => dispatch(upsertProject(p)))
+    socket.on(PROJECT, p => dispatch(upsertProject(p)))
   } catch (err) {
     console.log(err)
   }
-
 }
 
 export const postProject = (uid, project, token) => ({

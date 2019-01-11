@@ -14,7 +14,8 @@ dotenv.config({ path: path });
 
 import * as model from './model';
 import isMail from './util/isMail';
-
+import { UserInstance, ProjectInstance, SprintInstance } from './model';
+import { USER, PROJECT, SPRINT, NOTIFICATION } from './events'
 
 const sequelize = new Sequelize(process.env.DB!, process.env.DB_USER!, process.env.DB_PASS!, {
   dialect: 'mysql',
@@ -51,6 +52,8 @@ const ERR_MSG_USER_PROJECT = 'cannot find userProject'
 const ERR_MSG_TASK = 'cannot find task'
 const ERR_MSG_SPRINT = 'cannot find sprint'
 const ERR_MSG_STAGE = 'cannot find stage'
+
+
 
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -130,26 +133,63 @@ function countUsersOnline(book: { size: Map<number, string[]> }) {
 }
 
 //////
-function toUser(uid: any) {
-  return clientBook.get(Number(uid))
+
+//TODO catch?
+async function readUser(uid: any) {
+  return await User.findByPk(uid, { include: [Project, Task] })
 }
 
-async function toProjectMembers(pid: any) {
-  try {
-    let project: any = await Project.findByPk(pid)
-    let users = await project.getUsers()
-    return users.map((u: any) => toUser(u.id))
+async function readProject(pid: any) {
+  return await Project.findByPk(pid, { include: [User, Sprint, Task] })
+}
 
-  } catch (err) {
-    console.log(err)
+async function readSprint(sid: any) {
+  const StageWithOptions = {
+    model: Stage,
+    order: [['position', 'ASC']],
+    include: [Task],
+    separate: true
+  }
+
+  const sprint = await Sprint.findByPk(sid, {
+    include: [StageWithOptions]
+  })
+
+  return sprint
+}
+
+function emit(event: string, payload: any, socketIds: string[]) {
+  if (!socketIds)
+    return
+  for (let s of socketIds) {
+    io.to(s).emit(event, payload)
   }
 }
+
+function toUser(user: UserInstance) {
+  return clientBook.get(Number(user.id))
+}
+
+async function toProjectMembers(project: ProjectInstance) {
+  //TODO check users undefined?
+  //@ts-ignore
+  let users: UserInstance[] = await project.getUsers()
+  if (!users) {
+    console.log('Houston we have a problem')
+  }
+  return users.map((u) => toUser(u))
+}
+
 
 io.on('connection', (socket) => {
   console.log('Client connected: ' + socket.id)
 
-  socket.on('storeClientInfo', uid =>
+  socket.on('login', uid =>
     addClient(socket.id, uid, clientBook)
+  )
+
+  socket.on('logout', () =>
+    deleteClient(socket.id, clientBook)
   )
 
   socket.on('disconnect', () =>
@@ -197,7 +237,6 @@ const refreshToken = (user: any) => {
   user.expiry = moment().add(TOKEN_LIFETIME, 'seconds')
   user.token = crypto.randomBytes(TOKEN_BYTES).toString('hex')
 }
-
 
 adminRouter.get('/create', async (req, res, next) => {
   try {
@@ -247,17 +286,7 @@ apiRouter.get('/', (req, res) => {
   res.send({ message: 'Welcome to our wonderful REST API !!!' })
 })
 
-const emitUser = async (uid: any, notification: Notification | null, socketIds: string[] | undefined) => {
-  try {
-    let user = await User.findByPk(uid, { include: [Project, Task] })
-    if (socketIds)
-      for (let s of socketIds) {
-        io.to(s).emit('userFetched', user, notification)
-      }
-  } catch (err) {
-    console.log('Error: ', err)
-  }
-}
+
 
 apiRouter.get('/users/:uid', async (req, res, next) => {
   try {
@@ -275,16 +304,29 @@ apiRouter.get('/users/:uid', async (req, res, next) => {
 
 apiRouter.put('/users/:uid', async (req, res, next) => {
   try {
-    let user = await User.findByPk(req.params.uid)
+    let user: any = await User.findByPk(req.params.uid)
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
     }
     await user.update(req.body)
     res.status(200).send({ message: 'updated user' })
+
+    //TODO refactor and test 
+    emit(USER, await readUser(user.id), toUser(user)!)
+
+    //TODO emitProject to members in project with user
+    let projects = await user.getProjects()
+    if (!projects)
+      return
+    for (let p of projects) {
+      //@ts-ignore
+      emit(PROJECT, p, await toProjectMembers(p))
+    }
   } catch (err) {
     next(err)
   }
+
 })
 
 apiRouter.delete('/users/:uid', async (req, res, next) => {
@@ -298,6 +340,8 @@ apiRouter.delete('/users/:uid', async (req, res, next) => {
     res.status(200).send({ message: 'removed user' })
   } catch (err) {
     next(err)
+
+    //TODO same ^
   }
 })
 
@@ -315,7 +359,10 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
     }
     let project = await Project.create(req.body)
     await user.addProject(project, { through })
-    emitUser(user.id, null, toUser(user.id))
+
+    //TODO test
+    emit(USER, await readUser(user.id), toUser(user)!)
+
     res.status(201).send({ message: 'created project' })
   }
   catch (err) {
@@ -323,16 +370,7 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
   }
 })
 
-const emitProject = async (pid: number, socketIds: string[]) => {
-  try {
-    let project = await Project.findByPk(pid, { include: [User, Sprint, Task] })
-    for (let s of socketIds) {
-      io.to(s).emit('projectFetched', project)
-    }
-  } catch (err) {
-    console.log('Error: ', err)
-  }
-}
+
 
 apiRouter.get('/projects/:pid', async (req, res, next) => {
   try {
@@ -413,9 +451,11 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
       body: `You've been invited into project: ${project.name}`,
       icon: 'info',
     }
-    emitUser(user.id, notification, toUser(user.id))
 
-    emitProject(project.id, await toProjectMembers(project.id))
+    //@ts-ignore
+    emit(PROJECT, await readProject(project.id), await toProjectMembers(project))
+    emit(USER, await readUser(user.id), toUser(user)!)
+    emit(NOTIFICATION, notification, toUser(user)!)
 
     res.status(200).send({ message: 'added user to project' })
   } catch (err) {

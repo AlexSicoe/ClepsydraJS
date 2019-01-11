@@ -1,5 +1,7 @@
-export const RESET_APP = 'ROOT::RESET_APP'
+import { handleSocketsOnLogout } from './socket-actions';
 
-export const resetApp = () => ({
-  type: RESET_APP
-})
+export const RESET_APP = 'ROOT::RESET_APP'
+export function resetApp() {
+  handleSocketsOnLogout()
+  return { type: RESET_APP }
+}

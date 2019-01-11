@@ -13,8 +13,8 @@ interface UserAttributes {
   expiry: string,
   timestamp: string,
 }
-type UserInstance = Sequelize.Instance<UserAttributes> & UserAttributes
-type UserModel = Sequelize.Model<UserInstance, UserAttributes>
+export type UserInstance = Sequelize.Instance<UserAttributes> & UserAttributes
+export type UserModel = Sequelize.Model<UserInstance, UserAttributes>
 
 export function initUser(sequelize: Sequelize.Sequelize): UserModel {
   const attributes: SequelizeAttributes<UserAttributes> = {
@@ -76,8 +76,8 @@ interface ProjectAttributes {
   id?: string,
   name: string
 }
-type ProjectInstance = Sequelize.Instance<ProjectAttributes> & ProjectAttributes
-type ProjectModel = Sequelize.Model<ProjectInstance, ProjectAttributes>
+export type ProjectInstance = Sequelize.Instance<ProjectAttributes> & ProjectAttributes
+export type ProjectModel = Sequelize.Model<ProjectInstance, ProjectAttributes>
 export function initProject(sequelize: Sequelize.Sequelize): ProjectModel {
   const attributes: SequelizeAttributes<ProjectAttributes> = {
     name: {
@@ -97,8 +97,8 @@ interface UserProjectAttributes {
   id?: string,
   role: 'Admin' | 'Moderator' | 'User'
 }
-type UserProjectInstance = Sequelize.Instance<UserProjectAttributes> & UserProjectAttributes
-type UserProjectModel = Sequelize.Model<UserProjectAttributes, UserProjectAttributes>
+export type UserProjectInstance = Sequelize.Instance<UserProjectAttributes> & UserProjectAttributes
+export type UserProjectModel = Sequelize.Model<UserProjectAttributes, UserProjectAttributes>
 export function initUserProject(sequelize: Sequelize.Sequelize): UserProjectModel {
   const attributes: SequelizeAttributes<UserProjectAttributes> = {
     role: {
@@ -123,8 +123,8 @@ interface SprintAttributes {
   startDate: string,
   finishDate: string,
 }
-type SprintInstance = Sequelize.Instance<SprintAttributes> & SprintAttributes
-type SprintModel = Sequelize.Model<SprintInstance, SprintAttributes>
+export type SprintInstance = Sequelize.Instance<SprintAttributes> & SprintAttributes
+export type SprintModel = Sequelize.Model<SprintInstance, SprintAttributes>
 export function initSprint(sequelize: Sequelize.Sequelize): SprintModel {
   const attributes: SequelizeAttributes<SprintAttributes> = {
     name: {
@@ -158,8 +158,8 @@ interface StageAttributes {
   name: string,
   position: number,
 }
-type StageInstance = Sequelize.Instance<StageAttributes> & StageAttributes
-type StageModel = Sequelize.Model<StageInstance, StageAttributes>
+export type StageInstance = Sequelize.Instance<StageAttributes> & StageAttributes
+export type StageModel = Sequelize.Model<StageInstance, StageAttributes>
 export function initStage(sequelize: Sequelize.Sequelize): StageModel {
   const attributes: SequelizeAttributes<StageAttributes> = {
     name: {
@@ -185,8 +185,8 @@ interface TaskAttributes {
   timestamp: string,
 
 }
-type TaskInstance = Sequelize.Instance<TaskAttributes> & TaskAttributes
-type TaskModel = Sequelize.Model<TaskInstance, TaskAttributes>
+export type TaskInstance = Sequelize.Instance<TaskAttributes> & TaskAttributes
+export type TaskModel = Sequelize.Model<TaskInstance, TaskAttributes>
 export function initTask(sequelize: Sequelize.Sequelize): TaskModel {
   const attributes: SequelizeAttributes<TaskAttributes> = {
     name: {

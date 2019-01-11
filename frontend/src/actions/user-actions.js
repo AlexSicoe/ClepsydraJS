@@ -1,7 +1,6 @@
 import axios from 'axios'
-import { emitClientInfo } from './socket-actions'
 import { socket } from './socket-actions'
-import notify from '../utils/notify'
+import { USER } from '../utils/events'
 
 const API = 'http://localhost:4000/api'
 export const USER$SELECT = 'USER::SELECT'
@@ -36,12 +35,7 @@ export const fetchUser = (id, token) => async dispatch => {
   })
   const user = res.action.payload.data
   dispatch(upsertUser(user))
-  emitClientInfo(id)
-  socket.on('userFetched', (user, notification) => {
-    console.log(notification) //TODO trigger snackbar
-    notify(notification)
-    dispatch(upsertUser(user))
-  })
+  socket.on(USER, (user) => dispatch(upsertUser(user)))
 }
 
 export const putUser = (id, data, token) => ({
