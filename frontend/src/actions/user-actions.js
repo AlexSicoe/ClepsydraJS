@@ -23,9 +23,9 @@ export const upsertUser = (payload) => ({
   payload
 })
 
-export const destroyUser = (uid) => ({
+export const destroyUser = (payload) => ({
   type: USER$DESTROY,
-  payload: uid
+  payload
 })
 
 export const fetchUser = (id, token) => async dispatch => {
