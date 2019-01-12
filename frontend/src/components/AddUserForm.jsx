@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import { connect } from 'react-redux'
 import { addUserToProject } from '../actions/project-actions'
+import ConfirmForm from './view/ConfirmForm';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -41,30 +42,16 @@ class AddUserForm extends Component {
 
     return (
       <>
-        <TextField
-          placeholder="Username or mail address"
-          onChange={(event) => this.handleChange(event)}
-          name="mailOrName"
-        />
-        <br />
-        <br />
-        <div>
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={() => closeForm()}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={() => this.handleOK()}
-          >
-            OK
-          </Button>
-        </div>
+        <ConfirmForm
+          handleOK={() => this.handleOK()}
+          handleCancel={() => closeForm()}
+        >
+          <TextField
+            placeholder="Username or mail address"
+            onChange={(event) => this.handleChange(event)}
+            name="mailOrName"
+          />
+        </ConfirmForm>
       </>
     )
   }

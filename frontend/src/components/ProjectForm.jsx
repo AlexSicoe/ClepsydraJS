@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import { connect } from 'react-redux'
 import { postProject } from './../actions/project-actions'
+import ConfirmForm from './view/ConfirmForm'
 
 
 const mapStateToProps = (state) => ({
@@ -38,35 +39,22 @@ class ProjectForm extends Component {
     closeForm()
   }
 
+
   render() {
     const { closeForm } = this.props
 
     return (
       <>
-        <TextField
-          placeholder="Project Name"
-          onChange={(event) => this.handleChange(event)}
-          name="projectName"
-        />
-        <br />
-        <br />
-        <div>
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={() => closeForm()}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={() => this.handleOK()}
-          >
-            OK
-          </Button>
-        </div>
+        <ConfirmForm
+          handleOK={() => this.handleOK()}
+          handleCancel={() => closeForm()}
+        >
+          <TextField
+            placeholder="Project Name"
+            onChange={(event) => this.handleChange(event)}
+            name="projectName"
+          />
+        </ConfirmForm>
       </>
     )
   }
