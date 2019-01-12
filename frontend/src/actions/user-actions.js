@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { socket } from './socket-actions'
-import { USER } from '../utils/events'
+import { USER, USER_DELETED } from '../utils/events'
+import { resetApp } from './root-actions';
 
 const API = 'http://localhost:4000/api'
 export const USER$SELECT = 'USER::SELECT'
@@ -36,6 +37,7 @@ export const fetchUser = (id, token) => async dispatch => {
   const user = res.action.payload.data
   dispatch(upsertUser(user))
   socket.on(USER, (user) => dispatch(upsertUser(user)))
+  socket.on(USER_DELETED, () => dispatch(resetApp()))
 }
 
 export const putUser = (id, data, token) => ({

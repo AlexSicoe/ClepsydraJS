@@ -15,7 +15,7 @@ dotenv.config({ path: path });
 import * as model from './model';
 import isMail from './util/isMail';
 import { UserInstance, ProjectInstance, SprintInstance } from './model';
-import { USER, PROJECT, SPRINT, NOTIFICATION } from './events'
+import { USER, PROJECT, PROJECT_DELETED, SPRINT, NOTIFICATION, USER_DELETED } from './events'
 
 const sequelize = new Sequelize(process.env.DB!, process.env.DB_USER!, process.env.DB_PASS!, {
   dialect: 'mysql',
@@ -133,8 +133,6 @@ function countUsersOnline(book: { size: Map<number, string[]> }) {
 }
 
 //////
-
-//TODO catch?
 async function readUser(uid: any) {
   return await User.findByPk(uid, { include: [Project, Task] })
 }
@@ -290,8 +288,8 @@ apiRouter.get('/', (req, res) => {
 
 apiRouter.get('/users/:uid', async (req, res, next) => {
   try {
-    ;
-    let user = await User.findByPk(req.params.uid, { include: [Project, Task] })
+    const { uid } = req.params
+    let user = await readUser(uid)
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
@@ -303,8 +301,9 @@ apiRouter.get('/users/:uid', async (req, res, next) => {
 })
 
 apiRouter.put('/users/:uid', async (req, res, next) => {
+  const { uid } = req.params
   try {
-    let user: any = await User.findByPk(req.params.uid)
+    let user: any = await User.findByPk(uid)
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
@@ -312,36 +311,44 @@ apiRouter.put('/users/:uid', async (req, res, next) => {
     await user.update(req.body)
     res.status(200).send({ message: 'updated user' })
 
-    //TODO refactor and test 
     emit(USER, await readUser(user.id), toUser(user)!)
 
-    //TODO emitProject to members in project with user
+    //emit project to members in project with user
     let projects = await user.getProjects()
-    if (!projects)
-      return
     for (let p of projects) {
       //@ts-ignore
-      emit(PROJECT, p, await toProjectMembers(p))
+      emit(PROJECT, await readProject(p.id), await toProjectMembers(p))
     }
+
+
+
   } catch (err) {
     next(err)
   }
-
 })
 
 apiRouter.delete('/users/:uid', async (req, res, next) => {
   try {
-    let user = await User.findByPk(req.params.uid)
+    const { uid } = req.params
+    let user: any = await User.findByPk(uid)
     if (!user) {
       res.status(404).send({ message: ERR_MSG_USER })
       return
     }
+    //before deleting
+    let projects = await user.getProjects()
+    ////
     await user.destroy()
     res.status(200).send({ message: 'removed user' })
+
+    //@ts-ignore
+    emit(USER_DELETED, null, toUser({ id: uid }))
+    for (let p of projects) {
+      //@ts-ignore
+      emit(PROJECT, await readProject(p.id), await toProjectMembers(p))
+    }
   } catch (err) {
     next(err)
-
-    //TODO same ^
   }
 })
 
@@ -359,23 +366,18 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
     }
     let project = await Project.create(req.body)
     await user.addProject(project, { through })
-
-    //TODO test
-    emit(USER, await readUser(user.id), toUser(user)!)
-
     res.status(201).send({ message: 'created project' })
+    emit(USER, await readUser(user.id), toUser(user)!)
   }
   catch (err) {
     next(err)
   }
 })
 
-
-
 apiRouter.get('/projects/:pid', async (req, res, next) => {
   try {
     const { pid } = req.params
-    let project = await Project.findByPk(pid, { include: [User, Sprint, Task] })
+    let project = await readProject(pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
@@ -387,30 +389,48 @@ apiRouter.get('/projects/:pid', async (req, res, next) => {
 })
 
 apiRouter.put('/projects/:pid', async (req, res, next) => {
+  const { pid } = req.params
   try {
-    let project = await Project.findByPk(req.params.pid)
+    let project: any = await Project.findByPk(pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
     }
     await project.update(req.body)
-
     res.status(200).send({ message: 'updated project' })
+    //TODO add tests and refactor
+    //@ts-ignore
+    emit(PROJECT, project, await toProjectMembers(project))
+    let users = await project.getUsers()
+    for (let u of users) {
+      emit(USER, await readUser(u.id), toUser(u)!)
+    }
   } catch (err) {
     next(err)
   }
 })
 
 apiRouter.delete('/projects/:pid', async (req, res, next) => {
+  const { pid } = req.params
   try {
-    let project = await Project.findByPk(req.params.pid)
+    let project: any = await Project.findByPk(pid)
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
       return
     }
+    //before delete
+    const targets = await toProjectMembers(project)
+    const users = await project.getUsers()
+    ////
     await project.destroy()
-    //TODO emitUser to all users who are part of this project
     res.status(200).send({ message: 'removed project' })
+    //TODO add tests and refactor
+    //@ts-ignore
+    emit(PROJECT_DELETED, { id: pid }, targets)
+    for (let u of users) {
+      //@ts-ignore
+      emit(USER, await readUser(u.id), toUser(u))
+    }
   } catch (err) {
     next(err)
   }
@@ -466,10 +486,12 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
 apiRouter.put('/projects/:pid/users/:uid', async (req, res, next) => {
   //edits joint data of user and project... 
   //think about UserProject roles
+  const { pid, uid } = req.params
+
   const whereDetailsMatch = {
     where: {
-      project_id: req.params.pid,
-      user_id: req.params.uid
+      project_id: pid,
+      user_id: uid
     }
   }
 
@@ -481,6 +503,11 @@ apiRouter.put('/projects/:pid/users/:uid', async (req, res, next) => {
     }
     await through.update(req.body)
     res.status(200).send({ message: 'userProject updated' })
+
+    let project = await readProject(pid)
+    //@ts-ignore
+    emit(PROJECT, project, await toProjectMembers(project))
+
   } catch (err) {
     next(err)
   }
@@ -488,9 +515,10 @@ apiRouter.put('/projects/:pid/users/:uid', async (req, res, next) => {
 
 apiRouter.delete('/projects/:pid/users/:uid', async (req, res, next) => {
   //removes user from project
+  const { pid, uid } = req.params
   try {
-    const findProject = Project.findByPk(req.params.pid)
-    const findUser = User.findByPk(req.params.uid)
+    const findProject = Project.findByPk(pid)
+    const findUser = User.findByPk(uid)
     const [project, user]: any[] = await Promise.all([findProject, findUser])
     if (!project) {
       res.status(404).send({ message: ERR_MSG_PROJECT })
@@ -504,24 +532,23 @@ apiRouter.delete('/projects/:pid/users/:uid', async (req, res, next) => {
       res.status(404).send({ message: 'project doesn\'t have said user' })
     await project.removeUser(user)
     res.status(200).send({ message: 'user removed from project' })
+    //TODO add tests and refacotr
+    //@ts-ignore
+    emit(USER, await readUser(uid), toUser({ id: uid }))
+    //@ts-ignore
+    emit(PROJECT, await readProject(pid), await toProjectMembers(project))
+    //@ts-ignore
+    emit(PROJECT_DELETED, { id: pid }, toUser({ id: uid }))
+
   } catch (err) {
     next(err)
   }
 })
 
 apiRouter.get('/sprints/:sid', async (req, res, next) => {
-  const StageWithOptions = {
-    model: Stage,
-    order: [['position', 'ASC']],
-    include: [Task],
-    separate: true
-  }
-
   try {
     const { sid } = req.params
-    const sprint = await Sprint.findByPk(sid, {
-      include: [StageWithOptions]
-    })
+    const sprint = await readSprint(sid)
     if (!sprint) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
       return

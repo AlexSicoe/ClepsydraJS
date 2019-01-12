@@ -1,7 +1,7 @@
 // @flow
 import axios from 'axios'
 import { socket } from './socket-actions'
-import { PROJECT } from '../utils/events'
+import { PROJECT, PROJECT_DELETED } from '../utils/events'
 
 const API = 'http://localhost:4000/api'
 export const PROJECT$SELECT = 'PROJECT::SELECT'
@@ -27,9 +27,9 @@ export const upsertProject = (payload) => ({
   payload
 })
 
-export const destroyProject = (pid) => ({
+export const destroyProject = (payload) => ({
   type: PROJECT$DESTROY,
-  payload: pid
+  payload
 })
 
 export const fetchProject = (pid, token) => async (dispatch) => {
@@ -42,6 +42,7 @@ export const fetchProject = (pid, token) => async (dispatch) => {
     const project = res.action.payload.data
     dispatch(upsertProject(project))
     socket.on(PROJECT, p => dispatch(upsertProject(p)))
+    socket.on(PROJECT_DELETED, (p) => dispatch(destroyProject(p)))
   } catch (err) {
     console.log(err)
   }
