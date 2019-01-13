@@ -5,12 +5,14 @@ import App from './components/App.jsx'
 import * as serviceWorker from './serviceWorker'
 import { Provider } from 'react-redux'
 import store from './store/store'
-//TODO
-ReactDOM.render(
+
+const root = (
   <Provider store={store}>
     <App />
-  </Provider>,
-  document.getElementById('root'))
+  </Provider>
+)
+
+ReactDOM.render(root, document.getElementById('root'))
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
