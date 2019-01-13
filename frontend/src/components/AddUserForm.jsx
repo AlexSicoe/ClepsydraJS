@@ -37,6 +37,21 @@ class AddUserForm extends Component {
     closeForm()
   }
 
+  handleKey(e) {
+    const { closeForm } = this.props
+
+    switch (e.key) {
+      case 'Escape':
+        closeForm()
+        break
+      case 'Enter':
+        this.handleOK()
+        break
+      default:
+        break
+    }
+  }
+
   render() {
     const { closeForm } = this.props
 
@@ -50,6 +65,7 @@ class AddUserForm extends Component {
             placeholder="Username or mail address"
             onChange={(event) => this.handleChange(event)}
             name="mailOrName"
+            onKeyDown={(e) => this.handleKey(e)}
           />
         </ConfirmForm>
       </>

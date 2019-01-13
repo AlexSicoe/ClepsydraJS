@@ -24,45 +24,54 @@ const mapDispatch = {
 }
 
 class Register extends Component {
-  render() {
-    return (
-      <>
-        <SimpleAppBar title="Register" />
-        <TextField
-          placeholder="Username"
-          onChange={(event) =>
-            this.props.onSetUsername(event.target.value)
-          } />
-        <br />
-        <TextField
-          placeholder="Email"
-          type="email"
-          onChange={(event) =>
-            this.props.onSetEmail(event.target.value)
-          } />
-        <br />
-        <TextField
-          placeholder="Password"
-          type="password"
-          onChange={(event) =>
-            this.props.onSetPassword(event.target.value)
-          } />
-        <br />
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={(event) => this.handleClick(event)}
-        >
-          Submit
-        </Button>
-      </>
-    )
-  }
 
   handleClick(event) {
     let { username, email, password } = this.props
     let credentials = { username, email, password }
     this.props.onRegister(credentials)
+  }
+
+  handleKey(e) {
+    if (e.key === "Enter") {
+      this.handleClick()
+    }
+  }
+
+  render() {
+    const { onSetUsername, onSetEmail, onSetPassword } = this.props
+
+    return (
+      <>
+        <SimpleAppBar title="Register" />
+        <TextField
+          placeholder="Username"
+          onChange={e => onSetUsername(e.target.value)}
+          onKeyDown={e => this.handleKey(e)}
+        />
+        <br />
+        <TextField
+          placeholder="Email"
+          type="email"
+          onChange={e => onSetEmail(e.target.value)}
+          onKeyDown={e => this.handleKey(e)}
+        />
+        <br />
+        <TextField
+          placeholder="Password"
+          type="password"
+          onChange={e => onSetPassword(e.target.value)}
+          onKeyDown={e => this.handleKey(e)}
+        />
+        <br />
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={e => this.handleClick(e)}
+        >
+          Submit
+        </Button>
+      </>
+    )
   }
 }
 

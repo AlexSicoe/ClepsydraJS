@@ -39,6 +39,20 @@ class ProjectForm extends Component {
     closeForm()
   }
 
+  handleKey(e) {
+    const { closeForm } = this.props
+
+    switch (e.key) {
+      case 'Escape':
+        closeForm()
+        break
+      case 'Enter':
+        this.handleOK()
+        break
+      default:
+        break
+    }
+  }
 
   render() {
     const { closeForm } = this.props
@@ -52,6 +66,7 @@ class ProjectForm extends Component {
           <TextField
             placeholder="Project Name"
             onChange={(event) => this.handleChange(event)}
+            onKeyDown={(e) => this.handleKey(e)}
             name="projectName"
           />
         </ConfirmForm>

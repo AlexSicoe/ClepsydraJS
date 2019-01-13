@@ -30,42 +30,48 @@ const mapDispatchToProps = {
 }
 
 class Login extends Component {
+	
+	handleClick(event) {
+		let { username, password, onLogin } = this.props
+		let credentials = { username, password }
+		onLogin(credentials)
+	}
+
+	handleKey(e) {
+		if (e.key === "Enter") {
+			this.handleClick()
+		}
+	}
+
 	render() {
-		let { token } = this.props
+		let { token, onSetUsername, onSetPassword } = this.props
 		return (
 			token ? <RedirectToHomeScreen /> :
 				<>
 					<SimpleAppBar title="Login" />
 					<TextField
 						placeholder="Username"
-						onChange={(event) =>
-							this.props.onSetUsername(event.target.value)
-						} />
+						onChange={e => onSetUsername(e.target.value)}
+						onKeyDown={e => this.handleKey(e)}
+					/>
 					<br />
 					<TextField
 						type="Password"
 						placeholder="Password"
-						onChange={(event) =>
-							this.props.onSetPassword(event.target.value)
-						} />
+						onChange={e => onSetPassword(e.target.value)}
+						onKeyDown={e => this.handleKey(e)}
+					/>
 					<br />
 					<Button
 						color="primary"
 						variant="contained"
-						onClick={(event) => this.handleClick(event)}
+						onClick={e => this.handleClick(e)}
 					>
 						Submit
 					</Button>
 				</>
 		)
 	}
-
-	handleClick(event) {
-		let { username, password } = this.props
-		let credentials = { username, password }
-		this.props.onLogin(credentials)
-	}
-
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login)
