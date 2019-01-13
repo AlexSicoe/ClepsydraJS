@@ -1,24 +1,25 @@
 import React, { Component } from 'react'
 import TextField from '@material-ui/core/TextField'
 import { connect } from 'react-redux'
-import { addUserToProject } from '../actions/project-actions'
-import ConfirmForm from './view/ConfirmForm';
+import { postProject } from '../../actions/project-actions'
+import ConfirmForm from '../view/ConfirmForm'
+
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
-  pid: state.project.selected,
+  uid: state.auth.uid,
 })
 
 const mapDispatchToProps = {
-  onAddUserToProject: addUserToProject
+  onPostProject: postProject
 }
 
-class AddUserForm extends Component {
+class ProjectForm extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      mailOrName: '',
+      projectName: '',
     }
   }
 
@@ -29,10 +30,11 @@ class AddUserForm extends Component {
   }
 
   handleOK() {
-    const { mailOrName } = this.state
-    const { pid, token, closeForm, onAddUserToProject } = this.props
+    const { projectName } = this.state
+    const { token, uid, closeForm, onPostProject } = this.props
 
-    onAddUserToProject(pid, mailOrName, token)
+    const project = { name: projectName }
+    onPostProject(uid, project, token)
     closeForm()
   }
 
@@ -61,10 +63,10 @@ class AddUserForm extends Component {
           handleCancel={() => closeForm()}
         >
           <TextField
-            placeholder="Username or mail address"
+            placeholder="Project Name"
             onChange={e => this.handleChange(e)}
             onKeyDown={e => this.handleKey(e)}
-            name="mailOrName"
+            name="projectName"
           />
         </ConfirmForm>
       </>
@@ -72,4 +74,5 @@ class AddUserForm extends Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddUserForm)
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectForm)

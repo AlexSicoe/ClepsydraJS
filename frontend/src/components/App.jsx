@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import AuthScreen from './AuthScreen'
+import AuthScreen from './auth/AuthScreen'
 import './App.css'
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import HomeScreen from './HomeScreen'
+import HomeScreen from './home/HomeScreen'
 
 const mapStateToProps = (state) => ({
 	token: state.auth.token,

@@ -1,6 +1,6 @@
 
 import React from 'react'
-import { resetApp } from '../actions/root-actions'
+import { resetApp } from '../../actions/root-actions'
 import Button from '@material-ui/core/Button'
 import { connect } from 'react-redux';
 

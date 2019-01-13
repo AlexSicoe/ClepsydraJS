@@ -1,17 +1,17 @@
 import React, { Component } from 'react'
 import Button from '@material-ui/core/Button'
 import { connect } from 'react-redux'
-import { getUsers } from '../redux-orm/selectors'
+import { getUsers } from '../../redux-orm/selectors'
 
-import LogoutButton from './LogoutButton'
-import { fetchUser } from '../actions/user-actions'
-import { resetApp } from '../actions/root-actions'
-import SimpleAppBar from './view/SimpleAppBar'
-import SimpleList from './view/SimpleList'
-import { selectProject } from './../actions/project-actions'
-import ProjectScreen from './ProjectScreen'
+import LogoutButton from '../view/LogoutButton'
+import { fetchUser } from '../../actions/user-actions'
+import { resetApp } from '../../actions/root-actions'
+import SimpleAppBar from '../view/SimpleAppBar'
+import SimpleList from '../view/SimpleList'
+import { selectProject } from '../../actions/project-actions'
+import ProjectScreen from '../project/ProjectScreen'
 import ProjectForm from './ProjectForm'
-import { basicStyle, borderStyle } from './styles/styles'
+import { basicStyle, borderStyle } from '../styles/styles'
 
 
 const mapStateToProps = (state) => ({

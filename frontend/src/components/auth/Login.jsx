@@ -4,9 +4,9 @@ import TextField from '@material-ui/core/TextField'
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import { login } from '../actions/auth-actions'
-import HomeScreen from './HomeScreen'
-import SimpleAppBar from './view/SimpleAppBar';
+import { login } from '../../actions/auth-actions'
+import HomeScreen from '../home/HomeScreen'
+import SimpleAppBar from '../view/SimpleAppBar';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -95,4 +95,3 @@ function RedirectToHomeScreen(props) {
     </Router>
   )
 }
-

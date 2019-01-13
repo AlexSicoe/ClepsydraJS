@@ -3,8 +3,8 @@ import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import { connect } from 'react-redux'
 
-import { register } from '../actions/auth-actions'
-import SimpleAppBar from './view/SimpleAppBar';
+import { register } from '../../actions/auth-actions'
+import SimpleAppBar from '../view/SimpleAppBar';
 
 
 const mapStateToProps = (state) => ({

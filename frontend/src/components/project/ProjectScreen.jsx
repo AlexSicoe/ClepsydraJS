@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { fetchProject, addUserToProject } from './../actions/project-actions'
+import { fetchProject, addUserToProject } from '../../actions/project-actions'
 import Button from '@material-ui/core/Button'
-import SimpleAppBar from './view/SimpleAppBar'
-import SimpleList from './view/SimpleList'
-import LogoutButton from './LogoutButton'
-import { getProjects } from '../redux-orm/selectors'
+import SimpleAppBar from '../view/SimpleAppBar'
+import SimpleList from '../view/SimpleList'
+import LogoutButton from '../view/LogoutButton'
+import { getProjects } from '../../redux-orm/selectors'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
-import BackButton from './view/BackButton';
+import BackButton from '../view/BackButton';
 import AddUserForm from './AddUserForm';
 
 

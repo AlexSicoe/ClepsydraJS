@@ -14,14 +14,16 @@ export default class AuthScreen extends Component {
     this.handleClick = this.handleClick.bind(this)
   }
 
-  render() {
-    return (
-      <div className="loginScreen">
-        {this.state.isDisplayingLogin ?
-          this.renderLogin() :
-          this.renderRegister()}
-      </div>
-    )
+  handleClick(e) {
+    this.state.isDisplayingLogin ?
+      this.setState({ isDisplayingLogin: false }) :
+      this.setState({ isDisplayingLogin: true })
+  }
+
+  redirectToLogin() {
+    this.setState({
+      isDisplayingLogin: true
+    })
   }
 
   renderLogin() {
@@ -50,16 +52,13 @@ export default class AuthScreen extends Component {
     )
   }
 
-  handleClick(e) {
-    e.preventDefault()
-    this.state.isDisplayingLogin ?
-      this.setState({ isDisplayingLogin: false }) :
-      this.setState({ isDisplayingLogin: true })
-  }
-
-  redirectToLogin() {
-    this.setState({
-      isDisplayingLogin: true
-    })
+  render() {
+    return (
+      <div className="loginScreen">
+        {this.state.isDisplayingLogin ?
+          this.renderLogin() :
+          this.renderRegister()}
+      </div>
+    )
   }
 }
