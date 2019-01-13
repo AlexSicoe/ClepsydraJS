@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import { connect } from 'react-redux'
 import { addUserToProject } from '../actions/project-actions'
@@ -63,9 +62,9 @@ class AddUserForm extends Component {
         >
           <TextField
             placeholder="Username or mail address"
-            onChange={(event) => this.handleChange(event)}
+            onChange={e => this.handleChange(e)}
+            onKeyDown={e => this.handleKey(e)}
             name="mailOrName"
-            onKeyDown={(e) => this.handleKey(e)}
           />
         </ConfirmForm>
       </>

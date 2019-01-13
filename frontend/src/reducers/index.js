@@ -1,6 +1,5 @@
 import { combineReducers } from 'redux'
 import auth from './auth-reducer'
-import authForm from './auth-form-reducer'
 import { RESET_APP } from '../actions/root-actions';
 import entities from '../redux-orm/entities-reducer'
 import project from './project-reducer'
@@ -8,7 +7,6 @@ import project from './project-reducer'
 
 const appReducer = combineReducers({
   auth,
-  authForm,
   entities,
   project,
 })

@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import { connect } from 'react-redux'
 import { postProject } from './../actions/project-actions'
@@ -65,8 +64,8 @@ class ProjectForm extends Component {
         >
           <TextField
             placeholder="Project Name"
-            onChange={(event) => this.handleChange(event)}
-            onKeyDown={(e) => this.handleKey(e)}
+            onChange={e => this.handleChange(e)}
+            onKeyDown={e => this.handleKey(e)}
             name="projectName"
           />
         </ConfirmForm>

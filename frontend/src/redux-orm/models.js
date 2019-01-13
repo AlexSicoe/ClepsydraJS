@@ -1,6 +1,6 @@
 //@flow
 
-import { Model, attr, fk, oneToOne, many } from 'redux-orm'
+import { Model, attr, fk, many } from 'redux-orm'
 
 export class User extends Model { }
 User.modelName = 'User'
