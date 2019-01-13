@@ -12,6 +12,7 @@ import { selectProject } from '../../actions/project-actions'
 import ProjectScreen from '../project/ProjectScreen'
 import ProjectForm from './ProjectForm'
 import { basicStyle, borderStyle } from '../styles/styles'
+import LoadingScreen from './../view/LoadingScreen';
 
 
 const mapStateToProps = (state) => ({
@@ -62,8 +63,8 @@ class HomeScreen extends Component {
     const localUser = users.find(user => user.id === uid)
     const { showProjectScreen } = this.state
 
-    if (!localUser) //TODO, await fetching
-      return <></>
+    if (!localUser)
+      return <LoadingScreen />
 
     if (showProjectScreen)
       return <ProjectScreen closeProjectScreen={this.closeProjectScreen.bind(this)} />

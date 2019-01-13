@@ -10,6 +10,7 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import BackButton from '../view/BackButton';
 import AddUserForm from './AddUserForm';
+import LoadingScreen from '../view/LoadingScreen';
 
 
 
@@ -35,10 +36,6 @@ class ProjectScreen extends Component {
     this.handleFetch()
   }
 
-  componentDidUpdate() {
-    // this.handleFetch()
-  }
-
   handleItemClick(u) {
     console.log(u)
   }
@@ -59,13 +56,18 @@ class ProjectScreen extends Component {
   }
 
   render() {
-    const { pid, projects } = this.props
+    const { pid, projects, closeProjectScreen } = this.props
     const selectedProject = projects.find(p => p.id === pid)
 
     console.log(selectedProject)
 
     if (!selectedProject)
-      return <>Loading project</> //TODO what if it doesn't exist in redux or on server anymore?
+      return (
+        <LoadingScreen>
+          <BackButton callback={() => closeProjectScreen()} />
+        </LoadingScreen>
+      )
+
 
     return (
       <>
@@ -81,7 +83,7 @@ class ProjectScreen extends Component {
           onItemClick={(u) => this.handleItemClick(u)}
           onItemView={(onItemClick, u) => this.handleItemView(onItemClick, u)}
         />
-        <BackButton callback={() => this.props.closeProjectScreen()} />
+        <BackButton callback={() => closeProjectScreen()} />
         <br />
         <br />
         <AddUserButton />

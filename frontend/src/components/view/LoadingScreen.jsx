@@ -1,9 +1,11 @@
 import React from 'react'
+import BackButton from './BackButton';
 
-export default function LoadingScreen() {
+export default function LoadingScreen({ children }) {
   return (
-    <div>
+    <>
       <p>Loading...</p>
-    </div>
+      {children}
+    </>
   )
 }

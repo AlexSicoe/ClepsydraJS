@@ -1,17 +1,15 @@
 import React from 'react'
 import Button from '@material-ui/core/Button'
 
-function BackButton({ callback }) {
+function BackButton({ callback = () => { console.warn("Callback not implemented!") } }) {
   return (
-    <>
-      <Button
-        color="secondary"
-        variant="contained"
-        onClick={() => callback()}
-      >
-        Back
-      </Button>
-    </>
+    <Button
+      color="secondary"
+      variant="contained"
+      onClick={() => callback()}
+    >
+      Back
+    </Button>
   )
 }
 
