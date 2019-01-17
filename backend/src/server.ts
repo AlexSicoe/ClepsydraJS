@@ -18,7 +18,7 @@ import { UserInstance, ProjectInstance, SprintInstance } from './model';
 import { USER, PROJECT, PROJECT_DELETED, SPRINT, NOTIFICATION, USER_DELETED } from './events'
 
 const sequelize = new Sequelize(process.env.DB!, process.env.DB_USER!, process.env.DB_PASS!, {
-  dialect: 'mysql',
+  dialect: 'postgres',
   operatorsAliases: false,
   logging: false,
   define: {
@@ -238,8 +238,8 @@ const refreshToken = (user: any) => {
 
 adminRouter.get('/create', async (req, res, next) => {
   try {
-    const results = await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', { raw: true })
-    console.table([...results])
+    // const results = await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', { raw: true })
+    // console.table([...results])
     await sequelize.sync({ force: true })
     res.status(201).send({ message: 'created tables' })
   } catch (err) {

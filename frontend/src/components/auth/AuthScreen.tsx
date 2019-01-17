@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import Login from './Login'
 import Register from './Register'
 import AuthFooter from './AuthFooter'
-export default class AuthScreen extends Component {
-  constructor(props) {
+export default class AuthScreen extends Component<any, any> {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -14,7 +14,7 @@ export default class AuthScreen extends Component {
     this.handleClick = this.handleClick.bind(this)
   }
 
-  handleClick(e) {
+  handleClick(e: any) {
     this.state.isDisplayingLogin ?
       this.setState({ isDisplayingLogin: false }) :
       this.setState({ isDisplayingLogin: true })
