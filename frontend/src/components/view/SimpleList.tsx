@@ -6,7 +6,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import _ from 'lodash'
 
-const styles = theme => ({
+const styles = (theme: any) => ({
   root: {
     width: '100%',
     maxWidth: 360,
@@ -14,7 +14,7 @@ const styles = theme => ({
   },
 })
 
-const defaultItemView = (onItemClick, item) => (
+const defaultItemView = (onItemClick: any, item: any) => (
   <ListItem
     divider
     button
@@ -24,14 +24,16 @@ const defaultItemView = (onItemClick, item) => (
   </ListItem>
 )
 
-function SimpleList({
-  classes,
-  items,
-  subheader,
-  emptyMessage = 'Empty List',
-  onItemClick,
-  onItemView = defaultItemView
-}) {
+function SimpleList(props: any) {
+  const {
+    classes,
+    items,
+    subheader,
+    emptyMessage = 'Empty List',
+    onItemClick,
+    onItemView = defaultItemView
+  } = props
+
   return (
     <div className={classes.root}>
       <List component="nav" subheader={subheader} >

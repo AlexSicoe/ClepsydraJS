@@ -20,7 +20,11 @@ export const login = (credentials) => async dispatch => {
     payload: axios.post(`${AUTH}/login`, credentials),
     meta: { globalMessage: true }
   })
+  if(res.action) {
   const { uid } = res.action.payload.data
   handleSocketsOnLogin(uid)
+  } else {
+    console.log('The hamsters are in trouble')
+  }
 }
 

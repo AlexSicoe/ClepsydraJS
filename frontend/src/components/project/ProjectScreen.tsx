@@ -11,10 +11,11 @@ import ListItemText from '@material-ui/core/ListItemText'
 import BackButton from '../view/BackButton';
 import AddUserForm from './AddUserForm';
 import LoadingScreen from '../view/LoadingScreen';
+import { Callback } from '../../utils/types';
 
 
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   token: state.auth.token,
   pid: state.project.selected,
   projects: getProjects(state),
@@ -25,7 +26,10 @@ const mapDispatchToProps = {
   onAddUserToProject: addUserToProject
 }
 
-class ProjectScreen extends Component {
+class ProjectScreen extends Component<any, any> {
+  state = {
+
+  }
 
   handleFetch() {
     const { pid, token, onFetchProject } = this.props
@@ -36,17 +40,17 @@ class ProjectScreen extends Component {
     this.handleFetch()
   }
 
-  handleItemClick(u) {
+  handleItemClick(u: any) {
     console.log(u)
   }
 
-  handleItemView(onItemClick, u) {
+  handleItemView(onItemClick: any, u: any) {
     return (
       <ListItem
         divider
         button
         key={u.id}
-        onClick={() => onItemClick(u)} //
+        onClick={() => onItemClick(u)}
       >
         <ListItemText primary={u.username} />
         <ListItemText secondary={u.email} />
@@ -57,7 +61,7 @@ class ProjectScreen extends Component {
 
   render() {
     const { pid, projects, closeProjectScreen } = this.props
-    const selectedProject = projects.find(p => p.id === pid)
+    const selectedProject = projects.find((p: any) => p.id === pid)
 
     console.log(selectedProject)
 
@@ -75,13 +79,14 @@ class ProjectScreen extends Component {
           <LogoutButton />
         </SimpleAppBar>
 
-
+        {/* 
+        //@ts-ignore */}
         <SimpleList
           items={selectedProject.users}
           subheader="Users"
           emptyMessage="No users"
-          onItemClick={(u) => this.handleItemClick(u)}
-          onItemView={(onItemClick, u) => this.handleItemView(onItemClick, u)}
+          onItemClick={(u: any) => this.handleItemClick(u)}
+          onItemView={(onItemClick: any, u: any) => this.handleItemView(onItemClick, u)}
         />
         <BackButton callback={() => closeProjectScreen()} />
         <br />
@@ -103,13 +108,9 @@ class ProjectScreen extends Component {
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectScreen)
 
 
-class AddUserButton extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      showUserForm: false,
-    }
+class AddUserButton extends Component<any, any> {
+  state = {
+    showUserForm: false,
   }
 
   openUserForm() {

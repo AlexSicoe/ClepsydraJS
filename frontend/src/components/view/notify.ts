@@ -1,6 +1,6 @@
 import toastr from 'toastr'
 
-export default function notify(notification) {
+export default function notify(notification: Notification) {
   if (!notification) {
     return
   }
@@ -29,7 +29,7 @@ toastr.options = {
   "progressBar": false,
   "positionClass": "toast-bottom-right",
   "preventDuplicates": false,
-  "onclick": null,
+  // "onclick": null,
   "showDuration": 150,
   "hideDuration": 500,
   "timeOut": 2500,
@@ -38,4 +38,16 @@ toastr.options = {
   "hideEasing": "linear",
   "showMethod": "fadeIn",
   "hideMethod": "fadeOut"
+}
+
+export interface Notification {
+  title: string
+  body: string
+  icon: 'success' | 'warning' | 'error' | 'info'
+}
+
+export const networkErrorNotification: Notification = {
+  title: 'Network:',
+  icon: 'error',
+  body: 'The hamsters ran into trouble'
 }

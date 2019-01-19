@@ -8,7 +8,7 @@ const mapDispatchToProps = {
   onLogout: resetApp,
 }
 
-function LogoutButton(props) {
+function LogoutButton(props: any) {
   return (
     <>
       <Button

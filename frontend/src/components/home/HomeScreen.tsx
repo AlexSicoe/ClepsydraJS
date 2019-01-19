@@ -12,10 +12,10 @@ import { selectProject } from '../../actions/project-actions'
 import ProjectScreen from '../project/ProjectScreen'
 import ProjectForm from './ProjectForm'
 import { basicStyle, borderStyle } from '../styles/styles'
-import LoadingScreen from './../view/LoadingScreen';
+import LoadingScreen from '../view/LoadingScreen';
 
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   token: state.auth.token,
   authError: state.auth.error, //if this exists, reset app
   uid: state.auth.uid,
@@ -29,9 +29,9 @@ const mapDispatchToProps = {
 }
 
 
-class HomeScreen extends Component {
+class HomeScreen extends Component<any, any> {
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -48,7 +48,7 @@ class HomeScreen extends Component {
     }
   }
 
-  handleItemClick(p) {
+  handleItemClick(p: any) {
     const { onSelectProject } = this.props
     onSelectProject(p.id)
     this.setState({ showProjectScreen: true })
@@ -60,7 +60,7 @@ class HomeScreen extends Component {
 
   render() {
     const { uid, users } = this.props
-    const localUser = users.find(user => user.id === uid)
+    const localUser = users.find((user: any) => user.id === uid)
     const { showProjectScreen } = this.state
 
     if (!localUser)
@@ -80,13 +80,17 @@ class HomeScreen extends Component {
         Hello {localUser.username}!
           <br />
         <div style={{ ...basicStyle, ...borderStyle }}>
+
+          {/* 
+        //@ts-ignore */}
           <SimpleList
             items={localUser.projects}
             subheader="Project List"
             emptyMessage="You have no projects. Please create one"
-            onItemClick={(p) => this.handleItemClick(p)}
+            onItemClick={(p: any) => this.handleItemClick(p)}
           />
         </div>
+
         <div style={basicStyle}>
           <AddProjectButton />
         </div>
@@ -99,9 +103,9 @@ class HomeScreen extends Component {
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 
 
-class AddProjectButton extends Component {
+class AddProjectButton extends Component<any, any> {
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {

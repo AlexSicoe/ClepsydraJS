@@ -1,7 +1,10 @@
 import React from 'react'
 import Button from '@material-ui/core/Button'
 
-function BackButton({ callback = () => { console.warn("Callback not implemented!") } }) {
+
+const DEFAULT_CALLBACK = () => { console.warn("Callback not implemented!") }
+
+function BackButton({ callback = DEFAULT_CALLBACK }) {
   return (
     <Button
       color="secondary"

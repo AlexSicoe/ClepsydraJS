@@ -20,7 +20,7 @@ const styles = {
   },
 }
 
-function SimpleAppBar({ classes, title, children }) {
+function SimpleAppBar({ classes, title, children }: any) {
   return (
     <AppBar position="static">
       <Toolbar>

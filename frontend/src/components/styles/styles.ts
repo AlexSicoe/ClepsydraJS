@@ -1,5 +1,5 @@
 export let basicStyle = {
-  float: 'left',
+  float: 'left' as any,
   margin: '5px 10px',
 }
 

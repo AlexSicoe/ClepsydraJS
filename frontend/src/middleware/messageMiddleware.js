@@ -1,5 +1,5 @@
 import isPromise from 'is-promise'
-import notify from '../utils/notify'
+import notify from '../components/view/notify'
 
 
 const serverSays = 'Server says:';
