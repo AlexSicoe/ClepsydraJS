@@ -92,7 +92,7 @@ class HomeScreen extends Component<any, any> {
         </div>
 
         <div style={basicStyle}>
-          <AddProjectButton />
+          <ProjectForm />
         </div>
         <br />
       </>
@@ -101,40 +101,3 @@ class HomeScreen extends Component<any, any> {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
-
-
-class AddProjectButton extends Component<any, any> {
-
-  constructor(props: any) {
-    super(props)
-
-    this.state = {
-      showProjectForm: false,
-    }
-  }
-
-  openProjectForm() {
-    this.setState({ showProjectForm: true })
-  }
-
-  closeProjectForm() {
-    this.setState({ showProjectForm: false })
-  }
-
-  render() {
-    const { showProjectForm } = this.state
-
-    if (showProjectForm)
-      return <ProjectForm closeForm={this.closeProjectForm.bind(this)} />
-
-    return (
-      <Button
-        color="primary"
-        variant="contained"
-        onClick={() => this.openProjectForm()}
-      >
-        Add Project
-      </Button>
-    )
-  }
-}

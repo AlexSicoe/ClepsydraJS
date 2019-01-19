@@ -29,7 +29,7 @@ export default function ConfirmDialog(props: Props) {
   return (
     <Dialog
       open={open}
-      onClose={() => handleClose()}
+      onClose={handleClose}
       aria-labelledby="form-dialog-title"
     >
       <DialogTitle id="form-dialog-title">{title}</DialogTitle>
@@ -40,10 +40,10 @@ export default function ConfirmDialog(props: Props) {
         {children}
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => handleOK()} color="primary">
+        <Button onClick={handleOK} color="primary">
           OK
             </Button>
-        <Button onClick={() => handleClose()} color="primary">
+        <Button onClick={handleClose} color="primary">
           Cancel
             </Button>
       </DialogActions>
