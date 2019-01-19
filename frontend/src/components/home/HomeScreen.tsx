@@ -10,7 +10,7 @@ import SimpleAppBar from '../view/SimpleAppBar'
 import SimpleList from '../view/SimpleList'
 import { selectProject } from '../../actions/project-actions'
 import ProjectScreen from '../project/ProjectScreen'
-import ProjectForm from './ProjectForm'
+import AddProjectButton from './AddProjectButton'
 import { basicStyle, borderStyle } from '../styles/styles'
 import LoadingScreen from '../view/LoadingScreen';
 
@@ -92,7 +92,7 @@ class HomeScreen extends Component<any, any> {
         </div>
 
         <div style={basicStyle}>
-          <ProjectForm />
+          <AddProjectButton />
         </div>
         <br />
       </>

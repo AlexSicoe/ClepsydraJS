@@ -9,9 +9,8 @@ import { getProjects } from '../../redux-orm/selectors'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import BackButton from '../view/BackButton';
-import AddUserForm from './AddUserForm';
+import AddUserButton from './AddUserButton';
 import LoadingScreen from '../view/LoadingScreen';
-import { Callback } from '../../utils/types';
 
 
 
@@ -106,35 +105,3 @@ class ProjectScreen extends Component<any, any> {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectScreen)
-
-
-class AddUserButton extends Component<any, any> {
-  state = {
-    showUserForm: false,
-  }
-
-  openUserForm() {
-    this.setState({ showUserForm: true })
-  }
-
-  closeUserForm() {
-    this.setState({ showUserForm: false })
-  }
-
-  render() {
-    const { showUserForm } = this.state
-
-    if (showUserForm)
-      return <AddUserForm closeForm={this.closeUserForm.bind(this)} />
-
-    return (
-      <Button
-        color="primary"
-        variant="contained"
-        onClick={() => this.openUserForm()}
-      >
-        Add User
-      </Button>
-    )
-  }
-}
