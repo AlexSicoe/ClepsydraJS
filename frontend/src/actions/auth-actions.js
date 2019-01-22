@@ -14,15 +14,16 @@ export const register = (credentials) => ({
   meta: { globalMessage: true }
 })
 
-export const login = (credentials) => async dispatch => {
+export const login = (credentials, onSuccess) => async dispatch => {
   const res = await dispatch({
     type: LOGIN,
     payload: axios.post(`${AUTH}/login`, credentials),
     meta: { globalMessage: true }
   })
-  if(res.action) {
-  const { uid } = res.action.payload.data
-  handleSocketsOnLogin(uid)
+  if (res.action) {
+    const { uid } = res.action.payload.data
+    handleSocketsOnLogin(uid)
+    onSuccess()
   } else {
     console.log('The hamsters are in trouble')
   }

@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
-import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import { login } from '../../actions/auth-actions'
-import HomeScreen from '../home/HomeScreen'
 import SimpleAppBar from '../view/SimpleAppBar';
+import { withRouter } from 'react-router-dom';
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,
@@ -15,83 +14,64 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = {
-  onLogin: login,
+  login,
 }
 
 class Login extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      username: '',
-      password: '',
-    }
+  state = {
+    username: '',
+    password: '',
   }
 
-  handleChange(event) {
+  handleChange = (event) => {
     this.setState({
       [event.target.name]: event.target.value
     })
   }
 
-  handleClick(event) {
+  handleLogin = (event) => {
     let { username, password } = this.state
-    let { onLogin } = this.props
+    let { login, history } = this.props
     let credentials = { username, password }
-    onLogin(credentials)
+    login(credentials, () => history.push('/home'))
   }
 
-  handleKey(e) {
-    if (e.key === "Enter") {
-      this.handleClick()
+  handleKey = (event) => {
+    if (event.key === "Enter") {
+      this.handleLogin()
     }
   }
 
   render() {
-    let { token } = this.props
     return (
-      token ? <RedirectToHomeScreen /> :
-        <>
-          <SimpleAppBar title="Login" />
-          <TextField
-            placeholder="Username"
-            onChange={e => this.handleChange(e)}
-            onKeyDown={e => this.handleKey(e)}
-            name="username"
-          />
-          <br />
-          <TextField
-            type="Password"
-            placeholder="Password"
-            onChange={e => this.handleChange(e)}
-            onKeyDown={e => this.handleKey(e)}
-            name="password"
-          />
-          <br />
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={e => this.handleClick(e)}
-          >
-            Submit
+      <>
+        <SimpleAppBar title="Login" />
+        <TextField
+          placeholder="Username"
+          onChange={this.handleChange}
+          onKeyDown={this.handleKey}
+          name="username"
+        />
+        <br />
+        <TextField
+          type="Password"
+          placeholder="Password"
+          onChange={this.handleChange}
+          onKeyDown={this.handleKey}
+          name="password"
+        />
+        <br />
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={this.handleLogin}
+        >
+          Submit
 					</Button>
-        </>
+      </>
     )
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login)
-
-
-function RedirectToHomeScreen(props) {
-  return (
-    <Router>
-      <>
-        <Switch>
-          <Route path="/home" component={HomeScreen} />
-        </Switch>
-        <Redirect to="/home" />
-      </>
-    </Router>
-  )
-}
+const LoginWithRouter = withRouter(Login)
+export default connect(mapStateToProps, mapDispatchToProps)(LoginWithRouter)

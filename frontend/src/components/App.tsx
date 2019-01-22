@@ -35,8 +35,8 @@ class App extends Component<any, any> {
 			<Router>
 				<>
 					<Switch>
-						<Route exact path="/auth" component={AuthScreen} />
-						<Route exact path="/home" component={HomeScreen} />
+						<Route path="/auth" component={AuthScreen} />
+						<Route path="/home" component={HomeScreen} />
 					</Switch>
 
 					{
