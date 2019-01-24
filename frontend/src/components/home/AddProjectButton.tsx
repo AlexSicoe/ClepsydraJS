@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { postProject } from '../../actions/project-actions'
 import ConfirmDialog from '../view/ConfirmDialog';
 import Button from '@material-ui/core/Button';
-import { ChangeEvent, KeyboardEvent } from '../view/viewTypes';
+import { ChangeEvent, KeyEvent } from '../view/view-types';
 
 
 const mapStateToProps = (state: any) => ({
@@ -37,7 +37,7 @@ class ProjectForm extends Component<any, any> {
     onPostProject(uid, project, token)
   }
 
-  handleKey = (event: KeyboardEvent) => {
+  handleKey = (event: KeyEvent) => {
     switch (event.key) {
       case 'Escape':
         this.handleClose()

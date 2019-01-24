@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { addUserToProject } from '../../actions/project-actions';
 import ConfirmDialog from '../view/ConfirmDialog';
-import { ChangeEvent, KeyboardEvent } from '../view/viewTypes';
+import { ChangeEvent, KeyEvent } from '../view/view-types';
 
 const mapStateToProps = (state: any) => ({
   token: state.auth.token,
@@ -35,7 +35,7 @@ class AddUserForm extends Component<any, any> {
     onAddUserToProject(pid, mailOrName, token)
   }
 
-  handleKey = (event: KeyboardEvent) => {
+  handleKey = (event: KeyEvent) => {
 
     switch (event.key) {
       case 'Escape':

@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import './App.css';
-import AuthScreen from './auth/AuthScreen';
 import HomeScreen from './home/HomeScreen';
+import NoMatch from './NoMatch';
+import PublicScreen from './public/PublicScreen';
 
 
 const mapStateToProps = (state: any) => ({
@@ -27,7 +28,7 @@ class App extends Component<any, any> {
 		const { token } = this.props
 		return token ?
 			<Redirect to="/home" /> :
-			<Redirect to="/auth" />
+			<Redirect to="/" />
 	}
 
 	render() {
@@ -35,13 +36,11 @@ class App extends Component<any, any> {
 			<Router>
 				<>
 					<Switch>
-						<Route path="/auth" component={AuthScreen} />
+						<Route exact path="/" component={PublicScreen} />
 						<Route path="/home" component={HomeScreen} />
+						<Route component= {NoMatch}/>
 					</Switch>
-
-					{
-						this.renderRedirect()
-					}
+					{this.renderRedirect()}
 				</>
 			</Router>
 		)
