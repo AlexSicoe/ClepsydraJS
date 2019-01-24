@@ -5,6 +5,7 @@ import './App.css';
 import HomeScreen from './home/HomeScreen';
 import NoMatch from './NoMatch';
 import PublicScreen from './public/PublicScreen';
+import ProjectScreen from './project/ProjectScreen';
 
 
 const mapStateToProps = (state: any) => ({
@@ -38,6 +39,7 @@ class App extends Component<any, any> {
 					<Switch>
 						<Route exact path="/" component={PublicScreen} />
 						<Route path="/home" component={HomeScreen} />
+						<Route path="/projects/:pid" component={ProjectScreen} />
 						<Route component= {NoMatch}/>
 					</Switch>
 					{this.renderRedirect()}

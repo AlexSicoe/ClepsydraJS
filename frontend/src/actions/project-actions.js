@@ -4,7 +4,6 @@ import { socket } from './socket-actions'
 import { PROJECT, PROJECT_DELETED } from '../utils/events'
 
 const API = 'http://localhost:4000/api'
-export const PROJECT$SELECT = 'PROJECT::SELECT'
 export const PROJECT$UPSERT = 'PROJECT::UPSERT'
 export const PROJECT$DESTROY = 'PROJECT::DESTROY'
 
@@ -15,12 +14,6 @@ export const PROJECT$DELETE = 'PROJECT::DELETE'
 export const PROJECT$ADD_USER = 'PROJECT::ADD_USER'
 export const PROJECT$REMOVE_USER = 'PROJECT::REMOVE_USER'
 
-
-
-export const selectProject = (pid) => ({
-  type: PROJECT$SELECT,
-  payload: pid,
-})
 
 export const upsertProject = (payload) => ({
   type: PROJECT$UPSERT,

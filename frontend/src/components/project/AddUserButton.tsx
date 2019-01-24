@@ -8,7 +8,6 @@ import { ChangeEvent, KeyEvent } from '../view/view-types';
 
 const mapStateToProps = (state: any) => ({
   token: state.auth.token,
-  pid: state.project.selected,
 })
 
 const mapDispatchToProps = {

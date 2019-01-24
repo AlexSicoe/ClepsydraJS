@@ -11,18 +11,18 @@ import ListItemText from '@material-ui/core/ListItemText'
 import BackButton from '../view/BackButton';
 import AddUserButton from './AddUserButton';
 import LoadingScreen from '../view/LoadingScreen';
+import { withRouter } from 'react-router-dom';
 
 
 
 const mapStateToProps = (state: any) => ({
   token: state.auth.token,
-  pid: state.project.selected,
   projects: getProjects(state),
 })
 
 const mapDispatchToProps = {
-  onFetchProject: fetchProject,
-  onAddUserToProject: addUserToProject
+  fetchProject,
+  addUserToProject
 }
 
 class ProjectScreen extends Component<any, any> {
@@ -30,20 +30,18 @@ class ProjectScreen extends Component<any, any> {
 
   }
 
-  handleFetch() {
-    const { pid, token, onFetchProject } = this.props
-    onFetchProject(pid, token)
+  handleFetch = () => {
+    const { match, token, fetchProject } = this.props
+    const { pid } = match.params
+    fetchProject(pid, token)
   }
 
-  componentDidMount() {
-    this.handleFetch()
-  }
 
-  handleItemClick(u: any) {
+  handleItemClick = (u: any) => {
     console.log(u)
   }
 
-  handleItemView(onItemClick: any, u: any) {
+  handleItemView = (onItemClick: any, u: any) => {
     return (
       <ListItem
         divider
@@ -58,16 +56,23 @@ class ProjectScreen extends Component<any, any> {
     )
   }
 
+  goBack = () => this.props.history.goBack()
+
+  componentWillMount() {
+    this.handleFetch()
+  }
+
   render() {
-    const { pid, projects, closeProjectScreen } = this.props
-    const selectedProject = projects.find((p: any) => p.id === pid)
+    const { match, projects } = this.props
+    const { pid } = match.params
+    const selectedProject = projects.find((p: any) => p.id == pid)
 
     console.log(selectedProject)
 
     if (!selectedProject)
       return (
         <LoadingScreen>
-          <BackButton callback={() => closeProjectScreen()} />
+          <BackButton callback={this.goBack} />
         </LoadingScreen>
       )
 
@@ -84,13 +89,13 @@ class ProjectScreen extends Component<any, any> {
           items={selectedProject.users}
           subheader="Users"
           emptyMessage="No users"
-          onItemClick={(u: any) => this.handleItemClick(u)}
-          onItemView={(onItemClick: any, u: any) => this.handleItemView(onItemClick, u)}
+          onItemClick={this.handleItemClick}
+          onItemView={this.handleItemView}
         />
-        <BackButton callback={() => closeProjectScreen()} />
+        <BackButton callback={this.goBack} />
         <br />
         <br />
-        <AddUserButton />
+        <AddUserButton pid={pid} />
 
         <Button //TODO pune X la fiecare user
           color="primary"
@@ -104,4 +109,5 @@ class ProjectScreen extends Component<any, any> {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProjectScreen)
+const ProjectScreenWithRouter = withRouter(ProjectScreen)
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectScreenWithRouter)
