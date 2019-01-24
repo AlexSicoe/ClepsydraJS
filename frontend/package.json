@@ -16,6 +16,8 @@
     "immutable": "^4.0.0-rc.12",
     "is-promise": "^2.1.0",
     "lodash": "^4.17.11",
+    "mobx": "^5.9.0",
+    "mobx-react": "^5.4.3",
     "react": "^16.8.0-alpha.1",
     "react-dom": "^16.8.0-alpha.1",
     "react-pose": "^4.0.4",
