@@ -11,7 +11,7 @@ interface Props {
   open: boolean,
   title: string,
   content: string,
-  handleOK: any,
+  handleOK: Callback,
   handleClose: Callback,
   children?: any
 }

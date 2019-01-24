@@ -43,8 +43,7 @@ class LoginDialog extends Component<any, any> {
     })
   }
 
-  handleLogin = (event: any) => {
-    event.preventDefault()
+  handleLogin = () => {
     let { username, password } = this.state
     let { login, history } = this.props
     let credentials = { username, password }
@@ -53,7 +52,7 @@ class LoginDialog extends Component<any, any> {
 
   handleKey = (event: KeyEvent) => {
     if (event.key === "Enter") {
-      this.handleLogin(event)
+      this.handleLogin()
     }
   }
 
