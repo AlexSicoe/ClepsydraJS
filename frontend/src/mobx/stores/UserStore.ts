@@ -1,5 +1,5 @@
 
-import { observable, action, computed } from 'mobx';
+import { observable, action, computed, onBecomeObserved } from 'mobx';
 import UserApi from '../requests/UserApi';
 import { notifyError, notifySuccess } from '../../utils/notification-factories';
 import { USER, USER_DELETED } from '../../utils/events';
@@ -37,6 +37,7 @@ export default class UserStore {
 
   constructor(userApi: UserApi) {
     this.userApi = userApi
+    onBecomeObserved
   }
 
   @action reset = () => {
@@ -65,7 +66,10 @@ export default class UserStore {
       const response = await this.userApi.fetchUser(id, header)
       const user = response.data
       this.update(user)
-      socket.on(USER, (user: User) => this.update(user))
+      socket.on(USER, (user: User) => {
+        this.update(user)
+        console.log('update!')
+      })
       socket.on(USER_DELETED, () => this.reset())
     } catch (error) {
       notifyError(error)

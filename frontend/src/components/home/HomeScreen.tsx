@@ -39,7 +39,7 @@ class HomeScreen extends Component<Props, State> {
     const { authStore, userStore } = this.injected
     const { uid, token } = authStore
     if (!authStore.isAuthenticated) {
-      authStore.reset() //TODO logout: when i reset authStore, i reset all the stores
+      authStore.logout()
     } else {
       userStore.fetchUser(uid, token)
     }

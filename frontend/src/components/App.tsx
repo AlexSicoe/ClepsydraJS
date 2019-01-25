@@ -7,7 +7,7 @@ import ProjectScreen from './project/ProjectScreen';
 import PublicScreen from './public/PublicScreen';
 import { inject, observer } from 'mobx-react';
 import AuthStore from '../mobx/stores/AuthStore';
-
+import DevTools from 'mobx-react-devtools';
 interface Props {
 
 }
@@ -42,17 +42,20 @@ class App extends Component<Props, State> {
 
 	render() {
 		return (
-			<Router>
-				<>
-					<Switch>
-						<Route exact path="/" component={PublicScreen} />
-						<Route path="/home" component={HomeScreen} />
-						<Route path="/projects/:pid" component={ProjectScreen} />
-						<Route component={NoMatch} />
-					</Switch>
-					{this.renderRedirect()}
-				</>
-			</Router>
+			<div>
+				{/* <DevTools /> */}
+				<Router>
+					<>
+						<Switch>
+							<Route exact path="/" component={PublicScreen} />
+							<Route path="/home" component={HomeScreen} />
+							<Route path="/projects/:pid" component={ProjectScreen} />
+							<Route component={NoMatch} />
+						</Switch>
+						{this.renderRedirect()}
+					</>
+				</Router>
+			</div>
 		)
 	}
 

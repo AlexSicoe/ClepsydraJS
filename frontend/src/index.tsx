@@ -13,8 +13,6 @@ import UserStore from './mobx/stores/UserStore';
 import * as serviceWorker from './serviceWorker';
 import { Provider } from 'mobx-react';
 
-
-
 const stores = {
   authStore: new AuthStore(new AuthApi),
   userStore: new UserStore(new UserApi),

@@ -28,10 +28,9 @@ class LogoutButton extends Component<Props, State> {
     return (
       <>
         <Button
-
           color="secondary"
           variant="contained"
-          onClick={authStore.reset}
+          onClick={authStore.logout}
         >
           Logout
       </Button>

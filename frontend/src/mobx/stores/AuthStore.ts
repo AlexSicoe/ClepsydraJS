@@ -2,6 +2,7 @@ import AuthApi from "../requests/AuthApi";
 import { observable, action, computed, runInAction } from 'mobx'
 import { Callback } from "../../utils/types";
 import { notifyError, notifySuccess } from "../../utils/notification-factories";
+import { handleSocketsOnLogin, handleSocketsOnLogout } from "../requests/socket";
 
 
 export interface SignUpBody {
@@ -47,14 +48,25 @@ export default class AuthStore {
   }
 
   login = async (body: LoginBody, onSuccess: Callback) => {
-    const response = await this.authApi.login(body)
-    runInAction(() => {
-      const { token, uid } = response.data
-      this.token = token
-      this.uid = uid
-    })
-    onSuccess()
-    notifySuccess(response)
+    try {
+      const response = await this.authApi.login(body)
+      runInAction(() => {
+        const { token, uid } = response.data
+        this.token = token
+        this.uid = uid
+      })
+      onSuccess()
+      handleSocketsOnLogin(this.uid)
+      notifySuccess(response)
+    } catch (error) {
+      notifyError(error)
+    }
+  }
+
+  logout = () => {
+    handleSocketsOnLogout()
+    this.reset()
+    //TODO, reset the rest of the stores...
   }
 
 }
