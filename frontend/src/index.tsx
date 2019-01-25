@@ -15,25 +15,15 @@ import { Provider } from 'mobx-react';
 
 
 
-const authStore = new AuthStore(new AuthApi)
-const userStore = new UserStore(new UserApi)
-const projectStore = new ProjectStore(new ProjectApi)
-const sprintStore = new SprintStore(new SprintApi)
-
 const stores = {
-  authStore,
-  userStore,
-  projectStore,
-  sprintStore
+  authStore: new AuthStore(new AuthApi),
+  userStore: new UserStore(new UserApi),
+  projectStore: new ProjectStore(new ProjectApi),
+  sprintStore: new SprintStore(new SprintApi),
 }
 
 const root = (
-  <Provider
-    authStore={authStore}
-    userStore={userStore}
-    projectStore={projectStore}
-    sprintStore={sprintStore}
-  >
+  <Provider {...stores}>
     <App />
   </Provider>
 )
