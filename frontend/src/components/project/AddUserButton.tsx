@@ -1,23 +1,38 @@
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { addUserToProject } from '../../actions/project-actions';
+import AuthStore from '../../mobx/stores/AuthStore';
+import ProjectStore from '../../mobx/stores/ProjectStore';
+import UserStore from '../../mobx/stores/UserStore';
 import ConfirmDialog from '../view/ConfirmDialog';
 import { ChangeEvent, KeyEvent } from '../view/view-types';
 
-const mapStateToProps = (state: any) => ({
-  token: state.auth.token,
-})
 
-const mapDispatchToProps = {
-  onAddUserToProject: addUserToProject
+interface Props {
+
 }
 
-class AddUserForm extends Component<any, any> {
+interface InjectedProps extends Props {
+  authStore: AuthStore
+  projectStore: ProjectStore
+  history: History
+}
+
+interface State {
+
+}
+
+@inject('authStore', 'projectStore')
+@observer
+class AddUserButton extends Component<Props, State> {
   state = {
     open: false,
     mailOrName: '',
+  }
+
+  get injected() {
+    return this.props as InjectedProps
   }
 
   handleChange = (event: ChangeEvent) => {
@@ -28,10 +43,11 @@ class AddUserForm extends Component<any, any> {
 
   handleOK = () => {
     const { mailOrName } = this.state
-    const { pid, token, onAddUserToProject } = this.props
+    const { authStore, projectStore } = this.injected
+    const { token } = authStore
 
+    projectStore.addUserToProject(projectStore.id, { mailOrName }, token)
     this.handleClose()
-    onAddUserToProject(pid, mailOrName, token)
   }
 
   handleKey = (event: KeyEvent) => {
@@ -95,4 +111,4 @@ class AddUserForm extends Component<any, any> {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddUserForm)
+export default AddUserButton

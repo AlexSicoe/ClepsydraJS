@@ -1,11 +1,11 @@
 
-import { observable, action, runInAction } from 'mobx';
+import { observable, action, computed } from 'mobx';
 import UserApi from '../requests/UserApi';
 import { notifyError, notifySuccess } from '../../utils/notification-factories';
-import { socket } from '../../actions/socket-actions';
 import { USER, USER_DELETED } from '../../utils/events';
 import { AuthHeader } from './../requests/header-interfaces';
 import { Project } from './ProjectStore';
+import socket from '../requests/socket';
 
 export interface UserBody {
   username: string
@@ -55,7 +55,12 @@ export default class UserStore {
     this.tasks = user.tasks
   }
 
-  fetchUser = async (id: string, header: AuthHeader) => {
+  @computed loaded = () => {
+    return !!this.id
+  }
+
+  fetchUser = async (id: string, token: string) => {
+    const header: AuthHeader = { token }
     try {
       const response = await this.userApi.fetchUser(id, header)
       const user = response.data
@@ -67,7 +72,8 @@ export default class UserStore {
     }
   }
 
-  putUser = async (id: string, body: UserBody, header: AuthHeader) => {
+  putUser = async (id: string, body: UserBody, token: string) => {
+    const header: AuthHeader = { token }
     try {
       const response = await this.userApi.putUser(id, body, header)
       notifySuccess(response)
@@ -76,7 +82,8 @@ export default class UserStore {
     }
   }
 
-  deleteUser = async (id: string, header: AuthHeader) => {
+  deleteUser = async (id: string, token: string) => {
+    const header: AuthHeader = { token }
     try {
       const response = await this.userApi.deleteUser(id, header)
       notifySuccess(response)

@@ -1,11 +1,11 @@
 import ProjectApi from "../requests/ProjectApi";
 import { User, UserProject } from "./UserStore";
-import { observable, action } from "mobx";
+import { observable, action, computed } from "mobx";
 import { AuthHeader } from "../requests/header-interfaces";
 import { notifyError, notifySuccess } from "../../utils/notification-factories";
-import { socket } from "../../actions/socket-actions";
 import { PROJECT, PROJECT_DELETED } from "../../utils/events";
 import { MailOrNameBody } from './../requests/ProjectApi';
+import socket from "../requests/socket";
 
 
 export interface ProjectBody {
@@ -50,8 +50,13 @@ export default class ProjectStore {
     this.tasks = project.tasks
   }
 
+  @computed loaded = () => {
+    return !!this.id
+  }
 
-  fetchProject = async (pid: string, header: AuthHeader) => {
+
+  fetchProject = async (pid: string, token: string) => {
+    const header: AuthHeader = { token }
     try {
       const response = await this.projectApi.fetchProject(pid, header)
       const project = response.data
@@ -63,7 +68,8 @@ export default class ProjectStore {
     }
   }
 
-  postProject = async (uid: string, body: ProjectBody, header: AuthHeader) => {
+  postProject = async (uid: string, body: ProjectBody, token: string) => {
+    const header: AuthHeader = { token }
     try {
       const response = await this.projectApi.postProject(uid, body, header)
       notifySuccess(response)
@@ -72,7 +78,8 @@ export default class ProjectStore {
     }
   }
 
-  putProject = async (pid: string, body: ProjectBody, header: AuthHeader) => {
+  putProject = async (pid: string, body: ProjectBody, token: string) => {
+    const header: AuthHeader = { token }
     try {
       const response = await this.projectApi.putProject(pid, body, header)
       notifySuccess(response)
@@ -81,7 +88,8 @@ export default class ProjectStore {
     }
   }
 
-  deleteProject = async (pid: string, header: AuthHeader) => {
+  deleteProject = async (pid: string, token: string) => {
+    const header: AuthHeader = { token }
     try {
       const response = await this.projectApi.deleteProject(pid, header)
       notifySuccess(response)
@@ -90,7 +98,8 @@ export default class ProjectStore {
     }
   }
 
-  addUserToProject = async (pid: string, body: MailOrNameBody, header: AuthHeader) => {
+  addUserToProject = async (pid: string, body: MailOrNameBody, token: string) => {
+    const header: AuthHeader = { token }
     try {
       const response = await this.projectApi.addUserToProject(pid, body, header)
       notifySuccess(response)
@@ -99,7 +108,8 @@ export default class ProjectStore {
     }
   }
 
-  removeUserFromProject = async (pid: string, uid: string, header: AuthHeader) => {
+  removeUserFromProject = async (pid: string, uid: string, token: string) => {
+    const header: AuthHeader = { token }
     try {
       const response = await this.projectApi.removeUserFromProject(pid, uid, header)
       notifySuccess(response)

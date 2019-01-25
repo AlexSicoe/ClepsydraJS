@@ -1,9 +1,9 @@
 import { withStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { register } from '../../actions/auth-actions';
+import AuthStore from '../../mobx/stores/AuthStore';
 import ConfirmDialog from '../view/ConfirmDialog';
 import { ChangeEvent, KeyEvent } from '../view/view-types';
 
@@ -15,16 +15,28 @@ const styles = (theme: any) => ({
   }
 })
 
-const mapStateToProps = (state: any) => ({
-  fetching: state.auth.fetching,
-  fetched: state.auth.fetched,
-})
 
-const mapDispatch = {
-  register,
+interface Props {
+
 }
 
-class SignUpDialog extends Component<any, any> {
+interface InjectedProps {
+  authStore: AuthStore
+  classes: any
+}
+
+interface State {
+  open: boolean
+  username: string
+  email: string
+  password: string
+}
+
+
+
+@inject('authStore')
+@observer
+class SignUpDialog extends Component<Props, State> {
   state = {
     open: false,
     username: '',
@@ -32,8 +44,12 @@ class SignUpDialog extends Component<any, any> {
     password: '',
   }
 
+  get injected() {
+    return this.props as InjectedProps
+  }
 
   handleChange = (event: ChangeEvent) => {
+    //@ts-ignore
     this.setState({
       [event.target.name]: event.target.value
     })
@@ -41,9 +57,9 @@ class SignUpDialog extends Component<any, any> {
 
   handleSignUp = () => {
     let { username, email, password } = this.state
-    let { register } = this.props
+    let { authStore } = this.injected
     let credentials = { username, email, password }
-    register(credentials)
+    authStore!.signUp(credentials)
   }
 
   handleKey = (event: KeyEvent) => {
@@ -65,7 +81,7 @@ class SignUpDialog extends Component<any, any> {
   }
 
   render() {
-    const { classes } = this.props
+    const { classes } = this.injected
     const { open } = this.state
 
     return (
@@ -118,5 +134,4 @@ class SignUpDialog extends Component<any, any> {
   }
 }
 
-const SignUpDialogWithStyles = withStyles(styles)(SignUpDialog)
-export default connect(mapStateToProps, mapDispatch)(SignUpDialogWithStyles)
+export default withStyles(styles)(SignUpDialog)

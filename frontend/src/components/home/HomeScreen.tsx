@@ -1,9 +1,9 @@
+import { History } from 'history';
+import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { resetApp } from '../../actions/root-actions';
-import { fetchUser } from '../../actions/user-actions';
-import { getUsers } from '../../redux-orm/selectors';
+import AuthStore from '../../mobx/stores/AuthStore';
+import UserStore from '../../mobx/stores/UserStore';
 import { basicStyle, borderStyle } from '../styles/styles';
 import LoadingScreen from '../view/LoadingScreen';
 import LogoutButton from '../view/LogoutButton';
@@ -12,40 +12,48 @@ import SimpleList from '../view/SimpleList';
 import AddProjectButton from './AddProjectButton';
 
 
+interface Props {
 
-const mapStateToProps = (state: any) => ({
-  token: state.auth.token,
-  authError: state.auth.error, //if this exists, reset app
-  uid: state.auth.uid,
-  users: getUsers(state),
-})
+}
 
-const mapDispatchToProps = {
-  fetchUser,
-  logout: resetApp,
+interface InjectedProps extends Props {
+  authStore: AuthStore
+  userStore: UserStore
+  history: History
+}
+
+interface State {
+
 }
 
 
-class HomeScreen extends Component<any, any> {
+@inject('authStore', 'userStore')
+@observer
+class HomeScreen extends Component<Props, State> {
+
+  get injected() {
+    return this.props as InjectedProps
+  }
+
   componentWillMount() {
-    const { uid, token, logout } = this.props
-    if (!token) {
-      logout()
+    const { authStore, userStore } = this.injected
+    const { uid, token } = authStore
+    if (!authStore.isAuthenticated) {
+      authStore.reset() //TODO logout: when i reset authStore, i reset all the stores
     } else {
-      this.props.fetchUser(uid, token)
+      userStore.fetchUser(uid, token)
     }
   }
 
   redirectToProject = (p: any) => {
-    const { history } = this.props
+    const { history } = this.injected
     history.push(`/projects/${p.id}`)
   }
 
   render() {
-    const { uid, users } = this.props
-    const localUser = users.find((user: any) => user.id === uid)
+    const { userStore } = this.injected
 
-    if (!localUser)
+    if (!userStore.loaded)
       return <LoadingScreen />
 
     return (
@@ -54,14 +62,14 @@ class HomeScreen extends Component<any, any> {
           <LogoutButton />
         </SimpleAppBar>
 
-        Hello {localUser.username}!
+        Hello {userStore.username}!
           <br />
         <div style={{ ...basicStyle, ...borderStyle }}>
 
           {/* 
         //@ts-ignore */}
           <SimpleList
-            items={localUser.projects}
+            items={userStore.projects}
             subheader="Project List"
             emptyMessage="You have no projects. Please create one"
             onItemClick={this.redirectToProject}
@@ -77,5 +85,7 @@ class HomeScreen extends Component<any, any> {
   }
 }
 
-const HomeScreenWithRouter = withRouter(HomeScreen)
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreenWithRouter)
+
+
+//@ts-ignore
+export default withRouter(HomeScreen)

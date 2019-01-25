@@ -1,40 +1,47 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { fetchProject, addUserToProject } from '../../actions/project-actions'
-import Button from '@material-ui/core/Button'
-import SimpleAppBar from '../view/SimpleAppBar'
-import SimpleList from '../view/SimpleList'
-import LogoutButton from '../view/LogoutButton'
-import { getProjects } from '../../redux-orm/selectors'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemText from '@material-ui/core/ListItemText'
-import BackButton from '../view/BackButton';
-import AddUserButton from './AddUserButton';
-import LoadingScreen from '../view/LoadingScreen';
+import Button from '@material-ui/core/Button';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import { History } from 'history';
+import { inject, observer } from 'mobx-react';
+import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import AuthStore from '../../mobx/stores/AuthStore';
+import ProjectStore from '../../mobx/stores/ProjectStore';
+import BackButton from '../view/BackButton';
+import LoadingScreen from '../view/LoadingScreen';
+import LogoutButton from '../view/LogoutButton';
+import SimpleAppBar from '../view/SimpleAppBar';
+import SimpleList from '../view/SimpleList';
+import AddUserButton from './AddUserButton';
 
+interface Props {
 
-
-const mapStateToProps = (state: any) => ({
-  token: state.auth.token,
-  projects: getProjects(state),
-})
-
-const mapDispatchToProps = {
-  fetchProject,
-  addUserToProject
 }
 
-class ProjectScreen extends Component<any, any> {
+interface InjectedProps extends Props {
+  authStore: AuthStore
+  projectStore: ProjectStore
+  match: any
+  history: History
+}
+
+interface State {
+
+}
+
+
+@inject('authStore', 'projectStore')
+@observer
+class ProjectScreen extends Component<Props, State> {
   state = {
 
   }
 
-  handleFetch = () => {
-    const { match, token, fetchProject } = this.props
-    const { pid } = match.params
-    fetchProject(pid, token)
+  get injected() {
+    return this.props as InjectedProps
   }
+
+
 
 
   handleItemClick = (u: any) => {
@@ -56,20 +63,25 @@ class ProjectScreen extends Component<any, any> {
     )
   }
 
-  goBack = () => this.props.history.goBack()
+  goBack = () => this.injected.history.goBack()
+
+  handleFetch = () => {
+    const { authStore, projectStore, match } = this.injected
+    const { pid } = match.params
+    projectStore.fetchProject(pid, authStore.token)
+  }
 
   componentWillMount() {
     this.handleFetch()
   }
 
   render() {
-    const { match, projects } = this.props
+    const { match, projectStore } = this.injected
     const { pid } = match.params
-    const selectedProject = projects.find((p: any) => p.id == pid)
 
-    console.log(selectedProject)
 
-    if (!selectedProject)
+
+    if (!projectStore.loaded)
       return (
         <LoadingScreen>
           <BackButton callback={this.goBack} />
@@ -79,14 +91,14 @@ class ProjectScreen extends Component<any, any> {
 
     return (
       <>
-        <SimpleAppBar title={selectedProject.name}>
+        <SimpleAppBar title={projectStore.name}>
           <LogoutButton />
         </SimpleAppBar>
 
         {/* 
         //@ts-ignore */}
         <SimpleList
-          items={selectedProject.users}
+          items={projectStore.users}
           subheader="Users"
           emptyMessage="No users"
           onItemClick={this.handleItemClick}
@@ -95,7 +107,7 @@ class ProjectScreen extends Component<any, any> {
         <BackButton callback={this.goBack} />
         <br />
         <br />
-        <AddUserButton pid={pid} />
+        <AddUserButton />
 
         <Button //TODO pune X la fiecare user
           color="primary"
@@ -109,5 +121,5 @@ class ProjectScreen extends Component<any, any> {
   }
 }
 
-const ProjectScreenWithRouter = withRouter(ProjectScreen)
-export default connect(mapStateToProps, mapDispatchToProps)(ProjectScreenWithRouter)
+//@ts-ignore
+export default withRouter(ProjectScreen)

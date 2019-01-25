@@ -1,12 +1,13 @@
 import { withStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { login } from '../../actions/auth-actions';
+import AuthStore from '../../mobx/stores/AuthStore';
 import ConfirmDialog from '../view/ConfirmDialog';
 import { ChangeEvent, KeyEvent } from '../view/view-types';
+import { History } from 'history';
 
 
 
@@ -16,28 +17,39 @@ const styles = (theme: any) => ({
   }
 })
 
-const mapStateToProps = (state: any) => ({
-  token: state.auth.token,
-  fetching: state.auth.fetching,
-  fetched: state.auth.fetched,
-})
+interface Props {
 
-const mapDispatchToProps = {
-  login,
+
+}
+
+interface InjectedProps {
+  authStore: AuthStore
+  history: History
+  classes: any
+}
+
+interface State {
+  open: boolean
+  username: string
+  password: string
 }
 
 
-
-
-
-class LoginDialog extends Component<any, any> {
+@inject('authStore')
+@observer
+class LoginDialog extends Component<Props, State> {
   state = {
     open: false,
     username: '',
     password: '',
   }
 
+  get injected() {
+    return this.props as InjectedProps
+  }
+
   handleChange = (event: ChangeEvent) => {
+    //@ts-ignore
     this.setState({
       [event.target.name]: event.target.value
     })
@@ -45,9 +57,9 @@ class LoginDialog extends Component<any, any> {
 
   handleLogin = () => {
     let { username, password } = this.state
-    let { login, history } = this.props
+    let { authStore, history } = this.injected
     let credentials = { username, password }
-    login(credentials, () => history.push('/home'))
+    authStore.login(credentials, () => history.push('/home'))
   }
 
   handleKey = (event: KeyEvent) => {
@@ -69,7 +81,7 @@ class LoginDialog extends Component<any, any> {
   }
 
   render() {
-    const { classes } = this.props
+    const { classes } = this.injected
     const { open } = this.state
 
 
@@ -115,6 +127,6 @@ class LoginDialog extends Component<any, any> {
   }
 }
 
+//@ts-ignore
 const LoginDialogWithRouter = withRouter(LoginDialog)
-const LoginDialogWithStyles = withStyles(styles)(LoginDialogWithRouter)
-export default connect(mapStateToProps, mapDispatchToProps)(LoginDialogWithStyles)
+export default withStyles(styles)(LoginDialogWithRouter)

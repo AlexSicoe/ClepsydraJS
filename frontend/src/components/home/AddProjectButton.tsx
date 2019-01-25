@@ -1,28 +1,42 @@
-import React, { Component } from 'react'
-import TextField from '@material-ui/core/TextField'
-import { connect } from 'react-redux'
-import { postProject } from '../../actions/project-actions'
-import ConfirmDialog from '../view/ConfirmDialog';
 import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import { inject, observer } from 'mobx-react';
+import React, { Component } from 'react';
+import AuthStore from '../../mobx/stores/AuthStore';
+import ProjectStore from '../../mobx/stores/ProjectStore';
+import ConfirmDialog from '../view/ConfirmDialog';
 import { ChangeEvent, KeyEvent } from '../view/view-types';
 
 
-const mapStateToProps = (state: any) => ({
-  token: state.auth.token,
-  uid: state.auth.uid,
-})
+interface Props {
 
-const mapDispatchToProps = {
-  onPostProject: postProject
 }
 
-class ProjectForm extends Component<any, any> {
+interface InjectedProps extends Props {
+  authStore: AuthStore
+  projectStore: ProjectStore
+}
+
+interface State {
+  open: boolean
+  projectName: string
+}
+
+
+@inject('authStore', 'projectStore')
+@observer
+class AddProjectButton extends Component<Props, State> {
   state = {
     open: false,
     projectName: '',
   }
 
+  get injected() {
+    return this.props as InjectedProps
+  }
+
   handleChange = (event: ChangeEvent) => {
+    //@ts-ignore
     this.setState({
       [event.target.name]: event.target.value
     })
@@ -30,11 +44,16 @@ class ProjectForm extends Component<any, any> {
 
   handleOK = () => {
     const { projectName } = this.state
-    const { token, uid, onPostProject } = this.props
+    const { authStore, projectStore } = this.injected
+
+
 
     const project = { name: projectName }
     this.handleClose()
-    onPostProject(uid, project, token)
+    const { token, uid } = authStore
+    projectStore.postProject(uid, project, token)
+
+
   }
 
   handleKey = (event: KeyEvent) => {
@@ -97,4 +116,4 @@ class ProjectForm extends Component<any, any> {
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProjectForm)
+export default AddProjectButton
