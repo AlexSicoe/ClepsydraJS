@@ -1,4 +1,3 @@
-import { Provider } from 'mobx-react';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
@@ -12,16 +11,29 @@ import ProjectStore from './mobx/stores/ProjectStore';
 import SprintStore from './mobx/stores/SprintStore';
 import UserStore from './mobx/stores/UserStore';
 import * as serviceWorker from './serviceWorker';
+import { Provider } from 'mobx-react';
+
+
+
+const authStore = new AuthStore(new AuthApi)
+const userStore = new UserStore(new UserApi)
+const projectStore = new ProjectStore(new ProjectApi)
+const sprintStore = new SprintStore(new SprintApi)
 
 const stores = {
-  authStore: new AuthStore(new AuthApi),
-  userStore: new UserStore(new UserApi),
-  projectStore: new ProjectStore(new ProjectApi),
-  sprintStore: new SprintStore(new SprintApi),
+  authStore,
+  userStore,
+  projectStore,
+  sprintStore
 }
 
 const root = (
-  <Provider {...stores}>
+  <Provider
+    authStore={authStore}
+    userStore={userStore}
+    projectStore={projectStore}
+    sprintStore={sprintStore}
+  >
     <App />
   </Provider>
 )

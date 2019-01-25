@@ -1,26 +1,43 @@
 
-import React from 'react'
-import { resetApp } from '../../actions/root-actions'
+import React, { Component } from 'react'
 import Button from '@material-ui/core/Button'
-import { connect } from 'react-redux';
+import { inject, observer } from 'mobx-react';
+import AuthStore from '../../mobx/stores/AuthStore';
 
-const mapDispatchToProps = {
-  onLogout: resetApp,
+interface Props {
+
 }
 
-function LogoutButton(props: any) {
-  return (
-    <>
-      <Button
+interface InjectedProps {
+  authStore: AuthStore
+}
 
-        color="secondary"
-        variant="contained"
-        onClick={() => props.onLogout()}
-      >
-        Logout
+interface State {
+
+}
+
+@inject('authStore')
+@observer
+class LogoutButton extends Component<Props, State> {
+  get injected() {
+    return this.props as InjectedProps
+  }
+
+  render() {
+    const { authStore } = this.injected
+    return (
+      <>
+        <Button
+
+          color="secondary"
+          variant="contained"
+          onClick={authStore.reset}
+        >
+          Logout
       </Button>
-    </>
-  )
+      </>
+    )
+  }
 }
 
-export default connect(null, mapDispatchToProps)(LogoutButton)
+export default LogoutButton

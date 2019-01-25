@@ -4,7 +4,6 @@ import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import AuthStore from '../../mobx/stores/AuthStore';
 import ProjectStore from '../../mobx/stores/ProjectStore';
-import UserStore from '../../mobx/stores/UserStore';
 import ConfirmDialog from '../view/ConfirmDialog';
 import { ChangeEvent, KeyEvent } from '../view/view-types';
 

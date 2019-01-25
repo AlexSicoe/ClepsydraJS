@@ -50,7 +50,7 @@ export default class ProjectStore {
     this.tasks = project.tasks
   }
 
-  @computed loaded = () => {
+  @computed get loaded() {
     return !!this.id
   }
 

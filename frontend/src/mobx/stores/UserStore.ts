@@ -55,7 +55,7 @@ export default class UserStore {
     this.tasks = user.tasks
   }
 
-  @computed loaded = () => {
+  @computed get loaded() {
     return !!this.id
   }
 

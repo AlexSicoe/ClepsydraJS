@@ -1,33 +1,41 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import './App.css';
 import HomeScreen from './home/HomeScreen';
 import NoMatch from './NoMatch';
-import PublicScreen from './public/PublicScreen';
 import ProjectScreen from './project/ProjectScreen';
+import PublicScreen from './public/PublicScreen';
+import { inject, observer } from 'mobx-react';
+import AuthStore from '../mobx/stores/AuthStore';
 
-
-const mapStateToProps = (state: any) => ({
-	token: state.auth.token,
-})
-
-const mapDispatch = {
+interface Props {
 
 }
 
+interface InjectedProps {
+	authStore: AuthStore
+}
 
-class App extends Component<any, any> {
+interface State {
+
+}
+
+@inject('authStore')
+@observer
+class App extends Component<Props, State> {
+	get injected() {
+		return this.props as InjectedProps
+	}
+
 
 	componentWillMount() {
 		//TODO Login with persisted token
 		//if token expired, redirect to login
 	}
 
-
 	renderRedirect() {
-		const { token } = this.props
-		return token ?
+		const { authStore } = this.injected
+		return authStore.isAuthenticated ?
 			<Redirect to="/home" /> :
 			<Redirect to="/" />
 	}
@@ -40,7 +48,7 @@ class App extends Component<any, any> {
 						<Route exact path="/" component={PublicScreen} />
 						<Route path="/home" component={HomeScreen} />
 						<Route path="/projects/:pid" component={ProjectScreen} />
-						<Route component= {NoMatch}/>
+						<Route component={NoMatch} />
 					</Switch>
 					{this.renderRedirect()}
 				</>
@@ -51,5 +59,5 @@ class App extends Component<any, any> {
 
 }
 
-export default connect(mapStateToProps, mapDispatch)(App)
+export default App
 
