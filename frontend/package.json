@@ -25,9 +25,9 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "^2.1.1",
+    "react-trello": "^2.0.9",
     "socket.io-client": "^2.2.0",
     "toastr": "^2.1.4",
-    "type-to-reducer": "^1.1.0",
     "typescript": "^3.2.2"
   },
   "scripts": {

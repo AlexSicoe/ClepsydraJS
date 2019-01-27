@@ -6,6 +6,7 @@ import { USER, USER_DELETED } from '../../utils/events';
 import { AuthHeader } from './../requests/header-interfaces';
 import { Project } from './ProjectStore';
 import socket from '../requests/socket';
+import { PromiseState } from '../../utils/types';
 
 export interface UserBody {
   username: string
@@ -29,6 +30,7 @@ export interface UserProject {
 export default class UserStore {
 
   private userApi: UserApi
+  @observable state: PromiseState = 'pending'
   @observable id: string = ''
   @observable username: string = ''
   @observable email: string = ''
@@ -41,6 +43,7 @@ export default class UserStore {
   }
 
   @action reset = () => {
+    this.state = 'pending'
     this.id = ''
     this.username = ''
     this.email = ''
@@ -55,15 +58,15 @@ export default class UserStore {
     this.projects = user.projects
     this.tasks = user.tasks
   }
-
-  @computed get loaded() {
-    return !!this.id
-  }
-
+  
+  @action
   fetchUser = async (id: string, token: string) => {
     const header: AuthHeader = { token }
     try {
+      this.state = 'pending'
       const response = await this.userApi.fetchUser(id, header)
+
+      this.state = 'done'
       const user = response.data
       this.update(user)
       socket.on(USER, (user: User) => {
@@ -71,27 +74,41 @@ export default class UserStore {
         console.log('update!')
       })
       socket.on(USER_DELETED, () => this.reset())
+
     } catch (error) {
+      this.state = 'error'
       notifyError(error)
     }
   }
 
+  @action
   putUser = async (id: string, body: UserBody, token: string) => {
     const header: AuthHeader = { token }
     try {
+      this.state = 'pending'
       const response = await this.userApi.putUser(id, body, header)
+
+      this.state = 'done'
       notifySuccess(response)
+
     } catch (error) {
+      this.state = 'error'
       notifyError(error)
     }
   }
 
+  @action
   deleteUser = async (id: string, token: string) => {
     const header: AuthHeader = { token }
     try {
+      this.state = 'pending'
       const response = await this.userApi.deleteUser(id, header)
+
+      this.state = 'done'
       notifySuccess(response)
+
     } catch (error) {
+      this.state = 'error'
       notifyError(error)
     }
   }

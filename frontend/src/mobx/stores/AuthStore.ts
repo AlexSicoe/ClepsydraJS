@@ -1,6 +1,6 @@
 import AuthApi from "../requests/AuthApi";
 import { observable, action, computed, runInAction } from 'mobx'
-import { Callback } from "../../utils/types";
+import { Callback, PromiseState } from "../../utils/types";
 import { notifyError, notifySuccess } from "../../utils/notification-factories";
 import { handleSocketsOnLogin, handleSocketsOnLogout } from "../requests/socket";
 
@@ -21,6 +21,7 @@ export default class AuthStore {
 
 
   private authApi: AuthApi
+  @observable state: PromiseState = 'pending'
   @observable token: string = ''
   @observable uid: string = ''
 
@@ -30,6 +31,7 @@ export default class AuthStore {
   }
 
   @action reset = () => {
+    this.state = 'pending'
     this.token = ''
     this.uid = ''
   }
@@ -38,18 +40,28 @@ export default class AuthStore {
     return !!this.token
   }
 
+  @action
   signUp = async (body: SignUpBody) => {
     try {
+      this.state = 'pending'
       const response = await this.authApi.signUp(body)
+
+      this.state = 'done'
       notifySuccess(response)
+
     } catch (error) {
+      this.state = 'error'
       notifyError(error)
     }
   }
 
+  @action
   login = async (body: LoginBody, onSuccess: Callback) => {
     try {
+      this.state = 'pending'
       const response = await this.authApi.login(body)
+
+      this.state = 'done'
       runInAction(() => {
         const { token, uid } = response.data
         this.token = token
@@ -59,10 +71,12 @@ export default class AuthStore {
       handleSocketsOnLogin(this.uid)
       notifySuccess(response)
     } catch (error) {
+      this.state = 'error'
       notifyError(error)
     }
   }
 
+  @action
   logout = () => {
     handleSocketsOnLogout()
     this.reset()

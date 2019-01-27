@@ -53,7 +53,7 @@ class HomeScreen extends Component<Props, State> {
   render() {
     const { userStore } = this.injected
 
-    if (!userStore.loaded)
+    if (userStore.state === 'pending')
       return <LoadingScreen />
 
     return (

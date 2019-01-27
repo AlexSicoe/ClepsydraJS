@@ -81,7 +81,7 @@ class ProjectScreen extends Component<Props, State> {
 
 
 
-    if (!projectStore.loaded)
+    if (projectStore.state === 'pending')
       return (
         <LoadingScreen>
           <BackButton callback={this.goBack} />
