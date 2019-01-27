@@ -8,6 +8,7 @@ import PublicScreen from './public/PublicScreen';
 import { inject, observer } from 'mobx-react';
 import AuthStore from '../mobx/stores/AuthStore';
 import DevTools from 'mobx-react-devtools';
+import Area51 from './public/Area51';
 interface Props {
 
 }
@@ -50,9 +51,10 @@ class App extends Component<Props, State> {
 							<Route exact path="/" component={PublicScreen} />
 							<Route path="/home" component={HomeScreen} />
 							<Route path="/projects/:pid" component={ProjectScreen} />
+							<Route path="/area51" component={Area51} />
 							<Route component={NoMatch} />
 						</Switch>
-						{this.renderRedirect()}
+						{/* {this.renderRedirect()} */}
 					</>
 				</Router>
 			</div>
