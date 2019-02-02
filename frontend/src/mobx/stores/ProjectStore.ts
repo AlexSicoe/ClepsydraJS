@@ -6,7 +6,8 @@ import { notifyError, notifySuccess } from "../../utils/notification-factories";
 import { PROJECT, PROJECT_DELETED } from "../../utils/events";
 import { MailOrNameBody } from './../requests/ProjectApi';
 import socket from "../requests/socket";
-import { PromiseState } from "../../utils/types";
+import { PromiseState } from '../../utils/enums';
+const { PENDING, DONE, ERROR } = PromiseState
 
 
 export interface ProjectBody {
@@ -23,7 +24,7 @@ export interface Project extends ProjectBody {
 
 export default class ProjectStore {
   private projectApi: ProjectApi
-  @observable state: PromiseState = 'pending'
+  @observable state: PromiseState = PENDING
   @observable id: string = ''
   @observable name: string = ''
   @observable users: User[] = []
@@ -36,7 +37,7 @@ export default class ProjectStore {
   }
 
   @action reset = () => {
-    this.state = 'pending'
+    this.state = PENDING
     this.id = ''
     this.name = ''
     this.users = []
@@ -57,17 +58,17 @@ export default class ProjectStore {
   fetchProject = async (pid: string, token: string) => {
     const header: AuthHeader = { token }
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.projectApi.fetchProject(pid, header)
 
-      this.state = 'done'
+      this.state = DONE
       const project = response.data
       this.update(project)
       socket.on(PROJECT, (project: Project) => this.update(project))
       socket.on(PROJECT_DELETED, (project: Project) => this.reset())
 
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }
@@ -76,14 +77,14 @@ export default class ProjectStore {
   postProject = async (uid: string, body: ProjectBody, token: string) => {
     const header: AuthHeader = { token }
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.projectApi.postProject(uid, body, header)
 
-      this.state = 'done'
+      this.state = DONE
       notifySuccess(response)
 
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }
@@ -92,14 +93,14 @@ export default class ProjectStore {
   putProject = async (pid: string, body: ProjectBody, token: string) => {
     const header: AuthHeader = { token }
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.projectApi.putProject(pid, body, header)
 
-      this.state = 'done'
+      this.state = DONE
       notifySuccess(response)
 
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }
@@ -108,14 +109,14 @@ export default class ProjectStore {
   deleteProject = async (pid: string, token: string) => {
     const header: AuthHeader = { token }
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.projectApi.deleteProject(pid, header)
 
-      this.state = 'done'
+      this.state = DONE
       notifySuccess(response)
 
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }
@@ -124,14 +125,14 @@ export default class ProjectStore {
   addUserToProject = async (pid: string, body: MailOrNameBody, token: string) => {
     const header: AuthHeader = { token }
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.projectApi.addUserToProject(pid, body, header)
 
-      this.state = 'done'
+      this.state = DONE
       notifySuccess(response)
 
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }
@@ -140,14 +141,14 @@ export default class ProjectStore {
   removeUserFromProject = async (pid: string, uid: string, token: string) => {
     const header: AuthHeader = { token }
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.projectApi.removeUserFromProject(pid, uid, header)
 
-      this.state = 'done'
+      this.state = DONE
       notifySuccess(response)
 
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }

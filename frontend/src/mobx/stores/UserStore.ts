@@ -6,7 +6,8 @@ import { USER, USER_DELETED } from '../../utils/events';
 import { AuthHeader } from './../requests/header-interfaces';
 import { Project } from './ProjectStore';
 import socket from '../requests/socket';
-import { PromiseState } from '../../utils/types';
+import { PromiseState } from '../../utils/enums';
+const { PENDING, DONE, ERROR } = PromiseState
 
 export interface UserBody {
   username: string
@@ -30,7 +31,7 @@ export interface UserProject {
 export default class UserStore {
 
   private userApi: UserApi
-  @observable state: PromiseState = 'pending'
+  @observable state: PromiseState = PENDING
   @observable id: string = ''
   @observable username: string = ''
   @observable email: string = ''
@@ -43,7 +44,7 @@ export default class UserStore {
   }
 
   @action reset = () => {
-    this.state = 'pending'
+    this.state = PENDING
     this.id = ''
     this.username = ''
     this.email = ''
@@ -58,15 +59,15 @@ export default class UserStore {
     this.projects = user.projects
     this.tasks = user.tasks
   }
-  
+
   @action
   fetchUser = async (id: string, token: string) => {
     const header: AuthHeader = { token }
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.userApi.fetchUser(id, header)
 
-      this.state = 'done'
+      this.state = DONE
       const user = response.data
       this.update(user)
       socket.on(USER, (user: User) => {
@@ -76,7 +77,7 @@ export default class UserStore {
       socket.on(USER_DELETED, () => this.reset())
 
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }
@@ -85,14 +86,14 @@ export default class UserStore {
   putUser = async (id: string, body: UserBody, token: string) => {
     const header: AuthHeader = { token }
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.userApi.putUser(id, body, header)
 
-      this.state = 'done'
+      this.state = DONE
       notifySuccess(response)
 
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }
@@ -101,14 +102,14 @@ export default class UserStore {
   deleteUser = async (id: string, token: string) => {
     const header: AuthHeader = { token }
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.userApi.deleteUser(id, header)
 
-      this.state = 'done'
+      this.state = DONE
       notifySuccess(response)
 
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }

@@ -1,3 +1,2 @@
-export type Callback = () => void
+export type Callback = (...args: any) => void
 
-export type PromiseState = 'pending' | 'done' | 'error'

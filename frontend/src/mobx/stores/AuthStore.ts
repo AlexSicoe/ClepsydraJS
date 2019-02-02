@@ -1,9 +1,10 @@
 import AuthApi from "../requests/AuthApi";
 import { observable, action, computed, runInAction } from 'mobx'
-import { Callback, PromiseState } from "../../utils/types";
+import { Callback } from "../../utils/types";
 import { notifyError, notifySuccess } from "../../utils/notification-factories";
 import { handleSocketsOnLogin, handleSocketsOnLogout } from "../requests/socket";
-
+import { PromiseState } from '../../utils/enums';
+const { PENDING, DONE, ERROR } = PromiseState
 
 export interface SignUpBody {
   username: string
@@ -21,7 +22,7 @@ export default class AuthStore {
 
 
   private authApi: AuthApi
-  @observable state: PromiseState = 'pending'
+  @observable state: PromiseState = PENDING
   @observable token: string = ''
   @observable uid: string = ''
 
@@ -31,7 +32,7 @@ export default class AuthStore {
   }
 
   @action reset = () => {
-    this.state = 'pending'
+    this.state = PENDING
     this.token = ''
     this.uid = ''
   }
@@ -43,14 +44,14 @@ export default class AuthStore {
   @action
   signUp = async (body: SignUpBody) => {
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.authApi.signUp(body)
 
-      this.state = 'done'
+      this.state = DONE
       notifySuccess(response)
 
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }
@@ -58,10 +59,10 @@ export default class AuthStore {
   @action
   login = async (body: LoginBody, onSuccess: Callback) => {
     try {
-      this.state = 'pending'
+      this.state = PENDING
       const response = await this.authApi.login(body)
 
-      this.state = 'done'
+      this.state = DONE
       runInAction(() => {
         const { token, uid } = response.data
         this.token = token
@@ -71,7 +72,7 @@ export default class AuthStore {
       handleSocketsOnLogin(this.uid)
       notifySuccess(response)
     } catch (error) {
-      this.state = 'error'
+      this.state = ERROR
       notifyError(error)
     }
   }
