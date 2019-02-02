@@ -1,7 +1,7 @@
 import { IAuthHeader } from './header-interfaces'
 import { API } from '../../env-config'
 import axios from 'axios'
-import { IProjectBody } from '../stores/ProjectStore'
+import { IProject } from '../stores/model-interfaces'
 
 export interface IMailOrNameBody {
   mailOrName: string
@@ -11,10 +11,10 @@ export default class ProjectApi {
   fetchProject = (pid: string, headers: IAuthHeader) =>
     axios.get(`${API}/projects/${pid}`, { headers })
 
-  postProject = (uid: string, body: IProjectBody, headers: IAuthHeader) =>
+  postProject = (uid: string, body: IProject, headers: IAuthHeader) =>
     axios.post(`${API}/users/${uid}/projects`, body, { headers })
 
-  putProject = (pid: string, body: IProjectBody, headers: IAuthHeader) =>
+  putProject = (pid: string, body: IProject, headers: IAuthHeader) =>
     axios.put(`${API}/projects/${pid}`, body, { headers })
 
   deleteProject = (pid: string, headers: IAuthHeader) =>
@@ -23,7 +23,7 @@ export default class ProjectApi {
   addUserToProject = (
     pid: string,
     body: IMailOrNameBody,
-    headers: IAuthHeader,
+    headers: IAuthHeader
   ) => axios.post(`${API}/projects/${pid}/users`, body, { headers })
 
   removeUserFromProject = (pid: string, uid: string, headers: IAuthHeader) =>

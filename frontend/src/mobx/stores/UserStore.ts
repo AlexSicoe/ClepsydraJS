@@ -1,44 +1,21 @@
-import { observable, action, computed, onBecomeObserved } from 'mobx'
-import UserApi from '../requests/UserApi'
-import { notifyError, notifySuccess } from '../../utils/notification-factories'
-import { USER, USER_DELETED } from '../../utils/events'
-import { IAuthHeader } from './../requests/header-interfaces'
-import { IProject } from './ProjectStore'
-import socket from '../requests/socket'
+import { action, observable } from 'mobx'
 import { PromiseState } from '../../utils/enums'
+import { USER, USER_DELETED } from '../../utils/events'
+import { notifyError, notifySuccess } from '../../utils/notification-factories'
+import socket from '../requests/socket'
+import UserApi from '../requests/UserApi'
+import { IAuthHeader } from './../requests/header-interfaces'
+import { IUser } from './model-interfaces'
 const { PENDING, DONE, ERROR } = PromiseState
-
-export interface IUserBody {
-  username: string
-  email: string
-}
-
-export interface IUser extends IUserBody {
-  id: string
-  projects: IProject[]
-  tasks: any[]
-  timestamp: string
-  userProject: any
-}
-
-export enum Role {
-  Admin = 'Admin',
-  Moderator = 'Moderator',
-  User = 'User',
-}
-
-export interface IUserProject {
-  role: Role
-}
 
 export default class UserStore {
   private api: UserApi
-  @observable state: PromiseState = PENDING
-  @observable id: string = ''
-  @observable username: string = ''
-  @observable email: string = ''
-  @observable projects: any[] = []
-  @observable tasks: any[] = []
+  @observable state?: PromiseState = PENDING
+  @observable id?: number
+  @observable username?: string = ''
+  @observable email?: string = ''
+  @observable projects?: any[] = []
+  @observable tasks?: any[] = []
 
   constructor(api: UserApi) {
     this.api = api
@@ -46,7 +23,7 @@ export default class UserStore {
 
   @action reset = () => {
     this.state = PENDING
-    this.id = ''
+    this.id = undefined
     this.username = ''
     this.email = ''
     this.projects = []
@@ -66,33 +43,33 @@ export default class UserStore {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.api.fetchUser(id, header)
+      const res = await this.api.fetchUser(id, header)
 
       this.state = DONE
-      const user = response.data
+      const user = res.data
       this.update(user)
-      socket.on(USER, (receivedUser: IUser) => {
-        this.update(receivedUser)
+      socket.on(USER, (resUser: IUser) => {
+        this.update(resUser)
       })
       socket.on(USER_DELETED, () => this.reset())
-    } catch (error) {
+    } catch (err) {
       this.state = ERROR
-      notifyError(error)
+      notifyError(err)
     }
   }
 
   @action
-  putUser = async (id: string, body: IUserBody, token: string) => {
+  putUser = async (id: string, body: IUser, token: string) => {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.api.putUser(id, body, header)
+      const res = await this.api.putUser(id, body, header)
 
       this.state = DONE
-      notifySuccess(response)
-    } catch (error) {
+      notifySuccess(res)
+    } catch (err) {
       this.state = ERROR
-      notifyError(error)
+      notifyError(err)
     }
   }
 
@@ -101,13 +78,13 @@ export default class UserStore {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.api.deleteUser(id, header)
+      const res = await this.api.deleteUser(id, header)
 
       this.state = DONE
-      notifySuccess(response)
-    } catch (error) {
+      notifySuccess(res)
+    } catch (err) {
       this.state = ERROR
-      notifyError(error)
+      notifyError(err)
     }
   }
 }

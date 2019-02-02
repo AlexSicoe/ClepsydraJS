@@ -1,7 +1,8 @@
 import Sequelize, {
   DataTypeAbstract,
-  DefineAttributeColumnOptions,
+  DefineAttributeColumnOptions
 } from 'sequelize'
+const { INTEGER, STRING, BOOLEAN, DATE, NOW } = Sequelize
 declare global {
   type SequelizeAttributes<T extends { [key: string]: any }> = {
     [P in keyof T]: string | DataTypeAbstract | DefineAttributeColumnOptions
@@ -22,59 +23,59 @@ export type UserModel = Sequelize.Model<UserInstance, UserAttributes>
 export function initUser(sequelize: Sequelize.Sequelize): UserModel {
   const attributes: SequelizeAttributes<UserAttributes> = {
     username: {
-      type: Sequelize.STRING,
+      type: STRING,
       unique: true,
       allowNull: false,
       validate: {
         notEmpty: {
           args: true,
-          msg: 'username cannot be empty',
+          msg: 'username cannot be empty'
         },
         len: {
           args: [3, 30],
-          msg: 'username must have between 3 and 30 characters',
-        },
-      },
+          msg: 'username must have between 3 and 30 characters'
+        }
+      }
     },
     password: {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [6, 30],
-      },
+        len: [6, 30]
+      }
     },
     email: {
-      type: Sequelize.STRING,
+      type: STRING,
       unique: true,
       allowNull: false,
       validate: {
         notEmpty: true,
-        isEmail: true,
-      },
+        isEmail: true
+      }
     },
-    token: Sequelize.STRING,
-    expiry: Sequelize.DATE,
+    token: STRING,
+    expiry: DATE,
     timestamp: {
-      type: Sequelize.DATE,
+      type: DATE,
       allowNull: false,
-      defaultValue: Sequelize.NOW,
-    },
+      defaultValue: NOW
+    }
   }
   const options: Sequelize.DefineOptions<UserInstance> = {
     defaultScope: {
-      attributes: { exclude: ['password', 'token', 'expiry'] },
+      attributes: { exclude: ['password', 'token', 'expiry'] }
     },
     scopes: {
       withCredentials: {
-        attributes: {},
-      },
-    },
+        attributes: {}
+      }
+    }
   }
   const User = sequelize.define<UserInstance, UserAttributes>(
     'user',
     attributes,
-    options,
+    options
   )
   return User
 }
@@ -89,17 +90,17 @@ export type ProjectModel = Sequelize.Model<ProjectInstance, ProjectAttributes>
 export function initProject(sequelize: Sequelize.Sequelize): ProjectModel {
   const attributes: SequelizeAttributes<ProjectAttributes> = {
     name: {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [2, 30],
-      },
-    },
+        len: [2, 30]
+      }
+    }
   }
   const Project = sequelize.define<ProjectInstance, ProjectAttributes>(
     'project',
-    attributes,
+    attributes
   )
   return Project
 }
@@ -115,20 +116,20 @@ export type UserProjectModel = Sequelize.Model<
   UserProjectAttributes
 >
 export function initUserProject(
-  sequelize: Sequelize.Sequelize,
+  sequelize: Sequelize.Sequelize
 ): UserProjectModel {
   const attributes: SequelizeAttributes<UserProjectAttributes> = {
     role: {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
         isIn: {
           args: [['Admin', 'Moderator', 'User']],
-          msg: 'Must be Admin, Moderator or User',
-        },
-      },
-    },
+          msg: 'Must be Admin, Moderator or User'
+        }
+      }
+    }
   }
   const UserProject = sequelize.define<
     UserProjectInstance,
@@ -149,29 +150,29 @@ export type SprintModel = Sequelize.Model<SprintInstance, SprintAttributes>
 export function initSprint(sequelize: Sequelize.Sequelize): SprintModel {
   const attributes: SequelizeAttributes<SprintAttributes> = {
     name: {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [2, 30],
-      },
+        len: [2, 30]
+      }
     },
     startDate: {
-      type: Sequelize.DATE,
+      type: DATE,
       allowNull: false,
-      defaultValue: Sequelize.NOW,
+      defaultValue: NOW
       // validate: {isBefore: this.finishDate },
     },
     finishDate: {
-      type: Sequelize.DATE,
+      type: DATE,
       allowNull: false,
-      defaultValue: Sequelize.NOW,
+      defaultValue: NOW
       // validate: {isAfter: this.startDate  }
-    },
+    }
   }
   const Sprint = sequelize.define<SprintInstance, SprintAttributes>(
     'sprint',
-    attributes,
+    attributes
   )
   return Sprint
 }
@@ -187,20 +188,20 @@ export type StageModel = Sequelize.Model<StageInstance, StageAttributes>
 export function initStage(sequelize: Sequelize.Sequelize): StageModel {
   const attributes: SequelizeAttributes<StageAttributes> = {
     name: {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [2, 30],
-      },
+        len: [2, 30]
+      }
     },
     position: {
-      type: Sequelize.INTEGER,
-    },
+      type: INTEGER
+    }
   }
   const Stage = sequelize.define<StageInstance, StageAttributes>(
     'stage',
-    attributes,
+    attributes
   )
   return Stage
 }
@@ -208,6 +209,8 @@ export function initStage(sequelize: Sequelize.Sequelize): StageModel {
 interface TaskAttributes {
   id?: string
   name: string
+  description: string
+  position: number
   isFinished: boolean
   timestamp: string
 }
@@ -216,27 +219,38 @@ export type TaskModel = Sequelize.Model<TaskInstance, TaskAttributes>
 export function initTask(sequelize: Sequelize.Sequelize): TaskModel {
   const attributes: SequelizeAttributes<TaskAttributes> = {
     name: {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [2, 30],
-      },
+        len: [2, 30]
+      }
+    },
+    description: {
+      type: STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        len: [2, 300]
+      }
+    },
+    position: {
+      type: INTEGER
     },
     isFinished: {
-      type: Sequelize.BOOLEAN,
+      type: BOOLEAN,
       allowNull: false,
-      defaultValue: false,
+      defaultValue: false
     },
     timestamp: {
-      type: Sequelize.DATE,
+      type: DATE,
       allowNull: false,
-      defaultValue: Sequelize.NOW,
-    },
+      defaultValue: NOW
+    }
   }
   const Task = sequelize.define<TaskInstance, TaskAttributes>(
     'task',
-    attributes,
+    attributes
   )
   return Task
 }
