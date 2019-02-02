@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import SimpleAppBar from '../view/SimpleAppBar';
-import LoginDialog from '../auth/LoginDialog';
-import SignUpDialog from '../auth/SignUpDialog';
+import SimpleAppBar from '../view/SimpleAppBar'
+import LoginDialog from '../auth/LoginDialog'
+import SignUpDialog from '../auth/SignUpDialog'
 
 export default class PublicScreen extends Component {
   render() {
@@ -11,7 +11,6 @@ export default class PublicScreen extends Component {
           <LoginDialog />
           <SignUpDialog />
         </SimpleAppBar>
-
         This is a public screen...
       </div>
     )

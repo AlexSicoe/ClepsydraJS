@@ -1,42 +1,33 @@
-import { withStyles } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import { inject, observer } from 'mobx-react';
-import React, { Component } from 'react';
-import AuthStore from '../../mobx/stores/AuthStore';
-import ConfirmDialog from '../view/ConfirmDialog';
-import { ChangeEvent, KeyEvent } from '../view/view-types';
-
-
+import { withStyles } from '@material-ui/core'
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import { inject, observer } from 'mobx-react'
+import React, { Component } from 'react'
+import AuthStore from '../../mobx/stores/AuthStore'
+import ConfirmDialog from '../view/ConfirmDialog'
+import { ChangeEvent, KeyEvent } from '../view/view-types'
 
 const styles = (theme: any) => ({
   buttonMargin: {
-    margin: '5px'
-  }
+    margin: '5px',
+  },
 })
-
-
-interface Props {
-
-}
 
 interface InjectedProps {
   authStore: AuthStore
   classes: any
 }
 
-interface State {
+interface IState {
   open: boolean
   username: string
   email: string
   password: string
 }
 
-
-
 @inject('authStore')
 @observer
-class SignUpDialog extends Component<Props, State> {
+class SignUpDialog extends Component<any, IState> {
   state = {
     open: false,
     username: '',
@@ -49,34 +40,34 @@ class SignUpDialog extends Component<Props, State> {
   }
 
   handleChange = (event: ChangeEvent) => {
-    //@ts-ignore
+    // @ts-ignore
     this.setState({
-      [event.target.name]: event.target.value
+      [event.target.name]: event.target.value,
     })
   }
 
   handleSignUp = () => {
-    let { username, email, password } = this.state
-    let { authStore } = this.injected
-    let credentials = { username, email, password }
+    const { username, email, password } = this.state
+    const { authStore } = this.injected
+    const credentials = { username, email, password }
     authStore!.signUp(credentials)
   }
 
   handleKey = (event: KeyEvent) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       this.handleSignUp()
     }
   }
 
   handleOpen = () => {
     this.setState({
-      open: true
+      open: true,
     })
   }
 
   handleClose = () => {
     this.setState({
-      open: false
+      open: false,
     })
   }
 

@@ -1,31 +1,25 @@
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import { inject, observer } from 'mobx-react';
-import React, { Component } from 'react';
-import AuthStore from '../../mobx/stores/AuthStore';
-import ProjectStore from '../../mobx/stores/ProjectStore';
-import ConfirmDialog from '../view/ConfirmDialog';
-import { ChangeEvent, KeyEvent } from '../view/view-types';
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import { inject, observer } from 'mobx-react'
+import React, { Component } from 'react'
+import AuthStore from '../../mobx/stores/AuthStore'
+import ProjectStore from '../../mobx/stores/ProjectStore'
+import ConfirmDialog from '../view/ConfirmDialog'
+import { ChangeEvent, KeyEvent } from '../view/view-types'
 
-
-interface Props {
-
-}
-
-interface InjectedProps extends Props {
+interface InjectedProps {
   authStore: AuthStore
   projectStore: ProjectStore
 }
 
-interface State {
+interface IState {
   open: boolean
   projectName: string
 }
 
-
 @inject('authStore', 'projectStore')
 @observer
-class AddProjectButton extends Component<Props, State> {
+class AddProjectButton extends Component<any, IState> {
   state = {
     open: false,
     projectName: '',
@@ -36,9 +30,9 @@ class AddProjectButton extends Component<Props, State> {
   }
 
   handleChange = (event: ChangeEvent) => {
-    //@ts-ignore
+    // @ts-ignore
     this.setState({
-      [event.target.name]: event.target.value
+      [event.target.name]: event.target.value,
     })
   }
 
@@ -46,14 +40,10 @@ class AddProjectButton extends Component<Props, State> {
     const { projectName } = this.state
     const { authStore, projectStore } = this.injected
 
-
-
     const project = { name: projectName }
     this.handleClose()
     const { token, uid } = authStore
     projectStore.postProject(uid, project, token)
-
-
   }
 
   handleKey = (event: KeyEvent) => {
@@ -71,13 +61,13 @@ class AddProjectButton extends Component<Props, State> {
 
   handleOpen = () => {
     this.setState({
-      open: true
+      open: true,
     })
   }
 
   handleClose = () => {
     this.setState({
-      open: false
+      open: false,
     })
   }
 
@@ -86,11 +76,7 @@ class AddProjectButton extends Component<Props, State> {
 
     return (
       <>
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={this.handleOpen}
-        >
+        <Button color="primary" variant="contained" onClick={this.handleOpen}>
           Add Project
         </Button>
         <ConfirmDialog
@@ -114,6 +100,5 @@ class AddProjectButton extends Component<Props, State> {
     )
   }
 }
-
 
 export default AddProjectButton

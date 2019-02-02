@@ -35,7 +35,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "flow": "flow"
+    "lint": "tslint 'src/**/*.{ts,tsx}'" 
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -47,6 +47,10 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "flow-bin": "^0.89.0"
+    "prettier": "^1.16.3",
+    "tslint": "^5.12.1",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-config-standard": "^8.0.1",
+    "tslint-react": "^3.6.0"
   }
 }

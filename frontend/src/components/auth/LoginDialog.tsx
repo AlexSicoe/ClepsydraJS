@@ -17,10 +17,7 @@ const styles = (theme: any) => ({
   }
 })
 
-interface Props {
 
-
-}
 
 interface InjectedProps {
   authStore: AuthStore
@@ -28,7 +25,7 @@ interface InjectedProps {
   classes: any
 }
 
-interface State {
+interface IState {
   open: boolean
   username: string
   password: string
@@ -37,7 +34,7 @@ interface State {
 
 @inject('authStore')
 @observer
-class LoginDialog extends Component<Props, State> {
+class LoginDialog extends Component<any, IState> {
   state = {
     open: false,
     username: '',
@@ -49,16 +46,16 @@ class LoginDialog extends Component<Props, State> {
   }
 
   handleChange = (event: ChangeEvent) => {
-    //@ts-ignore
+    // @ts-ignore
     this.setState({
       [event.target.name]: event.target.value
     })
   }
 
   handleLogin = () => {
-    let { username, password } = this.state
-    let { authStore, history } = this.injected
-    let credentials = { username, password }
+    const { username, password } = this.state
+    const { authStore, history } = this.injected
+    const credentials = { username, password }
     authStore.login(credentials, () => history.push('/home'))
   }
 
@@ -127,6 +124,6 @@ class LoginDialog extends Component<Props, State> {
   }
 }
 
-//@ts-ignore
+// @ts-ignore
 const LoginDialogWithRouter = withRouter(LoginDialog)
 export default withStyles(styles)(LoginDialogWithRouter)

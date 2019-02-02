@@ -1,39 +1,37 @@
-import ProjectApi from "../requests/ProjectApi";
-import { User, UserProject } from "./UserStore";
-import { observable, action, computed } from "mobx";
-import { AuthHeader } from "../requests/header-interfaces";
-import { notifyError, notifySuccess } from "../../utils/notification-factories";
-import { PROJECT, PROJECT_DELETED } from "../../utils/events";
-import { MailOrNameBody } from './../requests/ProjectApi';
-import socket from "../requests/socket";
-import { PromiseState } from '../../utils/enums';
+import ProjectApi from '../requests/ProjectApi'
+import { IUser, IUserProject } from './UserStore'
+import { observable, action, computed } from 'mobx'
+import { IAuthHeader } from '../requests/header-interfaces'
+import { notifyError, notifySuccess } from '../../utils/notification-factories'
+import { PROJECT, PROJECT_DELETED } from '../../utils/events'
+import { IMailOrNameBody } from './../requests/ProjectApi'
+import socket from '../requests/socket'
+import { PromiseState } from '../../utils/enums'
 const { PENDING, DONE, ERROR } = PromiseState
 
-
-export interface ProjectBody {
+export interface IProjectBody {
   name: string
 }
 
-export interface Project extends ProjectBody {
+export interface IProject extends IProjectBody {
   id: string
-  users: User[]
+  users: IUser[]
   sprints: any[]
   tasks: any[]
-  userProject: UserProject
+  userProject: IUserProject
 }
 
 export default class ProjectStore {
-  private projectApi: ProjectApi
+  private api: ProjectApi
   @observable state: PromiseState = PENDING
   @observable id: string = ''
   @observable name: string = ''
-  @observable users: User[] = []
+  @observable users: IUser[] = []
   @observable sprints: any[] = []
   @observable tasks: any[] = []
 
-
-  constructor(projectApi: ProjectApi) {
-    this.projectApi = projectApi
+  constructor(api: ProjectApi) {
+    this.api = api
   }
 
   @action reset = () => {
@@ -45,8 +43,7 @@ export default class ProjectStore {
     this.tasks = []
   }
 
-
-  @action update = (project: Project) => {
+  @action update = (project: IProject) => {
     this.id = project.id
     this.name = project.name
     this.users = project.users
@@ -56,17 +53,18 @@ export default class ProjectStore {
 
   @action
   fetchProject = async (pid: string, token: string) => {
-    const header: AuthHeader = { token }
+    const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.projectApi.fetchProject(pid, header)
+      const response = await this.api.fetchProject(pid, header)
 
       this.state = DONE
       const project = response.data
       this.update(project)
-      socket.on(PROJECT, (project: Project) => this.update(project))
-      socket.on(PROJECT_DELETED, (project: Project) => this.reset())
-
+      socket.on(PROJECT, (receivedProject: IProject) =>
+        this.update(receivedProject),
+      )
+      socket.on(PROJECT_DELETED, (receivedProject: IProject) => this.reset())
     } catch (error) {
       this.state = ERROR
       notifyError(error)
@@ -74,15 +72,14 @@ export default class ProjectStore {
   }
 
   @action
-  postProject = async (uid: string, body: ProjectBody, token: string) => {
-    const header: AuthHeader = { token }
+  postProject = async (uid: string, body: IProjectBody, token: string) => {
+    const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.projectApi.postProject(uid, body, header)
+      const response = await this.api.postProject(uid, body, header)
 
       this.state = DONE
       notifySuccess(response)
-
     } catch (error) {
       this.state = ERROR
       notifyError(error)
@@ -90,15 +87,14 @@ export default class ProjectStore {
   }
 
   @action
-  putProject = async (pid: string, body: ProjectBody, token: string) => {
-    const header: AuthHeader = { token }
+  putProject = async (pid: string, body: IProjectBody, token: string) => {
+    const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.projectApi.putProject(pid, body, header)
+      const response = await this.api.putProject(pid, body, header)
 
       this.state = DONE
       notifySuccess(response)
-
     } catch (error) {
       this.state = ERROR
       notifyError(error)
@@ -107,14 +103,13 @@ export default class ProjectStore {
 
   @action
   deleteProject = async (pid: string, token: string) => {
-    const header: AuthHeader = { token }
+    const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.projectApi.deleteProject(pid, header)
+      const response = await this.api.deleteProject(pid, header)
 
       this.state = DONE
       notifySuccess(response)
-
     } catch (error) {
       this.state = ERROR
       notifyError(error)
@@ -122,15 +117,18 @@ export default class ProjectStore {
   }
 
   @action
-  addUserToProject = async (pid: string, body: MailOrNameBody, token: string) => {
-    const header: AuthHeader = { token }
+  addUserToProject = async (
+    pid: string,
+    body: IMailOrNameBody,
+    token: string,
+  ) => {
+    const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.projectApi.addUserToProject(pid, body, header)
+      const response = await this.api.addUserToProject(pid, body, header)
 
       this.state = DONE
       notifySuccess(response)
-
     } catch (error) {
       this.state = ERROR
       notifyError(error)
@@ -139,14 +137,13 @@ export default class ProjectStore {
 
   @action
   removeUserFromProject = async (pid: string, uid: string, token: string) => {
-    const header: AuthHeader = { token }
+    const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.projectApi.removeUserFromProject(pid, uid, header)
+      const response = await this.api.removeUserFromProject(pid, uid, header)
 
       this.state = DONE
       notifySuccess(response)
-
     } catch (error) {
       this.state = ERROR
       notifyError(error)

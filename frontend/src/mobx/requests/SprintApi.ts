@@ -1,6 +1,1 @@
-
-
-
-export default class SprintApi {
-  
-}
+export default class SprintApi {}

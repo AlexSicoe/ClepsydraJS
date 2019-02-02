@@ -1,30 +1,21 @@
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import { inject, observer } from 'mobx-react';
-import React, { Component } from 'react';
-import AuthStore from '../../mobx/stores/AuthStore';
-import ProjectStore from '../../mobx/stores/ProjectStore';
-import ConfirmDialog from '../view/ConfirmDialog';
-import { ChangeEvent, KeyEvent } from '../view/view-types';
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import { inject, observer } from 'mobx-react'
+import React, { Component } from 'react'
+import AuthStore from '../../mobx/stores/AuthStore'
+import ProjectStore from '../../mobx/stores/ProjectStore'
+import ConfirmDialog from '../view/ConfirmDialog'
+import { ChangeEvent, KeyEvent } from '../view/view-types'
 
-
-interface Props {
-
-}
-
-interface InjectedProps extends Props {
+interface InjectedProps {
   authStore: AuthStore
   projectStore: ProjectStore
   history: History
 }
 
-interface State {
-
-}
-
 @inject('authStore', 'projectStore')
 @observer
-class AddUserButton extends Component<Props, State> {
+class AddUserButton extends Component<any, any> {
   state = {
     open: false,
     mailOrName: '',
@@ -36,7 +27,7 @@ class AddUserButton extends Component<Props, State> {
 
   handleChange = (event: ChangeEvent) => {
     this.setState({
-      [event.target.name]: event.target.value
+      [event.target.name]: event.target.value,
     })
   }
 
@@ -50,7 +41,6 @@ class AddUserButton extends Component<Props, State> {
   }
 
   handleKey = (event: KeyEvent) => {
-
     switch (event.key) {
       case 'Escape':
         this.handleClose()
@@ -65,27 +55,22 @@ class AddUserButton extends Component<Props, State> {
 
   handleOpen = () => {
     this.setState({
-      open: true
+      open: true,
     })
   }
 
   handleClose = () => {
     this.setState({
-      open: false
+      open: false,
     })
   }
-
 
   render() {
     const { open } = this.state
 
     return (
       <>
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={this.handleOpen}
-        >
+        <Button color="primary" variant="contained" onClick={this.handleOpen}>
           Add User
         </Button>
         <ConfirmDialog

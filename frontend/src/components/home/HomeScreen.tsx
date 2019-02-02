@@ -1,36 +1,25 @@
-import { History } from 'history';
-import { inject, observer } from 'mobx-react';
-import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
-import AuthStore from '../../mobx/stores/AuthStore';
-import UserStore from '../../mobx/stores/UserStore';
-import { basicStyle, borderStyle } from '../styles/styles';
-import LoadingScreen from '../view/LoadingScreen';
-import LogoutButton from '../view/LogoutButton';
-import SimpleAppBar from '../view/SimpleAppBar';
-import SimpleList from '../view/SimpleList';
-import AddProjectButton from './AddProjectButton';
+import { History } from 'history'
+import { inject, observer } from 'mobx-react'
+import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
+import AuthStore from '../../mobx/stores/AuthStore'
+import UserStore from '../../mobx/stores/UserStore'
+import { basicStyle, borderStyle } from '../styles/styles'
+import LoadingScreen from '../view/LoadingScreen'
+import LogoutButton from '../view/LogoutButton'
+import SimpleAppBar from '../view/SimpleAppBar'
+import SimpleList from '../view/SimpleList'
+import AddProjectButton from './AddProjectButton'
 
-
-interface Props {
-
-}
-
-interface InjectedProps extends Props {
+interface InjectedProps {
   authStore: AuthStore
   userStore: UserStore
   history: History
 }
 
-interface State {
-
-}
-
-
 @inject('authStore', 'userStore')
 @observer
-class HomeScreen extends Component<Props, State> {
-
+class HomeScreen extends Component<any, any> {
   get injected() {
     return this.props as InjectedProps
   }
@@ -53,19 +42,18 @@ class HomeScreen extends Component<Props, State> {
   render() {
     const { userStore } = this.injected
 
-    if (userStore.state === 'pending')
+    if (userStore.state === 'pending') {
       return <LoadingScreen />
+    }
 
     return (
       <>
         <SimpleAppBar title="Home">
           <LogoutButton />
         </SimpleAppBar>
-
         Hello {userStore.username}!
-          <br />
+        <br />
         <div style={{ ...basicStyle, ...borderStyle }}>
-
           {/* 
         //@ts-ignore */}
           <SimpleList
@@ -75,7 +63,6 @@ class HomeScreen extends Component<Props, State> {
             onItemClick={this.redirectToProject}
           />
         </div>
-
         <div style={basicStyle}>
           <AddProjectButton />
         </div>
@@ -85,7 +72,5 @@ class HomeScreen extends Component<Props, State> {
   }
 }
 
-
-
-//@ts-ignore
+// @ts-ignore
 export default withRouter(HomeScreen)

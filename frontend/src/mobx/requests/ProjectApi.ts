@@ -1,31 +1,31 @@
-import { AuthHeader } from "./header-interfaces"
-import { API } from "../../env-config"
+import { IAuthHeader } from './header-interfaces'
+import { API } from '../../env-config'
 import axios from 'axios'
-import { ProjectBody } from "../stores/ProjectStore";
+import { IProjectBody } from '../stores/ProjectStore'
 
-
-export interface MailOrNameBody {
+export interface IMailOrNameBody {
   mailOrName: string
 }
 
 export default class ProjectApi {
-
-  fetchProject = (pid: string, headers: AuthHeader) =>
+  fetchProject = (pid: string, headers: IAuthHeader) =>
     axios.get(`${API}/projects/${pid}`, { headers })
 
-  postProject = (uid: string, body: ProjectBody, headers: AuthHeader) =>
+  postProject = (uid: string, body: IProjectBody, headers: IAuthHeader) =>
     axios.post(`${API}/users/${uid}/projects`, body, { headers })
 
-  putProject = (pid: string, body: ProjectBody, headers: AuthHeader) =>
+  putProject = (pid: string, body: IProjectBody, headers: IAuthHeader) =>
     axios.put(`${API}/projects/${pid}`, body, { headers })
 
-  deleteProject = (pid: string, headers: AuthHeader) =>
+  deleteProject = (pid: string, headers: IAuthHeader) =>
     axios.delete(`${API}/projects/${pid}`, { headers })
 
-  addUserToProject = (pid: string, body: MailOrNameBody, headers: AuthHeader) =>
-    axios.post(`${API}/projects/${pid}/users`, body, { headers })
+  addUserToProject = (
+    pid: string,
+    body: IMailOrNameBody,
+    headers: IAuthHeader,
+  ) => axios.post(`${API}/projects/${pid}/users`, body, { headers })
 
-  removeUserFromProject = (pid: string, uid: string, headers: AuthHeader) =>
+  removeUserFromProject = (pid: string, uid: string, headers: IAuthHeader) =>
     axios.delete(`${API}/projects/${pid}/users/${uid}`, { headers })
-
 }

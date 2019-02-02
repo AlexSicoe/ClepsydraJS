@@ -1,4 +1,3 @@
-
-export interface AuthHeader {
+export interface IAuthHeader {
   token: string
 }

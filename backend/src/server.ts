@@ -1,33 +1,44 @@
 'use strict'
-import { Request, Response } from 'express-serve-static-core';
-import http from 'http';
-import socketIo from 'socket.io';
-import express, { NextFunction } from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import moment from 'moment';
+import { Request, Response } from 'express-serve-static-core'
+import http from 'http'
+import socketIo from 'socket.io'
+import express, { NextFunction } from 'express'
+import bodyParser from 'body-parser'
+import cors from 'cors'
+import moment from 'moment'
 import crypto from 'crypto'
-import Sequelize from 'sequelize';
-import * as dotenv from "dotenv";
-let path = `${__dirname}/../.env`;
-dotenv.config({ path: path });
+import Sequelize from 'sequelize'
+import * as dotenv from 'dotenv'
+let path = `${__dirname}/../.env`
+dotenv.config({ path: path })
 
-import * as model from './model';
-import isMail from './util/isMail';
-import { UserInstance, ProjectInstance, SprintInstance } from './model';
-import { USER, PROJECT, PROJECT_DELETED, SPRINT, NOTIFICATION, USER_DELETED } from './events'
+import * as model from './model'
+import isMail from './util/isMail'
+import { UserInstance, ProjectInstance, SprintInstance } from './model'
+import {
+  USER,
+  PROJECT,
+  PROJECT_DELETED,
+  SPRINT,
+  NOTIFICATION,
+  USER_DELETED,
+} from './events'
 
-const sequelize = new Sequelize(process.env.DB!, process.env.DB_USER!, process.env.DB_PASS!, {
-  dialect: 'postgres',
-  operatorsAliases: false,
-  logging: false,
-  define: {
-    timestamps: false,
-    underscored: true
-  }
-})
+const sequelize = new Sequelize(
+  process.env.DB!,
+  process.env.DB_USER!,
+  process.env.DB_PASS!,
+  {
+    dialect: 'postgres',
+    operatorsAliases: false,
+    logging: false,
+    define: {
+      timestamps: false,
+      underscored: true,
+    },
+  },
+)
 const Op = Sequelize.Op
-
 
 const User = model.initUser(sequelize)
 const Project = model.initProject(sequelize)
@@ -37,9 +48,9 @@ const Sprint = model.initSprint(sequelize)
 const Task = model.initTask(sequelize)
 
 interface Notification {
-  title: string;
-  body: string;
-  icon: 'success' | 'info' | 'warning' | 'error';
+  title: string
+  body: string
+  icon: 'success' | 'info' | 'warning' | 'error'
 }
 
 const PORT = 4000
@@ -53,15 +64,10 @@ const ERR_MSG_TASK = 'cannot find task'
 const ERR_MSG_SPRINT = 'cannot find sprint'
 const ERR_MSG_STAGE = 'cannot find stage'
 
-
-
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cors())
-
-
-
 
 let adminRouter = express.Router()
 let authRouter = express.Router()
@@ -69,7 +75,6 @@ let apiRouter = express.Router()
 app.use('/admin', adminRouter)
 app.use('/auth', authRouter)
 app.use('/api', apiRouter)
-
 
 User.belongsToMany(Project, { through: UserProject })
 Project.belongsToMany(User, { through: UserProject })
@@ -84,17 +89,12 @@ Task.belongsTo(Stage)
 User.hasMany(Task)
 Task.belongsTo(User)
 
-
-
-
 const server = http.createServer(app)
 const io = socketIo(server)
 
 app.get('/', (req, res) => res.send('Hello World'))
 
-
 let clientBook: Map<number, string[]> = new Map()
-
 
 function addClient(client: string, uid: number, book: Map<number, string[]>) {
   let userClients = book.get(uid)
@@ -111,10 +111,8 @@ function deleteClient(client: string, book: Map<number, string[]>) {
   for (let [uid, userClients] of book.entries()) {
     for (let i = 0; i < userClients.length; i++) {
       if (userClients[i] === client) {
-        if (userClients.length === 1)
-          book.delete(uid)
-        else
-          userClients.splice(i, 1)
+        if (userClients.length === 1) book.delete(uid)
+        else userClients.splice(i, 1)
         console.log('Client disconnected: ', client)
         console.log(book)
         return
@@ -146,19 +144,18 @@ async function readSprint(sid: any) {
     model: Stage,
     order: [['position', 'ASC']],
     include: [Task],
-    separate: true
+    separate: true,
   }
 
   const sprint = await Sprint.findByPk(sid, {
-    include: [StageWithOptions]
+    include: [StageWithOptions],
   })
 
   return sprint
 }
 
 function emit(event: string, payload: any, socketIds: string[]) {
-  if (!socketIds)
-    return
+  if (!socketIds) return
   for (let s of socketIds) {
     io.to(s).emit(event, payload)
   }
@@ -178,21 +175,14 @@ async function toProjectMembers(project: ProjectInstance) {
   return users.map((u) => toUser(u))
 }
 
-
 io.on('connection', (socket) => {
   console.log('Client connected: ' + socket.id)
 
-  socket.on('login', uid =>
-    addClient(socket.id, uid, clientBook)
-  )
+  socket.on('login', (uid) => addClient(socket.id, uid, clientBook))
 
-  socket.on('logout', () =>
-    deleteClient(socket.id, clientBook)
-  )
+  socket.on('logout', () => deleteClient(socket.id, clientBook))
 
-  socket.on('disconnect', () =>
-    deleteClient(socket.id, clientBook)
-  )
+  socket.on('disconnect', () => deleteClient(socket.id, clientBook))
 
   socket.on('error', (error) => {
     console.log('received error from client:', socket.id)
@@ -207,13 +197,12 @@ io.on('connection', (socket) => {
 server.listen(PORT)
 console.warn(`server listening on port ${PORT}`)
 
-
-
-
 apiRouter.use(async (req, res, next) => {
   let { token } = req.headers
   try {
-    let user: any = await User.scope('withCredentials').findOne({ where: { token } })
+    let user: any = await User.scope('withCredentials').findOne({
+      where: { token },
+    })
     if (!user) {
       res.status(403).send({ message: 'invalid user' })
       return
@@ -229,7 +218,6 @@ apiRouter.use(async (req, res, next) => {
     next(err)
   }
 })
-
 
 const refreshToken = (user: any) => {
   user.expiry = moment().add(TOKEN_LIFETIME, 'seconds')
@@ -258,22 +246,22 @@ adminRouter.post('/register', async (req, res, next) => {
 
 authRouter.post('/login', async (req, res, next) => {
   const { username: mailOrName, password } = req.body
-  const whereCredentialsMatch = isMail(mailOrName) ?
-    { where: { email: mailOrName, password } } :
-    { where: { username: mailOrName, password } }
+  const whereCredentialsMatch = isMail(mailOrName)
+    ? { where: { email: mailOrName, password } }
+    : { where: { username: mailOrName, password } }
 
   try {
     let user: any = await User.findOne(whereCredentialsMatch)
     if (!user) {
-      res.status(401).send({ message: 'username or pasword don\'t match' })
+      res.status(401).send({ message: "username or pasword don't match" })
       return
     }
     refreshToken(user)
     await user.save()
     res.status(200).send({
-      message: 'you\'re in',
+      message: "you're in",
       token: user.token,
-      uid: user.id
+      uid: user.id,
     })
   } catch (err) {
     next(err)
@@ -283,8 +271,6 @@ authRouter.post('/login', async (req, res, next) => {
 apiRouter.get('/', (req, res) => {
   res.send({ message: 'Welcome to our wonderful REST API !!!' })
 })
-
-
 
 apiRouter.get('/users/:uid', async (req, res, next) => {
   try {
@@ -319,9 +305,6 @@ apiRouter.put('/users/:uid', async (req, res, next) => {
       //@ts-ignore
       emit(PROJECT, await readProject(p.id), await toProjectMembers(p))
     }
-
-
-
   } catch (err) {
     next(err)
   }
@@ -355,7 +338,7 @@ apiRouter.delete('/users/:uid', async (req, res, next) => {
 apiRouter.post('/users/:uid/projects', async (req, res, next) => {
   //user makes a project
   let through = {
-    role: 'Admin'
+    role: 'Admin',
   }
   let { uid } = req.params
   try {
@@ -368,8 +351,7 @@ apiRouter.post('/users/:uid/projects', async (req, res, next) => {
     await user.addProject(project, { through })
     res.status(201).send({ message: 'created project' })
     emit(USER, await readUser(user.id), toUser(user)!)
-  }
-  catch (err) {
+  } catch (err) {
     next(err)
   }
 })
@@ -439,14 +421,14 @@ apiRouter.delete('/projects/:pid', async (req, res, next) => {
 apiRouter.post('/projects/:pid/users', async (req, res, next) => {
   //adds user to project
   const through = {
-    role: 'User'
+    role: 'User',
   }
 
   const { pid } = req.params
   const { mailOrName } = req.body
-  const mailOrNameMatch = isMail(mailOrName) ?
-    { email: mailOrName } :
-    { username: mailOrName }
+  const mailOrNameMatch = isMail(mailOrName)
+    ? { email: mailOrName }
+    : { username: mailOrName }
 
   try {
     const findProject = Project.findByPk(pid)
@@ -472,8 +454,12 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
       icon: 'info',
     }
 
-    //@ts-ignore
-    emit(PROJECT, await readProject(project.id), await toProjectMembers(project))
+    emit(
+      PROJECT,
+      await readProject(project.id),
+      // @ts-ignore
+      await toProjectMembers(project),
+    )
     emit(USER, await readUser(user.id), toUser(user)!)
     emit(NOTIFICATION, notification, toUser(user)!)
 
@@ -484,15 +470,15 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
 })
 
 apiRouter.put('/projects/:pid/users/:uid', async (req, res, next) => {
-  //edits joint data of user and project... 
+  //edits joint data of user and project...
   //think about UserProject roles
   const { pid, uid } = req.params
 
   const whereDetailsMatch = {
     where: {
       project_id: pid,
-      user_id: uid
-    }
+      user_id: uid,
+    },
   }
 
   try {
@@ -507,7 +493,6 @@ apiRouter.put('/projects/:pid/users/:uid', async (req, res, next) => {
     let project = await readProject(pid)
     //@ts-ignore
     emit(PROJECT, project, await toProjectMembers(project))
-
   } catch (err) {
     next(err)
   }
@@ -528,8 +513,8 @@ apiRouter.delete('/projects/:pid/users/:uid', async (req, res, next) => {
       res.status(404).send({ message: ERR_MSG_USER })
       return
     }
-    if (!await project.hasUser(user))
-      res.status(404).send({ message: 'project doesn\'t have said user' })
+    if (!(await project.hasUser(user)))
+      res.status(404).send({ message: "project doesn't have said user" })
     await project.removeUser(user)
     res.status(200).send({ message: 'user removed from project' })
     //TODO add tests and refacotr
@@ -539,7 +524,6 @@ apiRouter.delete('/projects/:pid/users/:uid', async (req, res, next) => {
     emit(PROJECT, await readProject(pid), await toProjectMembers(project))
     //@ts-ignore
     emit(PROJECT_DELETED, { id: pid }, toUser({ id: uid }))
-
   } catch (err) {
     next(err)
   }
@@ -606,8 +590,8 @@ apiRouter.delete('/sprints/:sid', async (req, res, next) => {
 apiRouter.post('/sprints/:sid/stages', async (req, res, next) => {
   const options = {
     where: {
-      sprint_id: req.params.sid
-    }
+      sprint_id: req.params.sid,
+    },
   }
 
   try {
@@ -618,8 +602,7 @@ apiRouter.post('/sprints/:sid/stages', async (req, res, next) => {
       res.status(404).send({ message: ERR_MSG_SPRINT })
       return
     }
-    if (!nr)
-      nr = 0
+    if (!nr) nr = 0
 
     req.body.position = ++nr
     const stage = await Stage.create(req.body)
@@ -672,7 +655,7 @@ apiRouter.patch('/stages/:stid1/:stid2', async (req, res, next) => {
     }
     let pos1 = stage1.position
     let pos2 = stage2.position
-      ;[pos1, pos2] = [pos2, pos1]
+    ;[pos1, pos2] = [pos2, pos1]
     const update1 = stage1.update({ position: pos1 })
     const update2 = stage2.update({ position: pos2 })
     await Promise.all([update1, update2])
@@ -696,7 +679,6 @@ apiRouter.post('/projects/:pid/tasks', async (req, res, next) => {
     next(err)
   }
 })
-
 
 apiRouter.put('/tasks/:tid', async (req, res, next) => {
   try {
@@ -730,9 +712,7 @@ apiRouter.delete('/tasks/:tid', async (req, res, next) => {
 apiRouter.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   //add task to sprint
   const withOptions = {
-    order: [
-      ['position', 'ASC']
-    ]
+    order: [['position', 'ASC']],
   }
 
   try {
@@ -815,7 +795,6 @@ apiRouter.post('/tasks/:tid/users/:uid', async (req, res, next) => {
   } catch (err) {
     next(err)
   }
-
 })
 
 apiRouter.delete('/tasks/:tid/users/:uid', async (req, res, next) => {
@@ -847,7 +826,10 @@ apiRouter.patch('/stages/:stid1/:stid2/tasks/:tid', async (req, res, next) => {
     const findStage2 = Stage.findByPk(req.params.stid2)
     const findTask = Task.findByPk(req.params.tid)
     const [stage1, stage2, task]: any[] = await Promise.all([
-      findStage1, findStage2, findTask])
+      findStage1,
+      findStage2,
+      findTask,
+    ])
     if (!(stage1 && stage2)) {
       res.status(404).send({ message: ERR_MSG_STAGE })
       return
@@ -857,8 +839,8 @@ apiRouter.patch('/stages/:stid1/:stid2/tasks/:tid', async (req, res, next) => {
       return
     }
     //YAGNI?
-    if (!await stage1.hasTask(task)) {
-      res.status(404).send({ message: 'stage1 doesn\'t have task' })
+    if (!(await stage1.hasTask(task))) {
+      res.status(404).send({ message: "stage1 doesn't have task" })
       return
     }
     const removeTask = stage1.removeTask(task)
@@ -876,9 +858,7 @@ apiRouter.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
   //TODO transaction
   //TODO maybe use '/sprints/:sid/tasks/:tid' request called from here
   const withOptions = {
-    order: [
-      ['position', 'ASC']
-    ]
+    order: [['position', 'ASC']],
   }
 
   try {
@@ -886,7 +866,9 @@ apiRouter.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
     const findSprint2 = Sprint.findByPk(req.params.sid2)
     const findTask = Task.findByPk(req.params.tid)
     const [sprint1, sprint2, task]: any[] = await Promise.all([
-      findSprint1, findSprint2, findTask
+      findSprint1,
+      findSprint2,
+      findTask,
     ])
     if (!(sprint1 && sprint2)) {
       res.status(404).send({ message: ERR_MSG_SPRINT })
@@ -921,8 +903,8 @@ apiRouter.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
 })
 
 interface ErrorShape {
-  status: number;
-  message: string;
+  status: number
+  message: string
 }
 
 app.use((err: ErrorShape, req: Request, res: Response, next: NextFunction) => {

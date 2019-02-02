@@ -1,15 +1,9 @@
-import SprintApi from "../requests/SprintApi";
-
+import SprintApi from '../requests/SprintApi'
 
 export default class SprintStore {
-  private sprintApi: SprintApi
+  private api: SprintApi
 
-
-  constructor(sprintApi: SprintApi) {
-    this.sprintApi = sprintApi
-
-
+  constructor(api: SprintApi) {
+    this.api = api
   }
-
-  
 }

@@ -1,8 +1,7 @@
 import socketIOClient from 'socket.io-client'
-import { NOTIFICATION } from '../../utils/events';
-import notify, { Notification } from '../../components/view/notify';
-import { SERVER } from './../../env-config';
-
+import { NOTIFICATION } from '../../utils/events'
+import notify, { Notification } from '../../components/view/notify'
+import { SERVER } from './../../env-config'
 
 const socket = socketIOClient(SERVER)
 

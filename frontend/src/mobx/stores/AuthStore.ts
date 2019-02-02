@@ -1,34 +1,30 @@
-import AuthApi from "../requests/AuthApi";
+import AuthApi from '../requests/AuthApi'
 import { observable, action, computed, runInAction } from 'mobx'
-import { Callback } from "../../utils/types";
-import { notifyError, notifySuccess } from "../../utils/notification-factories";
-import { handleSocketsOnLogin, handleSocketsOnLogout } from "../requests/socket";
-import { PromiseState } from '../../utils/enums';
+import { Callback } from '../../utils/types'
+import { notifyError, notifySuccess } from '../../utils/notification-factories'
+import { handleSocketsOnLogin, handleSocketsOnLogout } from '../requests/socket'
+import { PromiseState } from '../../utils/enums'
 const { PENDING, DONE, ERROR } = PromiseState
 
-export interface SignUpBody {
+export interface ISignUpBody {
   username: string
   email: string
   password: string
 }
 
-export interface LoginBody {
+export interface ILoginBody {
   username: string
   password: string
 }
 
 export default class AuthStore {
-
-
-
-  private authApi: AuthApi
+  private api: AuthApi
   @observable state: PromiseState = PENDING
   @observable token: string = ''
   @observable uid: string = ''
 
-  constructor(authApi: AuthApi) {
-    this.authApi = authApi
-
+  constructor(api: AuthApi) {
+    this.api = api
   }
 
   @action reset = () => {
@@ -42,14 +38,13 @@ export default class AuthStore {
   }
 
   @action
-  signUp = async (body: SignUpBody) => {
+  signUp = async (body: ISignUpBody) => {
     try {
       this.state = PENDING
-      const response = await this.authApi.signUp(body)
+      const response = await this.api.signUp(body)
 
       this.state = DONE
       notifySuccess(response)
-
     } catch (error) {
       this.state = ERROR
       notifyError(error)
@@ -57,10 +52,10 @@ export default class AuthStore {
   }
 
   @action
-  login = async (body: LoginBody, onSuccess: Callback) => {
+  login = async (body: ILoginBody, onSuccess: Callback) => {
     try {
       this.state = PENDING
-      const response = await this.authApi.login(body)
+      const response = await this.api.login(body)
 
       this.state = DONE
       runInAction(() => {
@@ -81,8 +76,6 @@ export default class AuthStore {
   logout = () => {
     handleSocketsOnLogout()
     this.reset()
-    //TODO, reset the rest of the stores...
+    // TODO, reset the rest of the stores...
   }
-
 }
-

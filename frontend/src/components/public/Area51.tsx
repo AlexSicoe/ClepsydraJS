@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-//@ts-ignore
+// @ts-ignore
 import Board from 'react-trello'
 
 const getBoard = () => {
@@ -55,12 +55,12 @@ export default class Area51 extends Component<any, any> {
 
   
   addCard = () => {
-    //@ts-ignore
+    // @ts-ignore
     this.state.eventBus.publish({ type: 'ADD_CARD', laneId: 'lane1', card: { id: "M1", title: "Buy Milk", label: "15 mins", description: "Also set reminder" } })
   }
 
   completeCard = () => {
-    //@ts-ignore
+    // @ts-ignore
     this.state.eventBus.publish({
       type: 'MOVE_CARD', 
       fromLaneId: 'lane1', 
@@ -90,9 +90,6 @@ export default class Area51 extends Component<any, any> {
   }
 
 
-  componentDidMount() {
-
-  }
 
   render() {
     return (

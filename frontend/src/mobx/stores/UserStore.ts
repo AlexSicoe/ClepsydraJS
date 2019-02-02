@@ -1,36 +1,38 @@
-
-import { observable, action, computed, onBecomeObserved } from 'mobx';
-import UserApi from '../requests/UserApi';
-import { notifyError, notifySuccess } from '../../utils/notification-factories';
-import { USER, USER_DELETED } from '../../utils/events';
-import { AuthHeader } from './../requests/header-interfaces';
-import { Project } from './ProjectStore';
-import socket from '../requests/socket';
-import { PromiseState } from '../../utils/enums';
+import { observable, action, computed, onBecomeObserved } from 'mobx'
+import UserApi from '../requests/UserApi'
+import { notifyError, notifySuccess } from '../../utils/notification-factories'
+import { USER, USER_DELETED } from '../../utils/events'
+import { IAuthHeader } from './../requests/header-interfaces'
+import { IProject } from './ProjectStore'
+import socket from '../requests/socket'
+import { PromiseState } from '../../utils/enums'
 const { PENDING, DONE, ERROR } = PromiseState
 
-export interface UserBody {
+export interface IUserBody {
   username: string
   email: string
 }
 
-export interface User extends UserBody {
+export interface IUser extends IUserBody {
   id: string
-  projects: Project[]
+  projects: IProject[]
   tasks: any[]
   timestamp: string
   userProject: any
 }
 
-export type Role = 'Admin' | 'Moderator' | 'User'
+export enum Role {
+  Admin = 'Admin',
+  Moderator = 'Moderator',
+  User = 'User',
+}
 
-export interface UserProject {
+export interface IUserProject {
   role: Role
 }
 
 export default class UserStore {
-
-  private userApi: UserApi
+  private api: UserApi
   @observable state: PromiseState = PENDING
   @observable id: string = ''
   @observable username: string = ''
@@ -38,9 +40,8 @@ export default class UserStore {
   @observable projects: any[] = []
   @observable tasks: any[] = []
 
-  constructor(userApi: UserApi) {
-    this.userApi = userApi
-    onBecomeObserved
+  constructor(api: UserApi) {
+    this.api = api
   }
 
   @action reset = () => {
@@ -52,7 +53,7 @@ export default class UserStore {
     this.tasks = []
   }
 
-  @action update = (user: User) => {
+  @action update = (user: IUser) => {
     this.id = user.id
     this.username = user.username
     this.email = user.email
@@ -62,20 +63,18 @@ export default class UserStore {
 
   @action
   fetchUser = async (id: string, token: string) => {
-    const header: AuthHeader = { token }
+    const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.userApi.fetchUser(id, header)
+      const response = await this.api.fetchUser(id, header)
 
       this.state = DONE
       const user = response.data
       this.update(user)
-      socket.on(USER, (user: User) => {
-        this.update(user)
-        console.log('update!')
+      socket.on(USER, (receivedUser: IUser) => {
+        this.update(receivedUser)
       })
       socket.on(USER_DELETED, () => this.reset())
-
     } catch (error) {
       this.state = ERROR
       notifyError(error)
@@ -83,15 +82,14 @@ export default class UserStore {
   }
 
   @action
-  putUser = async (id: string, body: UserBody, token: string) => {
-    const header: AuthHeader = { token }
+  putUser = async (id: string, body: IUserBody, token: string) => {
+    const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.userApi.putUser(id, body, header)
+      const response = await this.api.putUser(id, body, header)
 
       this.state = DONE
       notifySuccess(response)
-
     } catch (error) {
       this.state = ERROR
       notifyError(error)
@@ -100,20 +98,16 @@ export default class UserStore {
 
   @action
   deleteUser = async (id: string, token: string) => {
-    const header: AuthHeader = { token }
+    const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const response = await this.userApi.deleteUser(id, header)
+      const response = await this.api.deleteUser(id, header)
 
       this.state = DONE
       notifySuccess(response)
-
     } catch (error) {
       this.state = ERROR
       notifyError(error)
     }
   }
-
-
-
 }
