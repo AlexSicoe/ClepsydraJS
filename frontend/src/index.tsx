@@ -17,7 +17,7 @@ const stores = {
   authStore: new AuthStore(new AuthApi()),
   userStore: new UserStore(new UserApi()),
   projectStore: new ProjectStore(new ProjectApi()),
-  sprintStore: new SprintStore(new SprintApi()),
+  sprintStore: new SprintStore(new SprintApi())
 }
 
 const root = (

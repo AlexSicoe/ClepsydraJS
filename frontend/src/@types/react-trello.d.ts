@@ -71,7 +71,7 @@ declare module ReactTrello {
       sourceLandId: string,
       targetLaneId: string,
       position: number,
-      cardDetails: Card<CardMetaData>,
+      cardDetails: Card<CardMetaData>
     ) => void
     /**
      * Callback function triggered when lane drag is started: handleLaneDragStart(laneId)
@@ -99,7 +99,7 @@ declare module ReactTrello {
     onCardClick?: (
       cardId: string,
       metaData: CardMetaData,
-      laneId: string,
+      laneId: string
     ) => void
     /**
      * Called when a new card is added: onCardAdd(card, laneId)

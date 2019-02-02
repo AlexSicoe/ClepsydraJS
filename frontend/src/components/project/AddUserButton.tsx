@@ -18,7 +18,7 @@ interface InjectedProps {
 class AddUserButton extends Component<any, any> {
   state = {
     open: false,
-    mailOrName: '',
+    mailOrName: ''
   }
 
   get injected() {
@@ -27,7 +27,7 @@ class AddUserButton extends Component<any, any> {
 
   handleChange = (event: ChangeEvent) => {
     this.setState({
-      [event.target.name]: event.target.value,
+      [event.target.name]: event.target.value
     })
   }
 
@@ -55,13 +55,13 @@ class AddUserButton extends Component<any, any> {
 
   handleOpen = () => {
     this.setState({
-      open: true,
+      open: true
     })
   }
 
   handleClose = () => {
     this.setState({
-      open: false,
+      open: false
     })
   }
 

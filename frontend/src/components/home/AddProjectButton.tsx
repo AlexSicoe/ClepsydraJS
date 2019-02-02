@@ -22,7 +22,7 @@ interface IState {
 class AddProjectButton extends Component<any, IState> {
   state = {
     open: false,
-    projectName: '',
+    projectName: ''
   }
 
   get injected() {
@@ -32,7 +32,7 @@ class AddProjectButton extends Component<any, IState> {
   handleChange = (event: ChangeEvent) => {
     // @ts-ignore
     this.setState({
-      [event.target.name]: event.target.value,
+      [event.target.name]: event.target.value
     })
   }
 
@@ -61,13 +61,13 @@ class AddProjectButton extends Component<any, IState> {
 
   handleOpen = () => {
     this.setState({
-      open: true,
+      open: true
     })
   }
 
   handleClose = () => {
     this.setState({
-      open: false,
+      open: false
     })
   }
 

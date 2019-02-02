@@ -1,23 +1,19 @@
-import { withStyles } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import { inject, observer } from 'mobx-react';
-import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
-import AuthStore from '../../mobx/stores/AuthStore';
-import ConfirmDialog from '../view/ConfirmDialog';
-import { ChangeEvent, KeyEvent } from '../view/view-types';
-import { History } from 'history';
-
-
+import { withStyles } from '@material-ui/core'
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import { inject, observer } from 'mobx-react'
+import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
+import AuthStore from '../../mobx/stores/AuthStore'
+import ConfirmDialog from '../view/ConfirmDialog'
+import { ChangeEvent, KeyEvent } from '../view/view-types'
+import { History } from 'history'
 
 const styles = (theme: any) => ({
   buttonMargin: {
     margin: '5px'
   }
 })
-
-
 
 interface InjectedProps {
   authStore: AuthStore
@@ -31,14 +27,13 @@ interface IState {
   password: string
 }
 
-
 @inject('authStore')
 @observer
 class LoginDialog extends Component<any, IState> {
   state = {
     open: false,
     username: '',
-    password: '',
+    password: ''
   }
 
   get injected() {
@@ -60,7 +55,7 @@ class LoginDialog extends Component<any, IState> {
   }
 
   handleKey = (event: KeyEvent) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       this.handleLogin()
     }
   }
@@ -80,7 +75,6 @@ class LoginDialog extends Component<any, IState> {
   render() {
     const { classes } = this.injected
     const { open } = this.state
-
 
     return (
       <>

@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router,
   Redirect,
   Route,
-  Switch,
+  Switch
 } from 'react-router-dom'
 import './App.css'
 import HomeScreen from './home/HomeScreen'

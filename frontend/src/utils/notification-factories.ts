@@ -4,7 +4,7 @@ import { AxiosResponse, AxiosError } from 'axios'
 export const networkErrorNotification: Notification = {
   title: 'Network:',
   icon: 'error',
-  body: 'The hamsters ran into trouble',
+  body: 'The hamsters ran into trouble'
 }
 
 export function notifyError(error: AxiosError) {
@@ -14,7 +14,7 @@ export function notifyError(error: AxiosError) {
     notify({
       title: 'Server:',
       icon: 'error',
-      body: response.data.message,
+      body: response.data.message
     })
   } else {
     notify(networkErrorNotification)
@@ -25,6 +25,6 @@ export function notifySuccess(response: AxiosResponse) {
   notify({
     title: 'Server:',
     icon: 'success',
-    body: response.data.message,
+    body: response.data.message
   })
 }

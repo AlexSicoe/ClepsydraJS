@@ -4,8 +4,8 @@ export interface IUser {
   email?: string
   projects?: IProject[]
   tasks?: ITask[]
-  timestamp?: string
   userProject?: IUserProject
+  timestamp?: string
 }
 
 export interface IProject {

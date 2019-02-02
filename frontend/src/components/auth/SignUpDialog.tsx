@@ -9,8 +9,8 @@ import { ChangeEvent, KeyEvent } from '../view/view-types'
 
 const styles = (theme: any) => ({
   buttonMargin: {
-    margin: '5px',
-  },
+    margin: '5px'
+  }
 })
 
 interface InjectedProps {
@@ -32,7 +32,7 @@ class SignUpDialog extends Component<any, IState> {
     open: false,
     username: '',
     email: '',
-    password: '',
+    password: ''
   }
 
   get injected() {
@@ -42,7 +42,7 @@ class SignUpDialog extends Component<any, IState> {
   handleChange = (event: ChangeEvent) => {
     // @ts-ignore
     this.setState({
-      [event.target.name]: event.target.value,
+      [event.target.name]: event.target.value
     })
   }
 
@@ -61,13 +61,13 @@ class SignUpDialog extends Component<any, IState> {
 
   handleOpen = () => {
     this.setState({
-      open: true,
+      open: true
     })
   }
 
   handleClose = () => {
     this.setState({
-      open: false,
+      open: false
     })
   }
 

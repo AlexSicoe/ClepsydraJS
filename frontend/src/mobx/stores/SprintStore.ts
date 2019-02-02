@@ -1,6 +1,5 @@
 import SprintApi from '../requests/SprintApi'
 
-
 export default class SprintStore {
   private api: SprintApi
 
