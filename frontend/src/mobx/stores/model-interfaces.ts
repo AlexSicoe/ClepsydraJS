@@ -46,7 +46,7 @@ export interface ITask {
   id?: number
   name?: string
   description?: string
-  position: number
+  position?: number
   isFinished?: boolean
   timestamp?: string
 }
