@@ -778,7 +778,7 @@ apiRouter.delete('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   }
 })
 
-apiRouter.post('/tasks/:tid/users/:uid', async (req, res, next) => {
+apiRouter.post('/users/:uid/tasks/:tid/', async (req, res, next) => {
   //assign task to user
   try {
     const findTask = Task.findByPk(req.params.tid)
@@ -799,7 +799,7 @@ apiRouter.post('/tasks/:tid/users/:uid', async (req, res, next) => {
   }
 })
 
-apiRouter.delete('/tasks/:tid/users/:uid', async (req, res, next) => {
+apiRouter.delete('/users/:uid/tasks/:tid/', async (req, res, next) => {
   //unassign task from user
   try {
     const findTask = Task.findByPk(req.params.tid)

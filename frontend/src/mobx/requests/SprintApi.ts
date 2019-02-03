@@ -16,6 +16,12 @@ export default class SprintApi {
   deleteSprint = (sid: number, headers: IAuthHeader) =>
     axios.delete(`${API}/sprints/${sid}`, { headers })
 
+  addTask = (sid: number, tid: number, headers: IAuthHeader) =>
+    axios.post(`${API}/sprints/${sid}/tasks/${tid}`, { headers })
+
+  removeTask = (sid: number, tid: number, headers: IAuthHeader) =>
+    axios.delete(`${API}/sprints/${sid}/tasks/${tid}`, { headers })
+
   moveTask = (sid1: number, sid2: number, tid: number, headers: IAuthHeader) =>
     axios.patch(`${API}/sprints/${sid1}/${sid2}/moveTask/${tid}`, { headers })
 }

@@ -12,4 +12,10 @@ export default class UserApi {
 
   deleteUser = (id: number, headers: IAuthHeader) =>
     axios.delete(`${API}/users/${id}`, { headers })
+
+  assignTask = (uid: number, tid: number, headers: IAuthHeader) =>
+    axios.post(`${API}/users/${uid}/tasks/${tid} `, { headers })
+
+  unassignTask = (uid: number, tid: number, headers: IAuthHeader) =>
+    axios.delete(`${API}/users/${uid}/tasks/${tid} `, { headers })
 }
