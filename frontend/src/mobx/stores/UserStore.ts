@@ -10,7 +10,7 @@ const { PENDING, DONE, ERROR } = PromiseState
 
 export default class UserStore {
   private api: UserApi
-  @observable state?: PromiseState = PENDING
+  @observable state: PromiseState = PENDING
   @observable id?: number
   @observable username?: string = ''
   @observable email?: string = ''
@@ -39,7 +39,7 @@ export default class UserStore {
   }
 
   @action
-  fetchUser = async (id: string, token: string) => {
+  fetchUser = async (id: number, token: string) => {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
@@ -59,7 +59,7 @@ export default class UserStore {
   }
 
   @action
-  putUser = async (id: string, body: IUser, token: string) => {
+  putUser = async (id: number, body: IUser, token: string) => {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
@@ -74,7 +74,7 @@ export default class UserStore {
   }
 
   @action
-  deleteUser = async (id: string, token: string) => {
+  deleteUser = async (id: number, token: string) => {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING

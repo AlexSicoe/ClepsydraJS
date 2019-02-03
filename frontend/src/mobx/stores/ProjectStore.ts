@@ -11,7 +11,7 @@ const { PENDING, DONE, ERROR } = PromiseState
 
 export default class ProjectStore {
   private api: ProjectApi
-  @observable state?: PromiseState = PENDING
+  @observable state: PromiseState = PENDING
   @observable id?: number
   @observable name?: string = ''
   @observable users?: IUser[] = []
@@ -40,7 +40,7 @@ export default class ProjectStore {
   }
 
   @action
-  fetchProject = async (pid: string, token: string) => {
+  fetchProject = async (pid: number, token: string) => {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
@@ -58,7 +58,7 @@ export default class ProjectStore {
   }
 
   @action
-  postProject = async (uid: string, body: IProject, token: string) => {
+  postProject = async (uid: number, body: IProject, token: string) => {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
@@ -73,7 +73,7 @@ export default class ProjectStore {
   }
 
   @action
-  putProject = async (pid: string, body: IProject, token: string) => {
+  putProject = async (pid: number, body: IProject, token: string) => {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
@@ -88,7 +88,7 @@ export default class ProjectStore {
   }
 
   @action
-  deleteProject = async (pid: string, token: string) => {
+  deleteProject = async (pid: number, token: string) => {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
@@ -103,7 +103,11 @@ export default class ProjectStore {
   }
 
   @action
-  addUserToProject = async (pid: any, body: IMailOrNameBody, token: string) => {
+  addUserToProject = async (
+    pid: number,
+    body: IMailOrNameBody,
+    token: string
+  ) => {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
@@ -118,7 +122,7 @@ export default class ProjectStore {
   }
 
   @action
-  removeUserFromProject = async (pid: string, uid: string, token: string) => {
+  removeUserFromProject = async (pid: number, uid: number, token: string) => {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING

@@ -30,7 +30,7 @@ class HomeScreen extends Component<any, any> {
     if (!authStore.isAuthenticated) {
       authStore.logout()
     } else {
-      userStore.fetchUser(uid, token)
+      userStore.fetchUser(uid!, token)
     }
   }
 

@@ -21,7 +21,7 @@ export default class AuthStore {
   private api: AuthApi
   @observable state: PromiseState = PENDING
   @observable token: string = ''
-  @observable uid: string = ''
+  @observable uid?: number
 
   constructor(api: AuthApi) {
     this.api = api
@@ -30,7 +30,7 @@ export default class AuthStore {
   @action reset = () => {
     this.state = PENDING
     this.token = ''
-    this.uid = ''
+    this.uid = undefined
   }
 
   @computed get isAuthenticated() {
@@ -64,7 +64,7 @@ export default class AuthStore {
         this.uid = uid
       })
       onSuccess()
-      handleSocketsOnLogin(this.uid)
+      handleSocketsOnLogin(this.uid!)
       notifySuccess(response)
     } catch (error) {
       this.state = ERROR

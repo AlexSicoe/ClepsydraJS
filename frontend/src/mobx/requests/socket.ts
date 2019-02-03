@@ -5,7 +5,7 @@ import { SERVER } from './../../env-config'
 
 const socket = socketIOClient(SERVER)
 
-export function handleSocketsOnLogin(uid: string) {
+export function handleSocketsOnLogin(uid: number) {
   socket.emit('login', uid)
   socket.on(NOTIFICATION, (n: Notification) => notify(n))
 }

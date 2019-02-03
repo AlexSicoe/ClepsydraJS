@@ -9,22 +9,22 @@ export interface IMailOrNameBody {
 }
 
 export default class ProjectApi {
-  fetchProject = (pid: string, headers: IAuthHeader) =>
+  fetchProject = (pid: number, headers: IAuthHeader) =>
     axios.get(`${API}/projects/${pid}`, { headers })
 
-  postProject = (uid: string, body: IProject, headers: IAuthHeader) =>
+  postProject = (uid: number, body: IProject, headers: IAuthHeader) =>
     axios.post(`${API}/users/${uid}/projects`, body, { headers })
 
-  putProject = (pid: string, body: IProject, headers: IAuthHeader) =>
+  putProject = (pid: number, body: IProject, headers: IAuthHeader) =>
     axios.put(`${API}/projects/${pid}`, body, { headers })
 
-  deleteProject = (pid: string, headers: IAuthHeader) =>
+  deleteProject = (pid: number, headers: IAuthHeader) =>
     axios.delete(`${API}/projects/${pid}`, { headers })
 
-  addUser = (pid: string, body: IMailOrNameBody, headers: IAuthHeader) =>
+  addUser = (pid: number, body: IMailOrNameBody, headers: IAuthHeader) =>
     axios.post(`${API}/projects/${pid}/users`, body, { headers })
 
-  removeUser = (pid: string, uid: string, headers: IAuthHeader) =>
+  removeUser = (pid: number, uid: number, headers: IAuthHeader) =>
     axios.delete(`${API}/projects/${pid}/users/${uid}`, { headers })
 
   addTask = (pid: number, body: ITask, headers: IAuthHeader) =>

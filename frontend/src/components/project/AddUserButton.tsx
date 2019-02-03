@@ -36,7 +36,7 @@ class AddUserButton extends Component<any, any> {
     const { authStore, projectStore } = this.injected
     const { token } = authStore
 
-    projectStore.addUserToProject(projectStore.id, { mailOrName }, token)
+    projectStore.addUserToProject(projectStore.id!, { mailOrName }, token)
     this.handleClose()
   }
 

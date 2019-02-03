@@ -43,7 +43,7 @@ class AddProjectButton extends Component<any, IState> {
     const project = { name: projectName }
     this.handleClose()
     const { token, uid } = authStore
-    projectStore.postProject(uid, project, token)
+    projectStore.postProject(uid!, project, token)
   }
 
   handleKey = (event: KeyEvent) => {

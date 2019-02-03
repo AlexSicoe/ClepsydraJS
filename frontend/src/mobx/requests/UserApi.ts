@@ -4,12 +4,12 @@ import { IAuthHeader } from './header-interfaces'
 import { IUser } from '../stores/model-interfaces'
 
 export default class UserApi {
-  fetchUser = (id: string, headers: IAuthHeader) =>
+  fetchUser = (id: number, headers: IAuthHeader) =>
     axios.get(`${API}/users/${id}`, { headers })
 
-  putUser = (id: string, body: IUser, headers: IAuthHeader) =>
+  putUser = (id: number, body: IUser, headers: IAuthHeader) =>
     axios.put(`${API}/users/${id}`, body, { headers })
 
-  deleteUser = (id: string, headers: IAuthHeader) =>
+  deleteUser = (id: number, headers: IAuthHeader) =>
     axios.delete(`${API}/users/${id}`, { headers })
 }
