@@ -21,7 +21,7 @@ import {
   PROJECT_DELETED,
   SPRINT,
   NOTIFICATION,
-  USER_DELETED,
+  USER_DELETED
 } from './events'
 
 const sequelize = new Sequelize(
@@ -34,9 +34,9 @@ const sequelize = new Sequelize(
     logging: false,
     define: {
       timestamps: false,
-      underscored: true,
-    },
-  },
+      underscored: true
+    }
+  }
 )
 const Op = Sequelize.Op
 
@@ -144,11 +144,11 @@ async function readSprint(sid: any) {
     model: Stage,
     order: [['position', 'ASC']],
     include: [Task],
-    separate: true,
+    separate: true
   }
 
   const sprint = await Sprint.findByPk(sid, {
-    include: [StageWithOptions],
+    include: [StageWithOptions]
   })
 
   return sprint
@@ -201,7 +201,7 @@ apiRouter.use(async (req, res, next) => {
   let { token } = req.headers
   try {
     let user: any = await User.scope('withCredentials').findOne({
-      where: { token },
+      where: { token }
     })
     if (!user) {
       res.status(403).send({ message: 'invalid user' })
@@ -261,7 +261,7 @@ authRouter.post('/login', async (req, res, next) => {
     res.status(200).send({
       message: "you're in",
       token: user.token,
-      uid: user.id,
+      uid: user.id
     })
   } catch (err) {
     next(err)
@@ -338,7 +338,7 @@ apiRouter.delete('/users/:uid', async (req, res, next) => {
 apiRouter.post('/users/:uid/projects', async (req, res, next) => {
   //user makes a project
   let through = {
-    role: 'Admin',
+    role: 'Admin'
   }
   let { uid } = req.params
   try {
@@ -421,7 +421,7 @@ apiRouter.delete('/projects/:pid', async (req, res, next) => {
 apiRouter.post('/projects/:pid/users', async (req, res, next) => {
   //adds user to project
   const through = {
-    role: 'User',
+    role: 'User'
   }
 
   const { pid } = req.params
@@ -451,14 +451,14 @@ apiRouter.post('/projects/:pid/users', async (req, res, next) => {
     let notification: Notification = {
       title: 'Invitation',
       body: `You've been invited into project: ${project.name}`,
-      icon: 'info',
+      icon: 'info'
     }
 
     emit(
       PROJECT,
       await readProject(project.id),
       // @ts-ignore
-      await toProjectMembers(project),
+      await toProjectMembers(project)
     )
     emit(USER, await readUser(user.id), toUser(user)!)
     emit(NOTIFICATION, notification, toUser(user)!)
@@ -477,8 +477,8 @@ apiRouter.put('/projects/:pid/users/:uid', async (req, res, next) => {
   const whereDetailsMatch = {
     where: {
       project_id: pid,
-      user_id: uid,
-    },
+      user_id: uid
+    }
   }
 
   try {
@@ -590,8 +590,8 @@ apiRouter.delete('/sprints/:sid', async (req, res, next) => {
 apiRouter.post('/sprints/:sid/stages', async (req, res, next) => {
   const options = {
     where: {
-      sprint_id: req.params.sid,
-    },
+      sprint_id: req.params.sid
+    }
   }
 
   try {
@@ -642,28 +642,30 @@ apiRouter.delete('/stages/:stid', async (req, res, next) => {
   }
 })
 
-//TODO refactor
-apiRouter.patch('/stages/:stid1/:stid2', async (req, res, next) => {
-  //switch stages positions
-  try {
-    const findStage1 = Stage.findByPk(req.params.stid1)
-    const findStage2 = Stage.findByPk(req.params.stid2)
-    const [stage1, stage2] = await Promise.all([findStage1, findStage2])
-    if (!(stage1 && stage2)) {
-      res.status(404).send({ message: ERR_MSG_STAGE })
-      return
+apiRouter.patch(
+  '/stages/switchPosition/:stid1/:stid2',
+  async (req, res, next) => {
+    //switch stages positions
+    try {
+      const findStage1 = Stage.findByPk(req.params.stid1)
+      const findStage2 = Stage.findByPk(req.params.stid2)
+      const [stage1, stage2] = await Promise.all([findStage1, findStage2])
+      if (!(stage1 && stage2)) {
+        res.status(404).send({ message: ERR_MSG_STAGE })
+        return
+      }
+      let pos1 = stage1.position
+      let pos2 = stage2.position
+      ;[pos1, pos2] = [pos2, pos1]
+      const update1 = stage1.update({ position: pos1 })
+      const update2 = stage2.update({ position: pos2 })
+      await Promise.all([update1, update2])
+      res.status(200).send({ message: 'positions switched' })
+    } catch (err) {
+      next(err)
     }
-    let pos1 = stage1.position
-    let pos2 = stage2.position
-    ;[pos1, pos2] = [pos2, pos1]
-    const update1 = stage1.update({ position: pos1 })
-    const update2 = stage2.update({ position: pos2 })
-    await Promise.all([update1, update2])
-    res.status(200).send({ message: 'positions switched' })
-  } catch (err) {
-    next(err)
   }
-})
+)
 
 apiRouter.post('/projects/:pid/tasks', async (req, res, next) => {
   try {
@@ -712,7 +714,7 @@ apiRouter.delete('/tasks/:tid', async (req, res, next) => {
 apiRouter.post('/sprints/:sid/tasks/:tid', async (req, res, next) => {
   //add task to sprint
   const withOptions = {
-    order: [['position', 'ASC']],
+    order: [['position', 'ASC']]
   }
 
   try {
@@ -818,89 +820,118 @@ apiRouter.delete('/tasks/:tid/users/:uid', async (req, res, next) => {
   }
 })
 
-apiRouter.patch('/stages/:stid1/:stid2/tasks/:tid', async (req, res, next) => {
-  //move task from one stage to another
-  //TODO transaction
+//TODO test
+apiRouter.patch('/tasks/switchPosition/:tid1/:tid2', async (req, res, next) => {
+  //switch stages positions
   try {
-    const findStage1 = Stage.findByPk(req.params.stid1)
-    const findStage2 = Stage.findByPk(req.params.stid2)
-    const findTask = Task.findByPk(req.params.tid)
-    const [stage1, stage2, task]: any[] = await Promise.all([
-      findStage1,
-      findStage2,
-      findTask,
-    ])
-    if (!(stage1 && stage2)) {
+    const findTask1 = Task.findByPk(req.params.tid1)
+    const findTask2 = Task.findByPk(req.params.tid2)
+    const [task1, task2] = await Promise.all([findTask1, findTask2])
+    if (!(task1 && task2)) {
       res.status(404).send({ message: ERR_MSG_STAGE })
       return
     }
-    if (!task) {
-      res.status(404).send({ message: ERR_MSG_TASK })
-      return
-    }
-    //YAGNI?
-    if (!(await stage1.hasTask(task))) {
-      res.status(404).send({ message: "stage1 doesn't have task" })
-      return
-    }
-    const removeTask = stage1.removeTask(task)
-    const addTask = stage2.addTask(task)
-    await Promise.all([removeTask, addTask])
-    res.status(200).send({ message: 'task moved between stages' })
+    let pos1 = task1.position
+    let pos2 = task2.position
+    ;[pos1, pos2] = [pos2, pos1]
+    const update1 = task1.update({ position: pos1 })
+    const update2 = task2.update({ position: pos2 })
+    await Promise.all([update1, update2])
+    res.status(200).send({ message: 'positions switched' })
   } catch (err) {
     next(err)
   }
 })
 
-apiRouter.patch('/sprints/:sid1/:sid2/tasks/:tid', async (req, res, next) => {
-  //move task from one sprint to another
-  //adds task to first stage of 2nd sprint
-  //TODO transaction
-  //TODO maybe use '/sprints/:sid/tasks/:tid' request called from here
-  const withOptions = {
-    order: [['position', 'ASC']],
-  }
-
-  try {
-    const findSprint1 = Sprint.findByPk(req.params.sid1)
-    const findSprint2 = Sprint.findByPk(req.params.sid2)
-    const findTask = Task.findByPk(req.params.tid)
-    const [sprint1, sprint2, task]: any[] = await Promise.all([
-      findSprint1,
-      findSprint2,
-      findTask,
-    ])
-    if (!(sprint1 && sprint2)) {
-      res.status(404).send({ message: ERR_MSG_SPRINT })
-      return
-    }
-    if (!task) {
-      res.status(404).send({ message: ERR_MSG_TASK })
-      return
-    }
-    //find and remove task in sprint1
-    let flag = false
-    const stages1 = await sprint1.getStages()
-    for (let stage of stages1) {
-      if (await stage.hasTask(task)) {
-        await stage.removeTask(task)
-        flag = true
-        break
+apiRouter.patch(
+  '/stages/:stid1/:stid2/moveTask/:tid/',
+  async (req, res, next) => {
+    //move task from one stage to another
+    //TODO transaction
+    try {
+      const findStage1 = Stage.findByPk(req.params.stid1)
+      const findStage2 = Stage.findByPk(req.params.stid2)
+      const findTask = Task.findByPk(req.params.tid)
+      const [stage1, stage2, task]: any[] = await Promise.all([
+        findStage1,
+        findStage2,
+        findTask
+      ])
+      if (!(stage1 && stage2)) {
+        res.status(404).send({ message: ERR_MSG_STAGE })
+        return
       }
+      if (!task) {
+        res.status(404).send({ message: ERR_MSG_TASK })
+        return
+      }
+      //YAGNI?
+      if (!(await stage1.hasTask(task))) {
+        res.status(404).send({ message: "stage1 doesn't have task" })
+        return
+      }
+      const removeTask = stage1.removeTask(task)
+      const addTask = stage2.addTask(task)
+      await Promise.all([removeTask, addTask])
+      res.status(200).send({ message: 'task moved between stages' })
+    } catch (err) {
+      next(err)
     }
-    if (flag == false) {
-      res.status(404).send({ message: `${ERR_MSG_TASK} in sprint1` })
-      return
+  }
+)
+
+apiRouter.patch(
+  '/sprints/:sid1/:sid2/moveTask/:tid',
+  async (req, res, next) => {
+    //move task from one sprint to another
+    //adds task to first stage of 2nd sprint
+    //TODO transaction
+    //TODO maybe use '/sprints/:sid/tasks/:tid' request called from here
+    const withOptions = {
+      order: [['position', 'ASC']]
     }
 
-    //add to first stage in sprint2
-    const stages2 = await sprint2.getStages(withOptions)
-    await stages2[0].addTask(task)
-    res.status(200).send({ message: 'task moved between sprints' })
-  } catch (err) {
-    next(err)
+    try {
+      const findSprint1 = Sprint.findByPk(req.params.sid1)
+      const findSprint2 = Sprint.findByPk(req.params.sid2)
+      const findTask = Task.findByPk(req.params.tid)
+      const [sprint1, sprint2, task]: any[] = await Promise.all([
+        findSprint1,
+        findSprint2,
+        findTask
+      ])
+      if (!(sprint1 && sprint2)) {
+        res.status(404).send({ message: ERR_MSG_SPRINT })
+        return
+      }
+      if (!task) {
+        res.status(404).send({ message: ERR_MSG_TASK })
+        return
+      }
+      //find and remove task in sprint1
+      let flag = false
+      const stages1 = await sprint1.getStages()
+      for (let stage of stages1) {
+        if (await stage.hasTask(task)) {
+          await stage.removeTask(task)
+          flag = true
+          break
+        }
+      }
+      if (flag == false) {
+        res.status(404).send({ message: `${ERR_MSG_TASK} in sprint1` })
+        return
+      }
+
+      //add to first stage in sprint2
+      const stages2 = await sprint2.getStages(withOptions)
+      await stages2[0].addTask(task)
+      res.status(200).send({ message: 'task moved between sprints' })
+    } catch (err) {
+      next(err)
+    }
   }
-})
+)
 
 interface ErrorShape {
   status: number

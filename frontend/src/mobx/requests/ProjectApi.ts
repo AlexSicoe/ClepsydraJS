@@ -2,6 +2,7 @@ import { IAuthHeader } from './header-interfaces'
 import { API } from '../../env-config'
 import axios from 'axios'
 import { IProject } from '../stores/model-interfaces'
+import { ITask } from './../stores/model-interfaces'
 
 export interface IMailOrNameBody {
   mailOrName: string
@@ -20,12 +21,12 @@ export default class ProjectApi {
   deleteProject = (pid: string, headers: IAuthHeader) =>
     axios.delete(`${API}/projects/${pid}`, { headers })
 
-  addUserToProject = (
-    pid: string,
-    body: IMailOrNameBody,
-    headers: IAuthHeader
-  ) => axios.post(`${API}/projects/${pid}/users`, body, { headers })
+  addUser = (pid: string, body: IMailOrNameBody, headers: IAuthHeader) =>
+    axios.post(`${API}/projects/${pid}/users`, body, { headers })
 
-  removeUserFromProject = (pid: string, uid: string, headers: IAuthHeader) =>
+  removeUser = (pid: string, uid: string, headers: IAuthHeader) =>
     axios.delete(`${API}/projects/${pid}/users/${uid}`, { headers })
+
+  addTask = (pid: number, body: ITask, headers: IAuthHeader) =>
+    axios.post(`${API}/projects/${pid}/tasks`, body, { headers })
 }

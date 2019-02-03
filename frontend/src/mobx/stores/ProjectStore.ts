@@ -107,7 +107,7 @@ export default class ProjectStore {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const res = await this.api.addUserToProject(pid, body, header)
+      const res = await this.api.addUser(pid, body, header)
 
       this.state = DONE
       notifySuccess(res)
@@ -122,7 +122,7 @@ export default class ProjectStore {
     const header: IAuthHeader = { token }
     try {
       this.state = PENDING
-      const res = await this.api.removeUserFromProject(pid, uid, header)
+      const res = await this.api.removeUser(pid, uid, header)
 
       this.state = DONE
       notifySuccess(res)
