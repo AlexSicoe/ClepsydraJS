@@ -41,6 +41,7 @@ const newData = [
     cards: [
       {
         id: 'Card1',
+        laneId: 'lane1',
         title: 'Nike',
         description: 'Just do it',
         label: '30 mins'
@@ -54,6 +55,7 @@ const newData = [
     cards: [
       {
         id: 'Card2',
+        laneId: 'lane2',
         title: 'Do something',
         description: 'Do something something',
         label: '45 mins'
@@ -61,23 +63,6 @@ const newData = [
     ]
   }
 ]
-
-const handleDragStart = (cardId: string, laneId: string) => {
-  console.log('drag started')
-  console.log(`cardId: ${cardId}`)
-  console.log(`laneId: ${laneId}`)
-}
-
-const handleDragEnd = (
-  cardId: string,
-  sourceLaneId: string,
-  targetLaneId: string
-) => {
-  console.log('drag ended')
-  console.log(`cardId: ${cardId}`)
-  console.log(`sourceLaneId: ${sourceLaneId}`)
-  console.log(`targetLaneId: ${targetLaneId}`)
-}
 
 export default class Area51 extends Component<any, any> {
   state = {
@@ -129,9 +114,40 @@ export default class Area51 extends Component<any, any> {
     console.log(card)
   }
 
+  handleCardClick = (cardId: string, metadata: any, laneId: string) => {
+    console.log('Card clicked')
+    console.log(cardId, metadata, laneId)
+  }
+
+  handleCardDelete = (cardId: string, laneId: string) => {
+    console.log('Card deleted')
+    console.log(cardId, laneId)
+  }
+
+  handleDelete = () => {
+    console.log('handled delete')
+  }
+
   handleDataChange = (nextData: any) => {
     console.log('New card has been added')
     console.log(nextData)
+  }
+
+  handleDragStart = (cardId: string, laneId: string) => {
+    console.log('drag started')
+    console.log(`cardId: ${cardId}`)
+    console.log(`laneId: ${laneId}`)
+  }
+
+  handleDragEnd = (
+    cardId: string,
+    sourceLaneId: string,
+    targetLaneId: string
+  ) => {
+    console.log('drag ended')
+    console.log(`cardId: ${cardId}`)
+    console.log(`sourceLaneId: ${sourceLaneId}`)
+    console.log(`targetLaneId: ${targetLaneId}`)
   }
 
   componentWillMount() {
@@ -145,6 +161,8 @@ export default class Area51 extends Component<any, any> {
   render() {
     return (
       <div>
+        {/*
+        // @ts-ignore */}
         <Board
           editable
           draggable
@@ -152,8 +170,10 @@ export default class Area51 extends Component<any, any> {
           onDataChange={this.handleDataChange}
           eventBusHandle={this.setEventBus}
           onCardAdd={this.handleCardAdd}
-          handleDragStart={handleDragStart}
-          handleDragEnd={handleDragEnd}
+          onCardClick={this.handleCardClick}
+          onCardDelete={this.handleCardDelete}
+          handleDragStart={this.handleDragStart}
+          handleDragEnd={this.handleDragEnd}
         />
       </div>
     )
