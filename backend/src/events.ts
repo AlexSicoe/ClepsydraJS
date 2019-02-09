@@ -1,7 +1,0 @@
-export const USER = 'user'
-export const USER_DELETED = 'userDeleted'
-export const PROJECT = 'project'
-export const PROJECT_DELETED = 'projectDeleted'
-export const SPRINT = 'sprint'
-export const SPRINT_DELETED = 'sprintDeleted'
-export const NOTIFICATION = 'notification'
