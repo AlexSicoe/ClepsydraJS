@@ -1,11 +1,11 @@
 // Application hooks that run for every service
 const log = require('./hooks/log')
-
+const includeAssociations = require('./hooks/include-associations')
 module.exports = {
   before: {
     all: [log()],
-    find: [],
-    get: [],
+    find: [includeAssociations()],
+    get: [includeAssociations()],
     create: [],
     update: [],
     patch: [],

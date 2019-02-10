@@ -1,14 +1,11 @@
 const { authenticate } = require('@feathersjs/authentication').hooks
-
 const userCreatesProject = require('../../hooks/user-creates-project')
-
-const includeMembers = require('../../hooks/include-members');
 
 module.exports = {
   before: {
     all: [authenticate('jwt')],
-    find: [includeMembers()],
-    get: [includeMembers()],
+    find: [],
+    get: [],
     create: [userCreatesProject()],
     update: [],
     patch: [],

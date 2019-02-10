@@ -5,7 +5,7 @@ const logger = require('../logger')
 const util = require('util')
 
 // To see more detailed messages, uncomment the following line:
-// logger.level = 'debug';
+// logger.level = 'debug'
 
 module.exports = () => {
   return (context) => {
