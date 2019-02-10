@@ -4,15 +4,14 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = (options = {}) => {
   return async (context) => {
-    const { app, params, service } = context
+    const { params, service } = context
     if (params.query.include) {
-      console.log(await service.Model.getTableName())
-      const User = app.service('users').Model
+      const associations = Object.keys(service.Model.associations)
       params.sequelize = {
-        include: [User]
+        include: [...associations]
       }
       delete params.query.include
     }
-    return await context
+    return context
   }
 }
