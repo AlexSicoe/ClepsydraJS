@@ -1,7 +1,7 @@
 const feathers = require('@feathersjs/feathers');
-const addMember = require('../../src/hooks/add-member');
+const handleMembers = require('../../src/hooks/handle-members');
 
-describe('\'add-member\' hook', () => {
+describe('\'handle-members\' hook', () => {
   let app;
 
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('\'add-member\' hook', () => {
     });
 
     app.service('dummy').hooks({
-      before: addMember()
+      before: handleMembers()
     });
   });
 

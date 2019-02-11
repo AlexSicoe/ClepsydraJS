@@ -1,20 +1,16 @@
 const { authenticate } = require('@feathersjs/authentication').hooks
 
-const removeMember = require('../../hooks/remove-member');
-
-const addMember = require('../../hooks/add-member');
-
-const updateMember = require('../../hooks/update-member');
+const handleMembers = require('../../hooks/handle-members')
 
 module.exports = {
   before: {
     all: [authenticate('jwt')],
     find: [],
     get: [],
-    create: [addMember()],
-    update: [updateMember()],
-    patch: [],
-    remove: [removeMember()]
+    create: [handleMembers()],
+    update: [handleMembers()],
+    patch: [handleMembers()],
+    remove: [handleMembers()]
   },
 
   after: {
