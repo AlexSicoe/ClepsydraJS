@@ -26,9 +26,8 @@ module.exports = (app) => {
 
   Project.associate = (models) => {
     const delOptions = { onDelete: 'cascade', hooks: true }
-    const { users, members, tasks, stages } = models
+    const { users, members, stages } = models
     Project.belongsToMany(users, { through: members })
-    Project.hasMany(tasks, delOptions)
     Project.hasMany(stages, delOptions)
   }
 

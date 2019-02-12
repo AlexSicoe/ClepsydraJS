@@ -1,7 +1,7 @@
 // See http://docs.sequelizejs.com/en/latest/docs/models-definition/
 // for more of what you can do here.
 const Sequelize = require('sequelize')
-const { STRING, INTEGER } = Sequelize.DataTypes
+const { STRING } = Sequelize.DataTypes
 
 module.exports = (app) => {
   const sequelizeClient = app.get('sequelizeClient')
@@ -29,7 +29,7 @@ module.exports = (app) => {
 
   // eslint-disable-next-line no-unused-vars
   Member.associate = (models) => {
-    const {users, projects} = models
+    const { users, projects } = models
     Member.belongsTo(users)
     Member.belongsTo(projects)
     // Define associations here

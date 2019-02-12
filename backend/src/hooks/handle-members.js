@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const errors = require('@feathersjs/errors')
 const { NotFound, NotImplemented } = errors
 
@@ -14,8 +15,6 @@ module.exports = function(options = {}) {
       default:
         throw new NotImplemented(`Method '${method}' not implemented`)
     }
-
-    return context
   }
 }
 

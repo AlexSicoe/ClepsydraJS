@@ -11,12 +11,12 @@ module.exports = (app) => {
       validate: {
         notEmpty: true,
         len: [2, 30]
-      },
-      position: {
-        type: INTEGER,
-        validate: {
-          min: 0
-        }
+      }
+    },
+    position: {
+      type: INTEGER,
+      validate: {
+        min: 0
       }
     }
   }
