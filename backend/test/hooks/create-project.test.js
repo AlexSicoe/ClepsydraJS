@@ -1,7 +1,7 @@
 const feathers = require('@feathersjs/feathers')
-const userCreatesProject = require('../../src/hooks/user-creates-project')
+const userCreatesProject = require('../../src/hooks/create-project')
 
-describe("'user-creates-project' hook", () => {
+describe("'create-project' hook", () => {
   let app
 
   beforeEach(() => {

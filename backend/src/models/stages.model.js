@@ -30,9 +30,10 @@ module.exports = (app) => {
   const Stage = sequelizeClient.define('stages', attributes, options)
 
   Stage.associate = (models) => {
+    const delOptions = { onDelete: 'cascade', hooks: true }
     const { projects, tasks } = models
     Stage.belongsTo(projects)
-    Stage.hasMany(tasks)
+    Stage.hasMany(tasks, delOptions)
   }
 
   return Stage

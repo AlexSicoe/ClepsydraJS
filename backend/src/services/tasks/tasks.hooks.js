@@ -1,13 +1,15 @@
 const { authenticate } = require('@feathersjs/authentication').hooks
 
+const handleTasks = require('../../hooks/handle-tasks')
+
 module.exports = {
   before: {
     all: [authenticate('jwt')],
     find: [],
     get: [],
-    create: [],
+    create: [handleTasks()],
     update: [],
-    patch: [],
+    patch: [handleTasks()],
     remove: []
   },
 

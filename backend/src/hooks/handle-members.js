@@ -13,7 +13,7 @@ module.exports = function(options = {}) {
       case 'remove':
         return removeMember(context, options)
       default:
-        throw new NotImplemented(`Method '${method}' not implemented`)
+        throw new NotImplemented(`Method not implemented: ${method}`)
     }
   }
 }
@@ -45,8 +45,8 @@ async function updateMember(context, options) {
       projectId
     }
   })
-  if (member === null) {
-    throw new NotFound('Cannot find Member')
+  if (!member) {
+    throw new NotFound('Cannot find member')
   }
   context.result = await member.update({
     role
@@ -66,8 +66,8 @@ async function removeMember(context, options) {
       projectId
     }
   })
-  if (member === null) {
-    throw new NotFound('Cannot find Member')
+  if (!member) {
+    throw new NotFound('Cannot find member')
   }
   await member.destroy()
   context.result = member

@@ -1,15 +1,16 @@
-const { authenticate } = require('@feathersjs/authentication').hooks
-const createProject = require('../../hooks/create-project')
+const { authenticate } = require('@feathersjs/authentication').hooks;
+
+const handleUserTasks = require('../../hooks/handle-user-tasks');
 
 module.exports = {
   before: {
-    all: [authenticate('jwt')],
+    all: [ authenticate('jwt') ],
     find: [],
     get: [],
-    create: [createProject()],
+    create: [handleUserTasks()],
     update: [],
     patch: [],
-    remove: []
+    remove: [handleUserTasks()]
   },
 
   after: {
@@ -31,4 +32,4 @@ module.exports = {
     patch: [],
     remove: []
   }
-}
+};
