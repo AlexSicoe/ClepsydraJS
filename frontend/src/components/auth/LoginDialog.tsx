@@ -4,10 +4,10 @@ import TextField from '@material-ui/core/TextField'
 import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import AuthStore from '../../mobx/stores/AuthStore'
 import ConfirmDialog from '../view/ConfirmDialog'
 import { ChangeEvent, KeyEvent } from '../view/view-types'
 import { History } from 'history'
+import AuthStore from '../../stores/AuthStore'
 
 const styles = (theme: any) => ({
   buttonMargin: {
@@ -23,7 +23,7 @@ interface InjectedProps {
 
 interface IState {
   open: boolean
-  username: string
+  name: string
   password: string
 }
 
@@ -32,7 +32,7 @@ interface IState {
 class LoginDialog extends Component<any, IState> {
   state = {
     open: false,
-    username: '',
+    name: '',
     password: ''
   }
 
@@ -48,9 +48,9 @@ class LoginDialog extends Component<any, IState> {
   }
 
   handleLogin = () => {
-    const { username, password } = this.state
+    const { name, password } = this.state
     const { authStore, history } = this.injected
-    const credentials = { username, password }
+    const credentials = { name, password }
     authStore.login(credentials, () => history.push('/home'))
   }
 
@@ -97,7 +97,7 @@ class LoginDialog extends Component<any, IState> {
             placeholder="Username"
             onChange={this.handleChange}
             onKeyDown={this.handleKey}
-            name="username"
+            name="name"
             margin="dense"
             fullWidth
             autoFocus

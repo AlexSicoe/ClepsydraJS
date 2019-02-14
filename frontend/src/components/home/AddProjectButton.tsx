@@ -2,27 +2,25 @@ import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
-import AuthStore from '../../mobx/stores/AuthStore'
-import ProjectStore from '../../mobx/stores/ProjectStore'
 import ConfirmDialog from '../view/ConfirmDialog'
 import { ChangeEvent, KeyEvent } from '../view/view-types'
+import ProjectStore from '../../stores/ProjectStore'
 
 interface InjectedProps {
-  authStore: AuthStore
   projectStore: ProjectStore
 }
 
 interface IState {
   open: boolean
-  projectName: string
+  name: string
 }
 
-@inject('authStore', 'projectStore')
+@inject('projectStore')
 @observer
 class AddProjectButton extends Component<any, IState> {
   state = {
     open: false,
-    projectName: ''
+    name: ''
   }
 
   get injected() {
@@ -37,13 +35,12 @@ class AddProjectButton extends Component<any, IState> {
   }
 
   handleOK = () => {
-    const { projectName } = this.state
-    const { authStore, projectStore } = this.injected
+    const { name } = this.state
+    const { projectStore } = this.injected
 
-    const project = { name: projectName }
+    const project = { name }
+    projectStore.createProject(project)
     this.handleClose()
-    const { token, uid } = authStore
-    projectStore.postProject(uid!, project, token)
   }
 
   handleKey = (event: KeyEvent) => {
@@ -87,7 +84,7 @@ class AddProjectButton extends Component<any, IState> {
           handleClose={this.handleClose}
         >
           <TextField
-            name="projectName"
+            name="name"
             placeholder="Project Name"
             onChange={this.handleChange}
             onKeyDown={this.handleKey}

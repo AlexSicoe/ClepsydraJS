@@ -1,30 +1,23 @@
 import React from 'react'
-import Button from "@material-ui/core/Button";
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import { Callback } from "../../utils/types";
+import Button from '@material-ui/core/Button'
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import { Callback } from '../../util/types'
 
-interface Props {
-  open: boolean,
-  title: string,
-  content: string,
-  handleOK: Callback,
-  handleClose: Callback,
+interface IProps {
+  open: boolean
+  title: string
+  content: string
+  handleOK: Callback
+  handleClose: Callback
   children?: any
 }
 
-export default function ConfirmDialog(props: Props) {
-  const {
-    open,
-    title,
-    content,
-    handleOK,
-    handleClose,
-    children
-  } = props
+export default function ConfirmDialog(props: IProps) {
+  const { open, title, content, handleOK, handleClose, children } = props
 
   return (
     <Dialog
@@ -34,18 +27,16 @@ export default function ConfirmDialog(props: Props) {
     >
       <DialogTitle id="form-dialog-title">{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          {content}
-        </DialogContentText>
+        <DialogContentText>{content}</DialogContentText>
         {children}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleOK} color="primary">
           OK
-            </Button>
+        </Button>
         <Button onClick={handleClose} color="primary">
           Cancel
-            </Button>
+        </Button>
       </DialogActions>
     </Dialog>
   )

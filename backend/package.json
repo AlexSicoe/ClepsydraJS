@@ -42,7 +42,7 @@
     "compression": "^1.7.3",
     "cors": "^2.8.5",
     "feathers-sequelize": "^4.0.0",
-    "helmet": "^3.15.0",
+    "helmet": "^3.15.1",
     "mysql2": "^1.6.5",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^1.0.0",

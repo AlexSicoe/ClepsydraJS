@@ -5,10 +5,12 @@ const {
   protect
 } = require('@feathersjs/authentication-local').hooks
 
+const sendUserData = require('../../hooks/send-user-data');
+
 module.exports = {
   before: {
     all: [],
-    find: [authenticate('jwt')],
+    find: [authenticate('jwt'), sendUserData()],
     get: [authenticate('jwt')],
     create: [hashPassword()],
     update: [hashPassword(), authenticate('jwt')],

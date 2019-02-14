@@ -11,11 +11,10 @@ import NoMatch from './NoMatch'
 import ProjectScreen from './project/ProjectScreen'
 import PublicScreen from './public/PublicScreen'
 import { inject, observer } from 'mobx-react'
-import AuthStore from '../mobx/stores/AuthStore'
-import DevTools from 'mobx-react-devtools'
+import AuthStore from '../stores/AuthStore'
 import Area51 from './public/Area51'
 
-interface InjectedProps {
+interface IInjectedProps {
   authStore: AuthStore
 }
 
@@ -23,7 +22,7 @@ interface InjectedProps {
 @observer
 class App extends Component<any, any> {
   get injected() {
-    return this.props as InjectedProps
+    return this.props as IInjectedProps
   }
 
   componentWillMount() {

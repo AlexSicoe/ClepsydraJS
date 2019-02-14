@@ -2,18 +2,16 @@ import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
-import AuthStore from '../../mobx/stores/AuthStore'
-import ProjectStore from '../../mobx/stores/ProjectStore'
 import ConfirmDialog from '../view/ConfirmDialog'
 import { ChangeEvent, KeyEvent } from '../view/view-types'
+import ProjectStore from '../../stores/ProjectStore'
 
 interface InjectedProps {
-  authStore: AuthStore
   projectStore: ProjectStore
   history: History
 }
 
-@inject('authStore', 'projectStore')
+@inject('projectStore')
 @observer
 class AddUserButton extends Component<any, any> {
   state = {
@@ -33,10 +31,9 @@ class AddUserButton extends Component<any, any> {
 
   handleOK = () => {
     const { mailOrName } = this.state
-    const { authStore, projectStore } = this.injected
-    const { token } = authStore
+    const { projectStore } = this.injected
 
-    projectStore.addUserToProject(projectStore.id!, { mailOrName }, token)
+    projectStore.addMember(projectStore.id!, mailOrName)
     this.handleClose()
   }
 

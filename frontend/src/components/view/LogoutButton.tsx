@@ -1,26 +1,21 @@
-
 import React, { Component } from 'react'
 import Button from '@material-ui/core/Button'
-import { inject, observer } from 'mobx-react';
-import AuthStore from '../../mobx/stores/AuthStore';
+import { inject, observer } from 'mobx-react'
+import AuthStore from '../../stores/AuthStore'
 
-interface Props {
+interface IProps {}
 
-}
-
-interface InjectedProps {
+interface IInjectedProps {
   authStore: AuthStore
 }
 
-interface State {
-
-}
+interface IState {}
 
 @inject('authStore')
 @observer
-class LogoutButton extends Component<Props, State> {
+class LogoutButton extends Component<IProps, IState> {
   get injected() {
-    return this.props as InjectedProps
+    return this.props as IInjectedProps
   }
 
   render() {
@@ -33,7 +28,7 @@ class LogoutButton extends Component<Props, State> {
           onClick={authStore.logout}
         >
           Logout
-      </Button>
+        </Button>
       </>
     )
   }

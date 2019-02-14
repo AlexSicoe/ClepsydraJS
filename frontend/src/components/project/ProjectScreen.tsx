@@ -5,23 +5,21 @@ import { History } from 'history'
 import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import AuthStore from '../../mobx/stores/AuthStore'
-import ProjectStore from '../../mobx/stores/ProjectStore'
 import BackButton from '../view/BackButton'
 import LoadingScreen from '../view/LoadingScreen'
 import LogoutButton from '../view/LogoutButton'
 import SimpleAppBar from '../view/SimpleAppBar'
 import SimpleList from '../view/SimpleList'
 import AddUserButton from './AddUserButton'
+import ProjectStore from '../../stores/ProjectStore'
 
 interface InjectedProps {
-  authStore: AuthStore
   projectStore: ProjectStore
   match: any
   history: History
 }
 
-@inject('authStore', 'projectStore')
+@inject('projectStore')
 @observer
 class ProjectScreen extends Component<any, any> {
   state = {}
@@ -37,9 +35,9 @@ class ProjectScreen extends Component<any, any> {
   handleItemView = (onItemClick: any, u: any) => {
     return (
       <ListItem divider button key={u.id} onClick={() => onItemClick(u)}>
-        <ListItemText primary={u.username} />
+        <ListItemText primary={u.name} />
         <ListItemText secondary={u.email} />
-        <ListItemText secondary={u.userProject.role} />
+        <ListItemText secondary={u.member.role} />
       </ListItem>
     )
   }
@@ -47,9 +45,9 @@ class ProjectScreen extends Component<any, any> {
   goBack = () => this.injected.history.goBack()
 
   handleFetch = () => {
-    const { authStore, projectStore, match } = this.injected
+    const { projectStore, match } = this.injected
     const { pid } = match.params
-    projectStore.fetchProject(pid, authStore.token)
+    projectStore.getProject(pid)
   }
 
   componentWillMount() {

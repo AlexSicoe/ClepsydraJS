@@ -1,23 +1,31 @@
+import { Provider } from 'mobx-react'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './components/App'
 import './index.css'
-import AuthApi from './mobx/requests/AuthApi'
-import ProjectApi from './mobx/requests/ProjectApi'
-import SprintApi from './mobx/requests/SprintApi'
-import UserApi from './mobx/requests/UserApi'
-import AuthStore from './mobx/stores/AuthStore'
-import ProjectStore from './mobx/stores/ProjectStore'
-import SprintStore from './mobx/stores/SprintStore'
-import UserStore from './mobx/stores/UserStore'
+import AuthStore from './stores/AuthStore'
+import ProjectStore from './stores/ProjectStore'
+import UserStore from './stores/UserStore'
 import * as serviceWorker from './serviceWorker'
-import { Provider } from 'mobx-react'
+import feathersApp from './feathersApp'
+
+const authService = feathersApp.service('authenticate')
+const userService = feathersApp.service('users')
+const projectService = feathersApp.service('projects')
+const memberService = feathersApp.service('members')
+const stageService = feathersApp.service('stages')
+const taskService = feathersApp.service('tasks')
+const userTaskService = feathersApp.service('user-tasks')
+
+const authStore = new AuthStore(userService, authService)
+const {accessToken} = authStore
+const userStore = new UserStore(userService, accessToken)
+const projectStore = new ProjectStore(projectService, memberService, accessToken)
 
 const stores = {
-  authStore: new AuthStore(new AuthApi()),
-  userStore: new UserStore(new UserApi()),
-  projectStore: new ProjectStore(new ProjectApi()),
-  sprintStore: new SprintStore(new SprintApi())
+  authStore,
+  userStore,
+  projectStore
 }
 
 const root = (

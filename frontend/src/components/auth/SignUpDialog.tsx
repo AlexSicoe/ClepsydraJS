@@ -3,9 +3,9 @@ import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
-import AuthStore from '../../mobx/stores/AuthStore'
 import ConfirmDialog from '../view/ConfirmDialog'
 import { ChangeEvent, KeyEvent } from '../view/view-types'
+import AuthStore from '../../stores/AuthStore'
 
 const styles = (theme: any) => ({
   buttonMargin: {
@@ -20,7 +20,7 @@ interface InjectedProps {
 
 interface IState {
   open: boolean
-  username: string
+  name: string
   email: string
   password: string
 }
@@ -30,7 +30,7 @@ interface IState {
 class SignUpDialog extends Component<any, IState> {
   state = {
     open: false,
-    username: '',
+    name: '',
     email: '',
     password: ''
   }
@@ -47,9 +47,9 @@ class SignUpDialog extends Component<any, IState> {
   }
 
   handleSignUp = () => {
-    const { username, email, password } = this.state
+    const { name, email, password } = this.state
     const { authStore } = this.injected
-    const credentials = { username, email, password }
+    const credentials = { name, email, password }
     authStore!.signUp(credentials)
   }
 
@@ -96,7 +96,7 @@ class SignUpDialog extends Component<any, IState> {
             placeholder="Username"
             onChange={this.handleChange}
             onKeyDown={this.handleKey}
-            name="username"
+            name="name"
           />
           <br />
           <TextField

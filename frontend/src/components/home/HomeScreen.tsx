@@ -2,18 +2,18 @@ import { History } from 'history'
 import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import AuthStore from '../../mobx/stores/AuthStore'
-import UserStore from '../../mobx/stores/UserStore'
 import { basicStyle, borderStyle } from '../styles/styles'
 import LoadingScreen from '../view/LoadingScreen'
 import LogoutButton from '../view/LogoutButton'
 import SimpleAppBar from '../view/SimpleAppBar'
 import SimpleList from '../view/SimpleList'
 import AddProjectButton from './AddProjectButton'
+import UserStore from '../../stores/UserStore'
+import AuthStore from '../../stores/AuthStore'
 
 interface InjectedProps {
-  authStore: AuthStore
   userStore: UserStore
+  authStore: AuthStore
   history: History
 }
 
@@ -26,11 +26,10 @@ class HomeScreen extends Component<any, any> {
 
   componentWillMount() {
     const { authStore, userStore } = this.injected
-    const { uid, token } = authStore
     if (!authStore.isAuthenticated) {
       authStore.logout()
     } else {
-      userStore.fetchUser(uid!, token)
+      userStore.getMyUser()
     }
   }
 
@@ -51,7 +50,7 @@ class HomeScreen extends Component<any, any> {
         <SimpleAppBar title="Home">
           <LogoutButton />
         </SimpleAppBar>
-        Hello {userStore.username}!
+        Hello {userStore.name}!
         <br />
         <div style={{ ...basicStyle, ...borderStyle }}>
           {/* 
