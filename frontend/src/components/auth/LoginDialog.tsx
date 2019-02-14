@@ -23,7 +23,7 @@ interface InjectedProps {
 
 interface IState {
   open: boolean
-  name: string
+  email: string
   password: string
 }
 
@@ -32,7 +32,7 @@ interface IState {
 class LoginDialog extends Component<any, IState> {
   state = {
     open: false,
-    name: '',
+    email: '',
     password: ''
   }
 
@@ -48,9 +48,9 @@ class LoginDialog extends Component<any, IState> {
   }
 
   handleLogin = () => {
-    const { name, password } = this.state
+    const { email, password } = this.state
     const { authStore, history } = this.injected
-    const credentials = { name, password }
+    const credentials = { email, password }
     authStore.login(credentials, () => history.push('/home'))
   }
 
@@ -94,10 +94,10 @@ class LoginDialog extends Component<any, IState> {
           handleClose={this.handleClose}
         >
           <TextField
-            placeholder="Username"
+            placeholder="Email"
             onChange={this.handleChange}
             onKeyDown={this.handleKey}
-            name="name"
+            name="email"
             margin="dense"
             fullWidth
             autoFocus

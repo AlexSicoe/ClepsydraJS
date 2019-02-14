@@ -51,6 +51,7 @@ class SignUpDialog extends Component<any, IState> {
     const { authStore } = this.injected
     const credentials = { name, email, password }
     authStore!.signUp(credentials)
+    this.handleClose()
   }
 
   handleKey = (event: KeyEvent) => {

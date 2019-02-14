@@ -1,5 +1,5 @@
-import { Service } from '@feathersjs/feathers'
-import { action, computed, observable, runInAction } from 'mobx'
+import { Service, Application } from '@feathersjs/feathers'
+import { action, computed, observable } from 'mobx'
 import { PromiseState } from '../util/enums'
 import { Callback } from '../util/types'
 import { IUser } from './model-interfaces'
@@ -10,6 +10,7 @@ export default class AuthStore {
   @observable accessToken: string = ''
 
   constructor(
+    private app: Application<any>,
     private userService: Service<IUser>,
     private authService: Service<any>
   ) {}
@@ -17,6 +18,10 @@ export default class AuthStore {
   @action reset = () => {
     this.state = PENDING
     this.accessToken = ''
+  }
+
+  @action update = (accessToken: string) => {
+    this.accessToken = accessToken
   }
 
   @computed get isAuthenticated() {
@@ -39,21 +44,21 @@ export default class AuthStore {
   }
 
   login = async (user: Partial<IUser>, onSuccess: Callback) => {
+    const data = { ...user, strategy: 'local' }
+
     try {
       this.state = PENDING
-      const res = await this.authService.create(user)
-
+      // const res = await this.authService.create(data)
+      await this.app.authenticate(data)
       this.state = DONE
-      runInAction(() => {
-        const { token } = res.data
-        this.accessToken = token
-      })
+      // this.update(res.accessToken)
       onSuccess()
-      console.log(res)
+      // console.log(res)
       // notifySuccess(response)
     } catch (err) {
       this.state = ERROR
       console.log(err)
+      // TODO redirect to login
       // notifyError(err)
     }
   }

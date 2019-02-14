@@ -2,22 +2,20 @@ import { History } from 'history'
 import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
+import UserStore from '../../stores/UserStore'
 import { basicStyle, borderStyle } from '../styles/styles'
 import LoadingScreen from '../view/LoadingScreen'
 import LogoutButton from '../view/LogoutButton'
 import SimpleAppBar from '../view/SimpleAppBar'
 import SimpleList from '../view/SimpleList'
 import AddProjectButton from './AddProjectButton'
-import UserStore from '../../stores/UserStore'
-import AuthStore from '../../stores/AuthStore'
 
 interface InjectedProps {
   userStore: UserStore
-  authStore: AuthStore
   history: History
 }
 
-@inject('authStore', 'userStore')
+@inject('userStore')
 @observer
 class HomeScreen extends Component<any, any> {
   get injected() {
@@ -25,12 +23,8 @@ class HomeScreen extends Component<any, any> {
   }
 
   componentWillMount() {
-    const { authStore, userStore } = this.injected
-    if (!authStore.isAuthenticated) {
-      authStore.logout()
-    } else {
-      userStore.getMyUser()
-    }
+    const { userStore } = this.injected
+    userStore.getMyUser()
   }
 
   redirectToProject = (p: any) => {

@@ -4,8 +4,15 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = function(options = {}) {
   return async (context) => {
-    const { params } = context
-    if (params.query.$whoAmI === 'true') context.result = params.user
+    const { params, service } = context
+    if (params.query.$whoAmI === 'true') {
+      const associations = Object.keys(service.Model.associations)
+      const user = await service.Model.findByPk(params.user.id, {
+        include: associations
+      })
+
+      context.result = user
+    }
     return context
   }
 }

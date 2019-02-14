@@ -9,7 +9,7 @@ import UserStore from './stores/UserStore'
 import * as serviceWorker from './serviceWorker'
 import feathersApp from './feathersApp'
 
-const authService = feathersApp.service('authenticate')
+const authService = feathersApp.service('authentication')
 const userService = feathersApp.service('users')
 const projectService = feathersApp.service('projects')
 const memberService = feathersApp.service('members')
@@ -17,10 +17,14 @@ const stageService = feathersApp.service('stages')
 const taskService = feathersApp.service('tasks')
 const userTaskService = feathersApp.service('user-tasks')
 
-const authStore = new AuthStore(userService, authService)
-const {accessToken} = authStore
+const authStore = new AuthStore(feathersApp, userService, authService)
+const { accessToken } = authStore
 const userStore = new UserStore(userService, accessToken)
-const projectStore = new ProjectStore(projectService, memberService, accessToken)
+const projectStore = new ProjectStore(
+  projectService,
+  memberService,
+  accessToken
+)
 
 const stores = {
   authStore,

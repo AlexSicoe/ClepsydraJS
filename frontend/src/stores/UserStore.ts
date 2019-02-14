@@ -39,13 +39,12 @@ export default class UserStore {
   getMyUser = async () => {
     const PARAMS = {
       query: {
-        $whoAmI: true
+        $whoAmI: 'true'
       }
     }
     try {
       this.state = PENDING
       const user = await this.service.find(PARAMS)
-
       this.state = DONE
       this.update(user as IUser)
     } catch (err) {

@@ -5,7 +5,7 @@ const {
   protect
 } = require('@feathersjs/authentication-local').hooks
 
-const sendUserData = require('../../hooks/send-user-data');
+const sendUserData = require('../../hooks/send-user-data')
 
 module.exports = {
   before: {
