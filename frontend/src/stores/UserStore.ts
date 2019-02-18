@@ -1,21 +1,92 @@
 import { Service } from '@feathersjs/feathers'
-import { action, observable } from 'mobx'
-import { PromiseState } from '../util/enums'
+import { action, observable, IObservableArray } from 'mobx'
+import { PromiseState, SocketEvent } from '../util/enums'
 import { notifyError } from '../util/notification-factories'
-import { IUser } from './model-interfaces'
+import { IUser, IProject, ITask } from './model-interfaces'
+import { safeSet } from '../util/functions'
 const { PENDING, DONE, ERROR } = PromiseState
+const { Created, Updated, Patched, Removed } = SocketEvent
 
 export default class UserStore {
   @observable state: PromiseState = PENDING
   @observable id?: number
   @observable name: string = ''
   @observable email: string = ''
-  @observable projects: any[] = []
-  @observable tasks: any[] = []
+  @observable projects: IObservableArray<IProject> = [] as any
+  @observable tasks: IObservableArray<ITask> = [] as any
 
-  constructor(private service: Service<IUser>, private accessToken: string) {
-    // socket.on(USER, (resUser: IUser) => {this.update(resUser)})
-    // socket.on(USER_DELETED, () => this.reset())
+  constructor(
+    private service: Service<IUser>,
+    private projectService: Service<IProject>,
+    private taskService: Service<ITask>,
+    private userTaskService: Service<ITask>
+  ) {
+    service.on(Updated, (user) => {
+      console.log('Updated user', user)
+      if (user.id === this.id) {
+        this.set(user)
+      }
+    })
+
+    service.on(Patched, (user) => {
+      console.log('Patched user', user)
+      if (user.id === this.id) {
+        this.set(user)
+      }
+    })
+
+    service.on(Removed, (user) => {
+      console.log('Removed user', user)
+      if (user.id === this.id) {
+        this.reset()
+      }
+    })
+
+    projectService.on(Created, (project: IProject) => {
+      console.log('Added project', project)
+      // if (project.members.find((m) => m.userId === this.id))
+      this.addProjectToStore(project)
+    })
+
+    projectService.on(Updated, (project) => {
+      console.log('Updated project', project)
+      this.setProjectFromStore(project)
+    })
+
+    projectService.on(Patched, (project) => {
+      console.log('Patched project', project)
+      this.setProjectFromStore(project)
+    })
+
+    projectService.on(Removed, (project) => {
+      console.log('Removed project', project)
+      this.removeProjectFromStore(project)
+    })
+
+    userTaskService.on(Created, (task) => {
+      console.log('Task assigned to User', task)
+      this.addTaskToStore(task)
+    })
+
+    userTaskService.on(Removed, (task) => {
+      console.log('Task unassigned from User', task)
+      this.removeTaskFromStore(task)
+    })
+
+    taskService.on(Removed, (task) => {
+      console.log('Task removed', task)
+      this.removeTaskFromStore(task)
+    })
+
+    taskService.on(Patched, (task) => {
+      console.log('Task patched', task)
+      this.setTaskFromStore(task)
+    })
+
+    taskService.on(Updated, (task) => {
+      console.log('Task updated', task)
+      this.setTaskFromStore(task)
+    })
   }
 
   @action reset = () => {
@@ -23,20 +94,55 @@ export default class UserStore {
     this.id = undefined
     this.name = ''
     this.email = ''
-    this.projects = []
-    this.tasks = []
+    this.projects = [] as any
+    this.tasks = [] as any
   }
 
-  @action update = (user: IUser) => {
+  @action set = (user: Partial<IUser>) => {
     this.id = user.id
-    this.name = user.name
-    this.email = user.email
-    this.projects = user.projects
-    this.tasks = user.tasks
+    this.name = safeSet(user.name, this.name)
+    this.email = safeSet(user.email, this.email)
+    this.projects = safeSet(user.projects, this.projects)
+    this.tasks = safeSet(user.tasks, this.tasks)
   }
 
-  @action
-  getMyUser = async () => {
+  @action addProjectToStore = (project: IProject) => {
+    this.projects.push(project)
+  }
+
+  @action setProjectFromStore = (project: IProject) => {
+    const index = this.projects.findIndex((p) => p.id === project.id)
+    if (index !== -1) {
+      this.projects[index] = project
+    }
+  }
+
+  @action removeProjectFromStore = (project: IProject) => {
+    const index = this.projects.findIndex((p) => p.id === project.id)
+    if (index !== -1) {
+      this.projects.splice(index, 1)
+    }
+  }
+
+  @action addTaskToStore = (task: ITask) => {
+    this.tasks.push(task)
+  }
+
+  @action setTaskFromStore = (task: ITask) => {
+    const index = this.tasks.findIndex((t) => t.id === task.id)
+    if (index !== -1) {
+      this.tasks[index] = task
+    }
+  }
+
+  @action removeTaskFromStore = (task: ITask) => {
+    const index = this.tasks.findIndex((t) => t.id === task.id)
+    if (index !== -1) {
+      this.tasks.splice(index, 1)
+    }
+  }
+
+  get = async () => {
     const PARAMS = {
       query: {
         $whoAmI: 'true'
@@ -46,15 +152,14 @@ export default class UserStore {
       this.state = PENDING
       const user = await this.service.find(PARAMS)
       this.state = DONE
-      this.update(user as IUser)
+      this.set(user as IUser)
     } catch (err) {
       this.state = ERROR
       notifyError(err)
     }
   }
 
-  @action
-  updateUser = async (id: number, user: IUser) => {
+  update = async (id: number, user: IUser) => {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING
@@ -69,7 +174,6 @@ export default class UserStore {
     }
   }
 
-  @action
   patch = async (id: number, user: Partial<IUser>) => {
     // const header: IAuthHeader = { accessToken }
     try {
@@ -85,8 +189,7 @@ export default class UserStore {
     }
   }
 
-  @action
-  removeUser = async (id: number) => {
+  remove = async (id: number) => {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING

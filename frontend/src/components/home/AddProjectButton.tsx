@@ -39,7 +39,7 @@ class AddProjectButton extends Component<any, IState> {
     const { projectStore } = this.injected
 
     const project = { name }
-    projectStore.createProject(project)
+    projectStore.create(project)
     this.handleClose()
   }
 

@@ -24,7 +24,7 @@ class HomeScreen extends Component<any, any> {
 
   componentWillMount() {
     const { userStore } = this.injected
-    userStore.getMyUser()
+    userStore.get()
   }
 
   redirectToProject = (p: any) => {

@@ -11,8 +11,7 @@ export default class AuthStore {
 
   constructor(
     private app: Application<any>,
-    private userService: Service<IUser>,
-    private authService: Service<any>
+    private userService: Service<IUser>
   ) {}
 
   @action reset = () => {
@@ -20,7 +19,7 @@ export default class AuthStore {
     this.accessToken = ''
   }
 
-  @action update = (accessToken: string) => {
+  @action set = (accessToken: string) => {
     this.accessToken = accessToken
   }
 

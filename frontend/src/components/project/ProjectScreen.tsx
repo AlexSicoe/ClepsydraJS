@@ -47,7 +47,7 @@ class ProjectScreen extends Component<any, any> {
   handleFetch = () => {
     const { projectStore, match } = this.injected
     const { pid } = match.params
-    projectStore.getProject(pid)
+    projectStore.get(pid)
   }
 
   componentWillMount() {

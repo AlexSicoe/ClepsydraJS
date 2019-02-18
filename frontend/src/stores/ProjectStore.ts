@@ -4,7 +4,6 @@ import { PromiseState } from '../util/enums'
 import { IMember, IProject, IStage, ITask, IUser } from './model-interfaces'
 const { PENDING, DONE, ERROR } = PromiseState
 
-
 export default class ProjectStore {
   @observable state: PromiseState = PENDING
   @observable id?: number
@@ -15,8 +14,7 @@ export default class ProjectStore {
 
   constructor(
     private service: Service<IProject>,
-    private memberService: Service<IMember>,
-    private accessToken: string
+    private memberService: Service<IMember>
   ) {
     // socket.on(PROJECT, (resProject: IProject) => this.update(resProject))
     // socket.on(PROJECT_DELETED, (resProject: IProject) => this.reset())
@@ -31,22 +29,21 @@ export default class ProjectStore {
     this.tasks = []
   }
 
-  @action update = (project: IProject) => {
+  @action set = (project: IProject) => {
     this.id = project.id
     this.name = project.name
     this.users = project.users
     this.stages = project.stages
   }
 
-  @action
-  getProject = async (id: number) => {
+  get = async (id: number) => {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING
       const project = await this.service.get(id)
 
       this.state = DONE
-      this.update(project)
+      this.set(project)
     } catch (err) {
       this.state = ERROR
       // notifyError(err)
@@ -54,8 +51,7 @@ export default class ProjectStore {
     }
   }
 
-  @action
-  createProject = async (project: Partial<IProject>) => {
+  create = async (project: Partial<IProject>) => {
     // const header: IAuthHeader = { accessToken }
 
     try {
@@ -71,8 +67,7 @@ export default class ProjectStore {
     }
   }
 
-  @action
-  updateProject = async (id: number, project: IProject) => {
+  update = async (id: number, project: IProject) => {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING
@@ -87,8 +82,7 @@ export default class ProjectStore {
     }
   }
 
-  @action
-  patchProject = async (id: number, project: Partial<IProject>) => {
+  patch = async (id: number, project: Partial<IProject>) => {
     try {
       this.state = PENDING
       const res = await this.service.patch(id, project)
@@ -102,8 +96,7 @@ export default class ProjectStore {
     }
   }
 
-  @action
-  removeProject = async (id: number) => {
+  remove = async (id: number) => {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING
@@ -118,7 +111,6 @@ export default class ProjectStore {
     }
   }
 
-  @action
   addMember = async (pid: number, mailOrName: string) => {
     // const header: IAuthHeader = { accessToken }
     try {
@@ -133,7 +125,6 @@ export default class ProjectStore {
     }
   }
 
-  @action
   removeMember = async (pid: number, uid: number) => {
     // const header: IAuthHeader = { accessToken }
     try {

@@ -4,7 +4,7 @@ export interface IUser {
   email: string
   projects: IProject[]
   tasks: ITask[]
-  member: IMember
+  members: IMember[]
 }
 
 export interface IProject {
@@ -12,7 +12,7 @@ export interface IProject {
   name: string
   users: IUser[]
   stages: IStage[]
-  member: IMember
+  members: IMember[]
 }
 
 export enum Role {
@@ -23,6 +23,8 @@ export enum Role {
 
 export interface IMember {
   role: Role
+  userId: number
+  projectId: number
 }
 
 export interface IStage {
