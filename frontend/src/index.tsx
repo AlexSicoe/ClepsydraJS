@@ -7,23 +7,24 @@ import AuthStore from './stores/AuthStore'
 import ProjectStore from './stores/ProjectStore'
 import UserStore from './stores/UserStore'
 import * as serviceWorker from './serviceWorker'
-import feathersApp from './feathersApp'
+import app from './feathersApp'
 
-const userService = feathersApp.service('users')
-const projectService = feathersApp.service('projects')
-const memberService = feathersApp.service('members')
-const stageService = feathersApp.service('stages')
-const taskService = feathersApp.service('tasks')
-const userTaskService = feathersApp.service('user-tasks')
+const userService = app.service('users')
+const projectService = app.service('projects')
+const memberService = app.service('members')
+const stageService = app.service('stages')
+const taskService = app.service('tasks')
+const userTaskService = app.service('user-tasks')
 
-const authStore = new AuthStore(feathersApp, userService)
+const authStore = new AuthStore(app, userService)
 const userStore = new UserStore(
+  app,
   userService,
   projectService,
   taskService,
   userTaskService
 )
-const projectStore = new ProjectStore(projectService, memberService)
+const projectStore = new ProjectStore(app, projectService, memberService)
 
 const stores = {
   authStore,

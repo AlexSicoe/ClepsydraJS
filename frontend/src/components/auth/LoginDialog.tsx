@@ -51,7 +51,11 @@ class LoginDialog extends Component<any, IState> {
     const { email, password } = this.state
     const { authStore, history } = this.injected
     const credentials = { email, password }
-    authStore.login(credentials, () => history.push('/home'))
+    authStore.login(
+      credentials,
+      () => history.push('/home'),
+      () => history.push('/')
+    )
   }
 
   handleKey = (event: KeyEvent) => {

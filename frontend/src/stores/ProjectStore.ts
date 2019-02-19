@@ -1,4 +1,4 @@
-import { Service } from '@feathersjs/feathers'
+import { Service, Application } from '@feathersjs/feathers'
 import { action, observable } from 'mobx'
 import { PromiseState } from '../util/enums'
 import { IMember, IProject, IStage, ITask, IUser } from './model-interfaces'
@@ -13,9 +13,12 @@ export default class ProjectStore {
   @observable tasks: ITask[] = []
 
   constructor(
-    private service: Service<IProject>,
+    app: Application<any>,
+    private projectService: Service<IProject>,
     private memberService: Service<IMember>
   ) {
+    app.on('logout', () => this.reset())
+
     // socket.on(PROJECT, (resProject: IProject) => this.update(resProject))
     // socket.on(PROJECT_DELETED, (resProject: IProject) => this.reset())
   }
@@ -40,7 +43,7 @@ export default class ProjectStore {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING
-      const project = await this.service.get(id)
+      const project = await this.projectService.get(id)
 
       this.state = DONE
       this.set(project)
@@ -56,7 +59,7 @@ export default class ProjectStore {
 
     try {
       this.state = PENDING
-      const res = await this.service.create(project)
+      const res = await this.projectService.create(project)
 
       this.state = DONE
       console.log(res)
@@ -71,7 +74,7 @@ export default class ProjectStore {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING
-      const res = await this.service.update(id, project)
+      const res = await this.projectService.update(id, project)
 
       this.state = DONE
       console.log(res)
@@ -85,7 +88,7 @@ export default class ProjectStore {
   patch = async (id: number, project: Partial<IProject>) => {
     try {
       this.state = PENDING
-      const res = await this.service.patch(id, project)
+      const res = await this.projectService.patch(id, project)
 
       this.state = DONE
       console.log(res)
@@ -100,7 +103,7 @@ export default class ProjectStore {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING
-      const res = await this.service.remove(id)
+      const res = await this.projectService.remove(id)
 
       this.state = DONE
       console.log(res)

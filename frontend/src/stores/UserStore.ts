@@ -1,4 +1,4 @@
-import { Service } from '@feathersjs/feathers'
+import { Service, Application } from '@feathersjs/feathers'
 import { action, observable, IObservableArray } from 'mobx'
 import { PromiseState, SocketEvent } from '../util/enums'
 import { notifyError } from '../util/notification-factories'
@@ -16,26 +16,29 @@ export default class UserStore {
   @observable tasks: IObservableArray<ITask> = [] as any
 
   constructor(
-    private service: Service<IUser>,
+    app: Application<any>,
+    private userService: Service<IUser>,
     private projectService: Service<IProject>,
     private taskService: Service<ITask>,
     private userTaskService: Service<ITask>
   ) {
-    service.on(Updated, (user) => {
+    app.on('logout', () => this.reset())
+
+    userService.on(Updated, (user) => {
       console.log('Updated user', user)
       if (user.id === this.id) {
         this.set(user)
       }
     })
 
-    service.on(Patched, (user) => {
+    userService.on(Patched, (user) => {
       console.log('Patched user', user)
       if (user.id === this.id) {
         this.set(user)
       }
     })
 
-    service.on(Removed, (user) => {
+    userService.on(Removed, (user) => {
       console.log('Removed user', user)
       if (user.id === this.id) {
         this.reset()
@@ -150,7 +153,7 @@ export default class UserStore {
     }
     try {
       this.state = PENDING
-      const user = await this.service.find(PARAMS)
+      const user = await this.userService.find(PARAMS)
       this.state = DONE
       this.set(user as IUser)
     } catch (err) {
@@ -163,7 +166,7 @@ export default class UserStore {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING
-      const res = await this.service.update(id, user)
+      const res = await this.userService.update(id, user)
 
       this.state = DONE
       console.log(res)
@@ -178,7 +181,7 @@ export default class UserStore {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING
-      const res = await this.service.patch(id, user)
+      const res = await this.userService.patch(id, user)
 
       this.state = DONE
       console.log(res)
@@ -193,7 +196,7 @@ export default class UserStore {
     // const header: IAuthHeader = { accessToken }
     try {
       this.state = PENDING
-      const res = await this.service.remove(id)
+      const res = await this.userService.remove(id)
 
       this.state = DONE
       console.log(res)
