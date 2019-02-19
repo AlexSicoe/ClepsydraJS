@@ -12,7 +12,8 @@ module.exports = (options = {}) => {
     if (query.$include === 'true') {
       const associations = Object.keys(service.Model.associations)
       params.sequelize = {
-        include: associations
+        include: associations,
+        raw: false
       }
     }
     delete query.$include

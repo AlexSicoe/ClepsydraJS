@@ -29,6 +29,7 @@ export interface IMember {
 
 export interface IStage {
   id: number
+  projectId: number
   name: string
   position: number
   tasks: ITask[]
@@ -36,7 +37,14 @@ export interface IStage {
 
 export interface ITask {
   id: number
+  stageId: number
+  userId?: number
   name: string
   description: string
   position: number
+}
+
+export interface ITimestamp {
+  updatedAt: string
+  createdAt: string
 }

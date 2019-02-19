@@ -1,5 +1,6 @@
 const { authenticate } = require('@feathersjs/authentication').hooks
 const createProject = require('../../hooks/create-project')
+const includeAssociationsForced = require('../../hooks/include-associations-forced')
 
 module.exports = {
   before: {
@@ -16,7 +17,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [includeAssociationsForced()],
     update: [],
     patch: [],
     remove: []

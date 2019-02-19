@@ -1,7 +1,5 @@
-import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import AuthStore from '../stores/AuthStore'
 import './App.css'
 import HomeScreen from './home/HomeScreen'
 import NoMatch from './NoMatch'
