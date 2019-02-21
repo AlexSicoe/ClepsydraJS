@@ -1,30 +1,34 @@
-import notify, { Notification } from '../components/view/notify'
-import { AxiosResponse, AxiosError } from 'axios'
+import notify, { NotificationIcon } from '../components/view/notify'
 
-export const networkErrorNotification: Notification = {
-  title: 'Network:',
-  icon: 'error',
-  body: 'The hamsters ran into trouble'
-}
-
-export function notifyError(error: AxiosError) {
-  console.error(error)
-  const { response } = error
-  if (response) {
-    notify({
-      title: 'Server:',
-      icon: 'error',
-      body: response.data.message
-    })
-  } else {
-    notify(networkErrorNotification)
-  }
-}
-
-export function notifySuccess(response: AxiosResponse) {
+export function notifyError(err: any) {
+  console.error(err)
   notify({
-    title: 'Server:',
-    icon: 'success',
-    body: response.data.message
+    title: `${err.code} ${err.name}`,
+    body: err.message,
+    icon: NotificationIcon.Error
+  })
+}
+
+export function notifySuccess(message: string) {
+  notify({
+    title: 'Success!',
+    body: message,
+    icon: NotificationIcon.Success
+  })
+}
+
+export function notifyWarning(message: string) {
+  notify({
+    title: 'Warning!',
+    body: message,
+    icon: NotificationIcon.Warning
+  })
+}
+
+export function notifyInfo(message: string) {
+  notify({
+    title: 'Info',
+    body: message,
+    icon: NotificationIcon.Info
   })
 }

@@ -1,10 +1,10 @@
 import toastr from 'toastr'
 
-export default function notify(notification: Notification) {
+export default function notify(notification: INotification) {
   if (!notification) {
     return
   }
-  let { title, body, icon } = notification
+  const { title, body, icon } = notification
   switch (icon) {
     case 'success':
       toastr.success(body, title)
@@ -18,36 +18,44 @@ export default function notify(notification: Notification) {
     case 'error':
       toastr.error(body, title)
       break
-    default: console.error('Unknown notification type!')
+    default:
+      console.error('Unknown notification type!')
   }
 }
 
 toastr.options = {
-  "closeButton": false,
-  "debug": false,
-  "newestOnTop": false,
-  "progressBar": false,
-  "positionClass": "toast-bottom-right",
-  "preventDuplicates": false,
+  closeButton: false,
+  debug: false,
+  newestOnTop: false,
+  progressBar: false,
+  positionClass: 'toast-bottom-right',
+  preventDuplicates: false,
   // "onclick": null,
-  "showDuration": 150,
-  "hideDuration": 500,
-  "timeOut": 2500,
-  "extendedTimeOut": 500,
-  "showEasing": "swing",
-  "hideEasing": "linear",
-  "showMethod": "fadeIn",
-  "hideMethod": "fadeOut"
+  showDuration: 150,
+  hideDuration: 500,
+  timeOut: 2500,
+  extendedTimeOut: 500,
+  showEasing: 'swing',
+  hideEasing: 'linear',
+  showMethod: 'fadeIn',
+  hideMethod: 'fadeOut'
 }
 
-export interface Notification {
+export interface INotification {
   title: string
   body: string
-  icon: 'success' | 'warning' | 'error' | 'info'
+  icon: NotificationIcon
 }
 
-export const networkErrorNotification: Notification = {
+export enum NotificationIcon {
+  Success = 'success',
+  Warning = 'warning',
+  Error = 'error',
+  Info = 'info'
+}
+
+export const networkErrorNotification: INotification = {
   title: 'Network:',
-  icon: 'error',
+  icon: NotificationIcon.Error,
   body: 'The hamsters ran into trouble'
 }

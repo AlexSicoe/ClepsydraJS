@@ -10,8 +10,9 @@ import LoadingScreen from '../view/LoadingScreen'
 import LogoutButton from '../view/LogoutButton'
 import SimpleAppBar from '../view/SimpleAppBar'
 import SimpleList from '../view/SimpleList'
-import AddUserButton from './AddUserButton'
+import AddUserButton from './AddMemberButton'
 import ProjectStore from '../../stores/ProjectStore'
+import { IUser } from '../../stores/model-interfaces'
 
 interface InjectedProps {
   projectStore: ProjectStore
@@ -32,12 +33,12 @@ class ProjectScreen extends Component<any, any> {
     console.log(u)
   }
 
-  handleItemView = (onItemClick: any, u: any) => {
+  handleItemView = (onItemClick: any, u: IUser) => {
     return (
       <ListItem divider button key={u.id} onClick={() => onItemClick(u)}>
         <ListItemText primary={u.name} />
         <ListItemText secondary={u.email} />
-        <ListItemText secondary={u.member.role} />
+        <ListItemText secondary={u.members!.role} />
       </ListItem>
     )
   }
@@ -46,8 +47,8 @@ class ProjectScreen extends Component<any, any> {
 
   handleFetch = () => {
     const { projectStore, match } = this.injected
-    const { pid } = match.params
-    projectStore.get(pid)
+    const { projectId } = match.params
+    projectStore.get(projectId)
   }
 
   componentWillMount() {

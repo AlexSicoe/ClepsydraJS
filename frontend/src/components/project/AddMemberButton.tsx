@@ -5,6 +5,7 @@ import React, { Component } from 'react'
 import ConfirmDialog from '../view/ConfirmDialog'
 import { ChangeEvent, KeyEvent } from '../view/view-types'
 import ProjectStore from '../../stores/ProjectStore'
+import { IMember, Role } from '../../stores/model-interfaces'
 
 interface InjectedProps {
   projectStore: ProjectStore
@@ -32,8 +33,11 @@ class AddUserButton extends Component<any, any> {
   handleOK = () => {
     const { mailOrName } = this.state
     const { projectStore } = this.injected
+    const member: Partial<IMember> = {
+      role: Role.User
+    }
 
-    projectStore.addMember(projectStore.id!, mailOrName)
+    projectStore.addMember(projectStore.id!, mailOrName, member)
     this.handleClose()
   }
 

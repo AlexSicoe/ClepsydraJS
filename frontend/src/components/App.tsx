@@ -16,7 +16,7 @@ class App extends Component<any, any> {
             <Switch>
               <Route exact path="/" component={PublicScreen} />
               <Route path="/home" component={HomeScreen} />
-              <Route path="/projects/:pid" component={ProjectScreen} />
+              <Route path="/projects/:projectId" component={ProjectScreen} />
               <Route path="/area51" component={Area51} />
               <Route component={NoMatch} />
             </Switch>

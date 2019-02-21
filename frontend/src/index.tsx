@@ -21,6 +21,7 @@ const userStore = new UserStore(
   app,
   userService,
   projectService,
+  memberService,
   taskService,
   userTaskService
 )

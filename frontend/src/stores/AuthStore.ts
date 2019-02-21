@@ -3,6 +3,8 @@ import { action, observable } from 'mobx'
 import { PromiseState } from '../util/enums'
 import { Callback } from '../util/types'
 import { IUser } from './model-interfaces'
+import { notifyError, notifySuccess } from '../util/notification-factories'
+import notify from '../components/view/notify'
 const { PENDING, DONE, ERROR } = PromiseState
 
 export default class AuthStore {
@@ -24,10 +26,10 @@ export default class AuthStore {
 
       this.state = DONE
       console.log(res)
+      notifySuccess('Registered')
     } catch (err) {
       this.state = ERROR
-      console.error(err)
-      // notifyError(err)
+      notifyError(err)
     }
   }
 
@@ -41,25 +43,28 @@ export default class AuthStore {
     try {
       this.state = PENDING
       await this.app.authenticate(data)
+
       this.state = DONE
       onSuccess()
     } catch (err) {
       this.state = ERROR
-      console.error(err)
       onError()
-      // notifyError(err)
+      notifyError(err)
     }
   }
 
   @action
   logout = async (onSuccess: Callback) => {
     try {
+      this.state = PENDING
       await this.app.logout()
+
+      this.state = DONE
       onSuccess()
       this.reset()
     } catch (err) {
-      console.error(err)
-      // notifyError(err)
+      this.state = ERROR
+      notifyError(err)
     }
   }
 }
