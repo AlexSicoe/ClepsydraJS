@@ -13,8 +13,8 @@ export default class UserStore {
   @observable id?: number
   @observable name: string = ''
   @observable email: string = ''
-  @observable projects: IProject[] = []
-  @observable tasks: ITask[] = []
+  @observable projects: IObservableArray<IProject> = [] as any
+  @observable tasks: IObservableArray<ITask> = [] as any
 
   constructor(
     app: Application<any>,
@@ -98,8 +98,8 @@ export default class UserStore {
     this.id = undefined
     this.name = ''
     this.email = ''
-    this.projects = []
-    this.tasks = []
+    this.projects.clear()
+    this.tasks.clear()
   }
 
   @action set = (user: Partial<IUser>) => {

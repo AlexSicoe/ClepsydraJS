@@ -1,9 +1,11 @@
+import { IObservableArray } from 'mobx'
+
 interface IIdentity {
   id: number
 }
 
 class HyperArray<T extends IIdentity> {
-  constructor(protected arr: T[]) {}
+  constructor(protected arr: IObservableArray<T>) {}
 
   push(...items: T[]) {
     return this.arr.push(...items)
