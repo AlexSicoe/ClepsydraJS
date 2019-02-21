@@ -49,7 +49,7 @@ export default class UserStore {
     projectService.on(Created, (project: IProject) => {
       console.log('Added project', project)
       // if (project.members.find((m) => m.userId === this.id))
-      new HyperArray(this.projects).add(project)
+      new HyperArray(this.projects).push(project)
     })
 
     projectService.on(Updated, (project) => {
@@ -69,7 +69,7 @@ export default class UserStore {
 
     userTaskService.on(Created, (task) => {
       console.log('Task assigned to User', task)
-      new HyperArray(this.tasks).add(task)
+      new HyperArray(this.tasks).push(task)
     })
 
     userTaskService.on(Removed, (task) => {
