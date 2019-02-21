@@ -2,24 +2,22 @@ interface IIdentity {
   id: number
 }
 
-class HyperArray<T extends IIdentity> extends Array<T> {
-  constructor(private arr: T[]) {
-    super()
+class HyperArray<T extends IIdentity> {
+  constructor(protected arr: T[]) {}
+
+  push(...items: T[]) {
+    return this.arr.push(...items)
   }
 
-  add(t: T) {
-    this.arr.push(t)
-  }
-
-  set(t: T) {
-    const index = this.arr.findIndex((e) => e.id === t.id)
+  set(item: T) {
+    const index = this.arr.findIndex((e) => e.id === item.id)
     if (index !== -1) {
-      this.arr[index] = t
+      this.arr[index] = item
     }
   }
 
-  remove(t: T) {
-    const index = this.arr.findIndex((e) => e.id === t.id)
+  remove(item: T) {
+    const index = this.arr.findIndex((e) => e.id === item.id)
     if (index !== -1) {
       this.arr.splice(index, 1)
     }
