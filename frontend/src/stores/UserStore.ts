@@ -49,17 +49,17 @@ export default class UserStore {
     projectService.on(Created, (project: IProject) => {
       console.log('Added project', project)
       // if (project.members.find((m) => m.userId === this.id))
-      new HyperArray(this.projects).upsert(project)
+      new HyperArray(this.projects).add(project)
     })
 
     projectService.on(Updated, (project) => {
       console.log('Updated project', project)
-      new HyperArray(this.projects).upsert(project)
+      new HyperArray(this.projects).set(project)
     })
 
     projectService.on(Patched, (project) => {
       console.log('Patched project', project)
-      new HyperArray(this.projects).upsert(project)
+      new HyperArray(this.projects).set(project)
     })
 
     projectService.on(Removed, (project) => {
@@ -69,7 +69,7 @@ export default class UserStore {
 
     userTaskService.on(Created, (task) => {
       console.log('Task assigned to User', task)
-      new HyperArray(this.tasks).upsert(task)
+      new HyperArray(this.tasks).add(task)
     })
 
     userTaskService.on(Removed, (task) => {
@@ -84,12 +84,12 @@ export default class UserStore {
 
     taskService.on(Patched, (task) => {
       console.log('Task patched', task)
-      new HyperArray(this.tasks).upsert(task)
+      new HyperArray(this.tasks).set(task)
     })
 
     taskService.on(Updated, (task) => {
       console.log('Task updated', task)
-      new HyperArray(this.tasks).upsert(task)
+      new HyperArray(this.tasks).set(task)
     })
   }
 
