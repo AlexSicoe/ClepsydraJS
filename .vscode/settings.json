@@ -1,4 +1,10 @@
 {
   "javascript.validate.enable": false,
-  "flow.pathToFlow": "${workspaceRoot}/frontend/node_modules/.bin/flow"
+  "flow.pathToFlow": "${workspaceRoot}/frontend/node_modules/.bin/flow",
+  "files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true
+  }
 }

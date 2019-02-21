@@ -9,7 +9,7 @@ module.exports = {
     get: [],
     create: [handleStages()],
     update: [],
-    patch: [handleStages()],
+    patch: [],
     remove: []
   },
 

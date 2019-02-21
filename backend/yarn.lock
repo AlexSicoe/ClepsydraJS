@@ -264,15 +264,118 @@
     lodash "^4.17.10"
     radix-router "^3.0.1"
 
+"@types/body-parser@*":
+  version "1.17.0"
+  resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.17.0.tgz#9f5c9d9bd04bb54be32d5eb9fc0d8c974e6cf58c"
+  integrity sha512-a2+YeUjPkztKJu5aIF2yArYFQQp8d51wZ7DavSHjFuY1mqVgidGyzEQ41JIVNy82fXj8yPgy2vJmfIywgESW6w==
+  dependencies:
+    "@types/connect" "*"
+    "@types/node" "*"
+
+"@types/connect@*":
+  version "3.4.32"
+  resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.32.tgz#aa0e9616b9435ccad02bc52b5b454ffc2c70ba28"
+  integrity sha512-4r8qa0quOvh7lGD0pre62CAb1oni1OO6ecJLGCezTmhQ8Fz50Arx9RUszryR8KlgK6avuSXvviL6yWyViQABOg==
+  dependencies:
+    "@types/node" "*"
+
+"@types/express-serve-static-core@*":
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.16.1.tgz#35df7b302299a4ab138a643617bd44078e74d44e"
+  integrity sha512-QgbIMRU1EVRry5cIu1ORCQP4flSYqLM1lS5LYyGWfKnFT3E58f0gKto7BR13clBFVrVZ0G0rbLZ1hUpSkgQQOA==
+  dependencies:
+    "@types/node" "*"
+    "@types/range-parser" "*"
+
+"@types/express@*":
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/@types/express/-/express-4.16.1.tgz#d756bd1a85c34d87eaf44c888bad27ba8a4b7cf0"
+  integrity sha512-V0clmJow23WeyblmACoxbHBu2JKlE5TiIme6Lem14FnPW9gsttyHtk6wq7njcdIWH1njAaFgR8gW09lgY98gQg==
+  dependencies:
+    "@types/body-parser" "*"
+    "@types/express-serve-static-core" "*"
+    "@types/serve-static" "*"
+
+"@types/feathersjs__configuration@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@types/feathersjs__configuration/-/feathersjs__configuration-1.0.2.tgz#1cd797adfd36a968fbabd9b1122ec40674b6202b"
+  integrity sha512-pYak1iKt+nZI+pQzw8I/cO2a1o0I2wXkVPzpSapC3gttyEB8lOCLNvkFnV44JI7zjX78vwetlkVvqNAqcZCw0g==
+  dependencies:
+    "@types/feathersjs__feathers" "*"
+
+"@types/feathersjs__errors@^3.3.1":
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/@types/feathersjs__errors/-/feathersjs__errors-3.3.1.tgz#db13f0c3a24a3b57e23280388fd95e950fd9da9c"
+  integrity sha512-5XeYdEVpDhukpRyAie6At81kY5XMMNt55jwlw/LnAkhO75aUKy/EYWP9WKsWcF2TQYy0GLzrkyjgayK/vG5SrA==
+  dependencies:
+    "@types/express" "*"
+
+"@types/feathersjs__express@*", "@types/feathersjs__express@^1.1.5":
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/@types/feathersjs__express/-/feathersjs__express-1.1.5.tgz#00a27a33280c0f718a47b7dac213ce99b50acf4a"
+  integrity sha512-jvk0DO5IwvqF7V9pwlGoLB1PqFNBWCti5vr/UmFYt8MGf430aN6sHDVFaQI6m616MXOdDnxfP4GpRrIoeLumqA==
+  dependencies:
+    "@types/express" "*"
+    "@types/feathersjs__express" "*"
+    "@types/feathersjs__feathers" "*"
+
+"@types/feathersjs__feathers@*", "@types/feathersjs__feathers@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@types/feathersjs__feathers/-/feathersjs__feathers-3.1.1.tgz#fc8bf1c12bd04d9576f87faf84c4d4202341c6ba"
+  integrity sha512-4/IC/qQI+V9WbhmQnMvuQctcURvdyVvSJ+3JANVEqedzvApW/P8TUfVHeJ/k7EaXBgglShI6rNSKwZTVNOiVRw==
+  dependencies:
+    "@types/feathersjs__feathers" "*"
+    "@types/node" "*"
+
+"@types/feathersjs__socket-commons@*":
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/@types/feathersjs__socket-commons/-/feathersjs__socket-commons-3.1.3.tgz#29a237f3d8d03873e8b2c5c1a8da1a6289667916"
+  integrity sha512-vGBxUmRZPqOlv0eytAFduvnQE13UUa4e8HCgmDcc6LlxczqBzBG8UXzrhLg6fmQJLOHnDvW1e6YwdKIeLaq/rw==
+  dependencies:
+    "@types/feathersjs__feathers" "*"
+
+"@types/feathersjs__socketio@^3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@types/feathersjs__socketio/-/feathersjs__socketio-3.0.4.tgz#e19fd682dab332b43721aa000194f9258cf232f3"
+  integrity sha512-sZSsoBazMuqMFFgflEbXjmxAjx5wrEgv8ymfnQRYcvp3RzSCRi34Wf84/HT0uYqoTH3jjLYQEGPnKcNmt91u1Q==
+  dependencies:
+    "@types/feathersjs__socket-commons" "*"
+    "@types/socket.io" "*"
+
 "@types/geojson@^1.0.0":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-1.0.6.tgz#3e02972728c69248c2af08d60a48cbb8680fffdf"
   integrity sha512-Xqg/lIZMrUd0VRmSRbCAewtwGZiAk3mEUDvV4op1tGl+LvyPcb/MIOSxTl9z+9+J+R4/vpjiCAT4xeKzH9ji1w==
 
+"@types/mime@*":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@types/mime/-/mime-2.0.1.tgz#dc488842312a7f075149312905b5e3c0b054c79d"
+  integrity sha512-FwI9gX75FgVBJ7ywgnq/P7tw+/o1GUbtP0KzbtusLigAOgIgNISRK0ZPl4qertvXSIE8YbsVJueQ90cDt9YYyw==
+
 "@types/node@*":
   version "10.12.24"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.24.tgz#b13564af612a22a20b5d95ca40f1bffb3af315cf"
   integrity sha512-GWWbvt+z9G5otRBW8rssOFgRY87J9N/qbhqfjMZ+gUuL6zoL+Hm6gP/8qQBG4jjimqdaNLCehcVapZ/Fs2WjCQ==
+
+"@types/range-parser@*":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
+  integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
+
+"@types/serve-static@*":
+  version "1.13.2"
+  resolved "https://registry.yarnpkg.com/@types/serve-static/-/serve-static-1.13.2.tgz#f5ac4d7a6420a99a6a45af4719f4dcd8cd907a48"
+  integrity sha512-/BZ4QRLpH/bNYgZgwhKEh+5AsboDBcUdlBYgzoLX0fpj3Y2gp6EApyOlM3bK53wQS/OE1SrdSYBAbux2D1528Q==
+  dependencies:
+    "@types/express-serve-static-core" "*"
+    "@types/mime" "*"
+
+"@types/socket.io@*":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@types/socket.io/-/socket.io-2.1.2.tgz#7165c2587cc3b86b44aa78e2a0060140551de211"
+  integrity sha512-Ind+4qMNfQ62llyB4IMs1D8znMEBsMKohZBPqfBUIXqLQ9bdtWIbNTBWwtdcBWJKnokMZGcmWOOKslatni5vtA==
+  dependencies:
+    "@types/node" "*"
 
 abab@^2.0.0:
   version "2.0.0"

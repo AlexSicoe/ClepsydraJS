@@ -1,15 +1,15 @@
+// @ts-ignore
 const { authenticate } = require('@feathersjs/authentication').hooks
-
-const handleTasks = require('../../hooks/handle-tasks')
+const swapPositions = require('../../hooks/swap-positions')
 
 module.exports = {
   before: {
     all: [authenticate('jwt')],
     find: [],
     get: [],
-    create: [handleTasks()],
+    create: [],
     update: [],
-    patch: [],
+    patch: [swapPositions()],
     remove: []
   },
 

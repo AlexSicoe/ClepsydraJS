@@ -51,6 +51,11 @@
     "winston": "^3.0.0"
   },
   "devDependencies": {
+    "@types/feathersjs__configuration": "^1.0.2",
+    "@types/feathersjs__errors": "^3.3.1",
+    "@types/feathersjs__express": "^1.1.5",
+    "@types/feathersjs__feathers": "^3.1.1",
+    "@types/feathersjs__socketio": "^3.0.4",
     "eslint": "^5.9.0",
     "jest": "^24.1.0",
     "nodemon": "^1.18.7",
