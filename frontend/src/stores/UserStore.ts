@@ -78,47 +78,47 @@ export default class UserStore {
       }
     })
 
-    memberService.on(Created, (member) => {
+    memberService.on(Created, (member: IMember) => {
       console.log('Member added to project', member)
       // TODO
     })
 
-    memberService.on(Removed, (member) => {
+    memberService.on(Removed, (member: IMember) => {
       console.log('Member removed from project', member)
       // TODO
     })
 
-    memberService.on(Updated, (member) => {
+    memberService.on(Updated, (member: IMember) => {
       console.log('Member updated', member)
       // TODO
     })
 
-    memberService.on(Patched, (member) => {
+    memberService.on(Patched, (member: IMember) => {
       console.log('Member patched', member)
       // TODO
     })
 
-    userTaskService.on(Created, (task) => {
+    userTaskService.on(Created, (task: ITask) => {
       console.log('Task assigned to User', task)
       this.tasks.push(task)
     })
 
-    userTaskService.on(Removed, (task) => {
+    userTaskService.on(Removed, (task: ITask) => {
       console.log('Task unassigned from User', task)
       new HyperArray(this.tasks).remove(task)
     })
 
-    taskService.on(Removed, (task) => {
+    taskService.on(Removed, (task: ITask) => {
       console.log('Task removed', task)
       new HyperArray(this.tasks).remove(task)
     })
 
-    taskService.on(Patched, (task) => {
+    taskService.on(Patched, (task: ITask) => {
       console.log('Task patched', task)
       new HyperArray(this.tasks).set(task)
     })
 
-    taskService.on(Updated, (task) => {
+    taskService.on(Updated, (task: ITask) => {
       console.log('Task updated', task)
       new HyperArray(this.tasks).set(task)
     })
@@ -143,14 +143,14 @@ export default class UserStore {
   }
 
   get = async () => {
-    const PARAMS = {
+    const params = {
       query: {
         $whoAmI: 'true'
       }
     }
     try {
       this.state = PENDING
-      const user = await this.userService.find(PARAMS)
+      const user = await this.userService.find(params)
       this.state = DONE
       this.set(user as IUser)
     } catch (err) {
@@ -168,8 +168,7 @@ export default class UserStore {
       console.log(res)
     } catch (err) {
       this.state = ERROR
-      // notifyError(err)
-      console.log(err)
+      notifyError(err)
     }
   }
 
@@ -182,8 +181,7 @@ export default class UserStore {
       console.log(res)
     } catch (err) {
       this.state = ERROR
-      // notifyError(err)
-      console.log(err)
+      notifyError(err)
     }
   }
 
@@ -196,8 +194,7 @@ export default class UserStore {
       console.log(res)
     } catch (err) {
       this.state = ERROR
-      // notifyError(err)
-      console.log(err)
+      notifyError(err)
     }
   }
 }

@@ -22,6 +22,8 @@ module.exports = function(options = {}) {
  * @param {HookContext} context
  * @param {{}} options
  */
+
+// eslint-disable-next-line no-unused-vars
 async function addTask(context, options) {
   const { app, params, data } = context
 
@@ -33,6 +35,7 @@ async function addTask(context, options) {
     throw new BadRequest('stageId not specified')
   }
 
+  // @ts-ignore
   const stage = await app.service('stages').Model.findByPk(stageId)
   if (!stage) {
     throw new NotFound('Cannot find stage')

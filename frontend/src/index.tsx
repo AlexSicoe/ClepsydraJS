@@ -25,7 +25,12 @@ const userStore = new UserStore(
   taskService,
   userTaskService
 )
-const projectStore = new ProjectStore(app, projectService, memberService)
+const projectStore = new ProjectStore(
+  app,
+  projectService,
+  memberService,
+  userService
+)
 
 const stores = {
   authStore,

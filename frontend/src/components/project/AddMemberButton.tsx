@@ -37,7 +37,7 @@ class AddUserButton extends Component<any, any> {
       role: Role.User
     }
 
-    projectStore.addMember(projectStore.id!, mailOrName, member)
+    projectStore.addMember(mailOrName, member)
     this.handleClose()
   }
 

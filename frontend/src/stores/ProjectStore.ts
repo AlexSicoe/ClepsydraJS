@@ -1,10 +1,9 @@
-import { Service, Application } from '@feathersjs/feathers'
-import { action, observable, IObservableArray } from 'mobx'
+import { Application, Service } from '@feathersjs/feathers'
+import { action, IObservableArray, observable } from 'mobx'
 import { PromiseState, SocketEvent } from '../util/enums'
-import { IMember, IProject, IStage, ITask, IUser } from './model-interfaces'
-import { createObservableArray } from 'mobx/lib/internal'
 import { safeSet } from '../util/functions'
 import { notifyError, notifySuccess } from '../util/notification-factories'
+import { IMember, IProject, IStage, ITask, IUser } from './model-interfaces'
 const { PENDING, DONE, ERROR } = PromiseState
 const { Created, Updated, Patched, Removed } = SocketEvent
 
@@ -19,49 +18,50 @@ export default class ProjectStore {
   constructor(
     app: Application<any>,
     private projectService: Service<IProject>,
-    private memberService: Service<IMember>
+    private memberService: Service<IMember>,
+    private userService: Service<IUser>
   ) {
     app.on('logout', () => this.reset())
 
-    projectService.on(Updated, (project) => {
+    projectService.on(Updated, (project: IProject) => {
       console.log('Updated project', project)
       if (project.id === this.id) {
         this.set(project)
       }
     })
 
-    projectService.on(Patched, (project) => {
+    projectService.on(Patched, (project: IProject) => {
       console.log('Patched project', project)
       if (project.id === this.id) {
         this.set(project)
       }
     })
 
-    projectService.on(Removed, (project) => {
+    projectService.on(Removed, (project: IProject) => {
       console.log('Removed project', project)
       if (project.id === this.id) {
         this.reset()
       }
     })
 
-    memberService.on(Created, (member) => {
+    memberService.on(Created, async (member: IMember) => {
       console.log('Member added to project', member)
-      // TODO
+      await this.getUser(member)
     })
 
-    memberService.on(Removed, (member) => {
+    memberService.on(Removed, (member: IMember) => {
       console.log('Member removed from project', member)
-      // TODO
+      this.deleteUser(member.userId)
     })
 
-    memberService.on(Updated, (member) => {
+    memberService.on(Updated, async (member: IMember) => {
       console.log('Member updated', member)
-      // TODO
+      await this.getUser(member)
     })
 
-    memberService.on(Patched, (member) => {
+    memberService.on(Patched, async (member: IMember) => {
       console.log('Member patched', member)
-      // TODO
+      await this.getUser(member)
     })
   }
 
@@ -79,6 +79,20 @@ export default class ProjectStore {
     this.name = safeSet(this.name, project.name)
     this.users = safeSet(this.users, project.users)
     this.stages = safeSet(this.stages, project.stages)
+  }
+
+  @action upsertUser = (user: IUser) => {
+    let foundUser = this.users.find((u) => u.id === user.id)
+    if (foundUser) {
+      foundUser = user
+    } else {
+      this.users.push(user)
+    }
+  }
+
+  @action deleteUser = (userId: number) => {
+    // @ts-ignore
+    this.users = this.users.filter((u) => u.id !== userId)
   }
 
   get = async (id: number) => {
@@ -147,14 +161,11 @@ export default class ProjectStore {
     }
   }
 
-  addMember = async (
-    projectId: number,
-    mailOrName: string,
-    member: Partial<IMember>
-  ) => {
+  addMember = async (mailOrName: string, member: Partial<IMember>) => {
     const params = {
       query: {
-        projectId
+        projectId: this.id,
+        mailOrName
       }
     }
     try {
@@ -168,10 +179,10 @@ export default class ProjectStore {
     }
   }
 
-  removeMember = async (projectId: number, userId: number) => {
+  removeMember = async (userId: number) => {
     const params = {
       query: {
-        projectId,
+        projectId: this.id,
         userId
       }
     }
@@ -179,9 +190,25 @@ export default class ProjectStore {
     try {
       this.state = PENDING
       const res = await this.memberService.remove(null, params)
-
       this.state = DONE
       notifySuccess('Member removed')
+    } catch (err) {
+      this.state = ERROR
+      notifyError(err)
+    }
+  }
+
+  getUser = async (member: IMember) => {
+    const params = {
+      query: { $include: 'true' }
+    }
+
+    try {
+      this.state = PENDING
+      const user = await this.userService.get(member.userId, params)
+      user.members = member // TODO make an adapter or something. jeez.
+      this.upsertUser(user)
+      this.state = DONE
     } catch (err) {
       this.state = ERROR
       notifyError(err)

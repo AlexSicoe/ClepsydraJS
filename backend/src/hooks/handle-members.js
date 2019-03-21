@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 const errors = require('@feathersjs/errors')
-const { NotFound, NotImplemented } = errors
+const { BadRequest, NotFound, NotImplemented } = errors
+const isMail = require('../../util/isMail')
 
 module.exports = function(options = {}) {
   return async (context) => {
@@ -19,10 +20,45 @@ module.exports = function(options = {}) {
 }
 
 async function addMember(context, options) {
-  const { params, service, data } = context
+  const { params, data, app, service } = context
 
-  const { userId, projectId } = params.query
+  if (!params.query) {
+    throw new BadRequest('Inexistent query')
+  }
+
   const { role } = data
+
+  let { mailOrName, userId, projectId } = params.query
+  if (!projectId) {
+    throw new BadRequest('projectId not specified')
+  }
+  if (mailOrName) {
+    const userService = app.service('users')
+    let resFind
+
+    if (isMail(mailOrName)) {
+      let email = mailOrName
+      resFind = await userService.find({
+        query: {
+          $limit: 1,
+          email
+        }
+      })
+    } else {
+      let name = mailOrName
+      resFind = await userService.find({
+        query: {
+          $limit: 1,
+          name
+        }
+      })
+    }
+    if (resFind.total !== 1) {
+      throw new NotFound('User not found')
+    }
+    const user = resFind.data[0]
+    userId = user.id
+  }
 
   context.result = await service.Model.create({
     role,
