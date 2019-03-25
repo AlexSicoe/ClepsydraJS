@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 // @ts-ignore
 import Board from 'react-trello'
+import KanbanController, { ICard } from './KanbanController'
 
 const data = {
   lanes: [
@@ -65,100 +66,43 @@ const newData = [
 ]
 
 export default class Area51 extends Component<any, any> {
-  state = {
-    boardData: {
-      lanes: []
-    }
-    // eventBus: null,
-  }
+  private controller: KanbanController
 
-  setEventBus = (eventBus: any) => {
-    this.setState({ eventBus })
-  }
+  constructor(props: any) {
+    super(props)
 
-  addCard = () => {
-    // @ts-ignore
-    this.state.eventBus.publish({
-      type: 'ADD_CARD',
-      laneId: 'lane1',
-      card: {
-        id: 'M1',
-        title: 'Buy Milk',
-        label: '15 mins',
-        description: 'Also set reminder'
+    this.state = {
+      boardData: {
+        lanes: []
       }
-    })
-  }
+    }
 
-  completeCard = () => {
-    // @ts-ignore
-    this.state.eventBus.publish({
-      type: 'MOVE_CARD',
-      fromLaneId: 'lane1',
-      toLaneId: 'lane2',
-      cardId: 'M1',
-      index: 0
-    })
-  }
-
-  updateData(newLaneData: any) {
-    // @ts-ignore
-    this.state.eventBus.publish({
-      type: 'UPDATE_LANES',
-      lanes: newLaneData
-    })
-  }
-
-  handleCardAdd = (card: any, laneId: string) => {
-    console.log(`New card added to lane ${laneId}`)
-    console.log(card)
-  }
-
-  handleCardClick = (cardId: string, metadata: any, laneId: string) => {
-    console.log('Card clicked')
-    console.log(cardId, metadata, laneId)
-  }
-
-  handleCardDelete = (cardId: string, laneId: string) => {
-    console.log('Card deleted')
-    console.log(cardId, laneId)
-  }
-
-  handleDelete = () => {
-    console.log('handled delete')
-  }
-
-  handleDataChange = (nextData: any) => {
-    console.log('New card has been added')
-    console.log(nextData)
-  }
-
-  handleDragStart = (cardId: string, laneId: string) => {
-    console.log('drag started')
-    console.log(`cardId: ${cardId}`)
-    console.log(`laneId: ${laneId}`)
-  }
-
-  handleDragEnd = (
-    cardId: string,
-    sourceLaneId: string,
-    targetLaneId: string
-  ) => {
-    console.log('drag ended')
-    console.log(`cardId: ${cardId}`)
-    console.log(`sourceLaneId: ${sourceLaneId}`)
-    console.log(`targetLaneId: ${targetLaneId}`)
+    this.controller = new KanbanController()
   }
 
   componentWillMount() {
     const response = data
     this.setState({ boardData: response })
-    setTimeout(this.addCard, 1000)
-    setTimeout(this.completeCard, 2000)
-    setTimeout(this.updateData.bind(this, newData), 3000)
+    this.updateBoard()
+  }
+
+  updateBoard = () => {
+    const { controller } = this
+
+    const card: ICard = {
+      id: 'M1',
+      title: 'Buy Milk',
+      label: '15 mins',
+      description: 'Also set reminder'
+    }
+    setTimeout(() => controller.addCard(card, 'lane1'), 1000)
+    setTimeout(() => controller.moveCard('M1', 'lane1', 'lane2'), 2000)
+    setTimeout(() => controller.updateData(newData), 3000)
   }
 
   render() {
+    const { controller } = this
+
     return (
       <div>
         {/*
@@ -167,13 +111,13 @@ export default class Area51 extends Component<any, any> {
           editable
           draggable
           data={this.state.boardData}
-          onDataChange={this.handleDataChange}
-          eventBusHandle={this.setEventBus}
-          onCardAdd={this.handleCardAdd}
-          onCardClick={this.handleCardClick}
-          onCardDelete={this.handleCardDelete}
-          handleDragStart={this.handleDragStart}
-          handleDragEnd={this.handleDragEnd}
+          eventBusHandle={controller.setEventBus}
+          onDataChange={controller.handleDataChange}
+          onCardAdd={controller.handleCardAdd}
+          onCardClick={controller.handleCardClick}
+          onCardDelete={controller.handleCardDelete}
+          handleDragStart={controller.handleDragStart}
+          handleDragEnd={controller.handleDragEnd}
         />
       </div>
     )
