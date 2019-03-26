@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 // @ts-ignore
 import Board from 'react-trello'
-import KanbanController, { ICard } from './KanbanController'
+import KanbanController, { ICard, IBoardData, ILane } from './KanbanController'
 
-const data = {
+const mockData: IBoardData = {
   lanes: [
     {
       id: 'lane1',
@@ -34,7 +34,7 @@ const data = {
   ]
 }
 
-const newData = [
+const newData: ILane[] = [
   {
     id: 'lane1',
     title: 'Planned Tasks',
@@ -71,22 +71,14 @@ export default class Area51 extends Component<any, any> {
   constructor(props: any) {
     super(props)
 
-    this.state = {
-      boardData: {
-        lanes: []
-      }
-    }
-
-    this.controller = new KanbanController()
+    this.controller = new KanbanController(mockData)
   }
 
   componentWillMount() {
-    const response = data
-    this.setState({ boardData: response })
-    this.updateBoard()
+    this.simulateUpdates()
   }
 
-  updateBoard = () => {
+  simulateUpdates = () => {
     const { controller } = this
 
     const card: ICard = {
@@ -98,11 +90,11 @@ export default class Area51 extends Component<any, any> {
     setTimeout(() => controller.addCard(card, 'lane1'), 1000)
     setTimeout(() => controller.moveCard('M1', 'lane1', 'lane2'), 2000)
     setTimeout(() => controller.updateData(newData), 3000)
+    setTimeout(() => controller.removeCard('Card2', 'lane2'), 4000)
   }
 
   render() {
     const { controller } = this
-
     return (
       <div>
         {/*
@@ -110,14 +102,20 @@ export default class Area51 extends Component<any, any> {
         <Board
           editable
           draggable
-          data={this.state.boardData}
+          canAddLanes
+          // collapsibleLanes
+          data={controller.data}
           eventBusHandle={controller.setEventBus}
-          onDataChange={controller.handleDataChange}
-          onCardAdd={controller.handleCardAdd}
-          onCardClick={controller.handleCardClick}
-          onCardDelete={controller.handleCardDelete}
+          onDataChange={controller.onDataChange}
+          onCardAdd={controller.onCardAdd}
+          onCardClick={controller.onCardClick}
+          onCardDelete={controller.onCardDelete}
+          onLaneClick={controller.onLaneClick}
           handleDragStart={controller.handleDragStart}
           handleDragEnd={controller.handleDragEnd}
+          handleLaneDragStart={controller.handleLaneDragStart}
+          handleLaneDragEnd={controller.handleLaneDragEnd}
+          // laneSortFunction
         />
       </div>
     )

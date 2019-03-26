@@ -4,6 +4,7 @@ export interface ICard {
   label: string
   description: string
   laneId?: string
+  metadata?: any
 }
 
 export interface ILane {
@@ -20,6 +21,8 @@ export interface IBoardData {
 export default class KanbanController {
   private eventBus: any
 
+  constructor(public data: IBoardData) {}
+
   setEventBus = (eventBus: any) => {
     console.log('SET EVENT BUS')
     this.eventBus = eventBus
@@ -33,9 +36,6 @@ export default class KanbanController {
     })
   }
 
-  /**
-   *  @param index Card's position within lane
-   */
   moveCard = (
     cardId: string,
     fromLaneId: string,
@@ -51,9 +51,15 @@ export default class KanbanController {
     })
   }
 
-  /**
-   * @param lanes New lane data
-   */
+  removeCard = (cardId: string, laneId: string, index = 0) => {
+    this.eventBus.publish({
+      type: 'REMOVE_CARD',
+      cardId,
+      laneId,
+      index
+    })
+  }
+
   updateData = (lanes: ILane[]) => {
     this.eventBus.publish({
       type: 'UPDATE_LANES',
@@ -61,32 +67,36 @@ export default class KanbanController {
     })
   }
 
-  handleCardAdd = (card: ICard, laneId: string) => {
-    console.log(`New card added to lane ${laneId}`)
-    console.log(card)
-  }
-
-  handleCardClick = (cardId: string, metadata: any, laneId: string) => {
-    console.log('Card clicked')
-    console.log(cardId, metadata, laneId)
-  }
-
-  handleCardDelete = (cardId: string, laneId: string) => {
-    console.log('Card deleted')
-    console.log(cardId, laneId)
-  }
-
-  handleDelete = () => {
-    console.log('handled delete')
-  }
-
-  handleDataChange = (nextData: any) => {
-    console.log('New card has been added')
+  onDataChange = (nextData: any) => {
+    console.log('DATA CHANGED')
     console.log(nextData)
   }
 
+  onCardAdd = (card: ICard, laneId: string) => {
+    console.log(`NEW CARD ADDED ON LANE ${laneId}`)
+    console.log(card)
+  }
+
+  onCardClick = (cardId: string, metadata: any, laneId: string) => {
+    console.log('CARD CLICKED')
+    console.log(`cardId: ${cardId}`)
+    console.log(`laneId: ${laneId}`)
+    console.log(`metadata: ${metadata}`)
+  }
+
+  onCardDelete = (cardId: string, laneId: string) => {
+    console.log('CARD DELETED')
+    console.log(`cardId: ${cardId}`)
+    console.log(`laneId: ${laneId}`)
+  }
+
+  onLaneClick = (laneId: number) => {
+    console.log('LANE CLICKED')
+    console.log(`laneId: ${laneId}`)
+  }
+
   handleDragStart = (cardId: string, laneId: string) => {
-    console.log('drag started')
+    console.log('DRAG STARTED')
     console.log(`cardId: ${cardId}`)
     console.log(`laneId: ${laneId}`)
   }
@@ -96,9 +106,21 @@ export default class KanbanController {
     sourceLaneId: string,
     targetLaneId: string
   ) => {
-    console.log('drag ended')
+    console.log('DRAG ENDED')
     console.log(`cardId: ${cardId}`)
     console.log(`sourceLaneId: ${sourceLaneId}`)
     console.log(`targetLaneId: ${targetLaneId}`)
+  }
+
+  handleLaneDragStart = (laneId: string) => {
+    console.log('LANE DRAG STARTED')
+    console.log(`laneId: ${laneId}`)
+  }
+
+  handleLaneDragEnd = (laneId: string, newPosition: number, payload: any) => {
+    console.log('LANE DRAG ENDED')
+    console.log(`laneId: ${laneId}`)
+    console.log(`newPosition: ${newPosition}`)
+    console.log(`payload: ${payload}`)
   }
 }
