@@ -1,13 +1,14 @@
-import KanbanController, { ICard, ILane } from './KanbanController'
+import KanbanController, { ICard, ILane, IBoardData } from './KanbanController'
 import { ITask, IStage, IProject } from '../../stores/model-interfaces'
 import { ID } from '../../util/types'
 
 interface IKanbanAdapter {
   mapTaskToCard: (task: ITask) => ICard
   mapStageToLane: (stage: IStage) => ILane
+  mapStagesToBoardData: (stages: IStage[]) => IBoardData
 
   setEventBus: (eventBus: any) => void
-  addTask: (task: ITask, stageId: ID) => void
+  addTask: (task: ITask) => void
   moveTask: (
     taskId: ID,
     fromStageId: ID,
@@ -33,110 +34,93 @@ interface IKanbanAdapter {
 }
 
 export default class KanbanAdapter implements IKanbanAdapter {
-  mapTaskToCard: (task: ITask) => ICard
-  mapStageToLane: (stage: IStage) => ILane
+  public controller: KanbanController
 
-  setEventBus: (eventBus: any) => void
-  addTask: (task: ITask, stageId: ID) => void
-  moveTask: (
-    taskId: ID,
-    fromStageId: ID,
-    toStageId: ID,
-    position?: number
-  ) => void
-  removeTask: (taskId: ID, stageId: ID, position?: number) => void
-  updateStages: (stages: IStage[]) => void
-  onStagesChange: (stages: IStage[]) => void
-  onTaskAdd: (task: ITask, stageId: ID) => void
-  onTaskClick: (taskId: ID, metadata: any, stageId: ID) => void
-  onTaskDelete: (taskId: ID, stageId: ID) => void
-  onStageClick: (stageId: ID) => void
-  onTaskDragStart: (taskId: ID, stageId: ID) => void
-  onTaskDragEnd: (taskId: ID, fromStageId: ID, toStageId: ID) => void
-  onStageDragStart: (stageId: ID) => void
-  onStageDragEnd: (
-    oldPosition: number,
-    newPosition: number,
-    stage: IStage
-  ) => void
-  stageSortFunction: (task1: ITask, task2: ITask) => number
+  constructor(private data: IStage[]) {
+    this.controller = new KanbanController(this.mapStagesToBoardData(data))
+  }
 
-  constructor(private controller: KanbanController) {
-    this.mapTaskToCard = (task) => {
-      const card: ICard = {
-        id: task.id,
-        title: task.name,
-        label: '61 mins',
-        description: task.description,
-        laneId: task.stageId,
-        metadata: { position: task.position }
-      }
-      return card
+  mapTaskToCard = (task: ITask) => {
+    const card: ICard = {
+      id: task.id,
+      title: task.name,
+      label: '61 mins',
+      description: task.description,
+      laneId: task.stageId,
+      metadata: { position: task.position }
     }
+    return card
+  }
 
-    this.mapStageToLane = (stage) => {
-      const lane: ILane = {
-        id: stage.id,
-        title: stage.name,
-        label: '0/0',
-        cards: stage.tasks.map((t) => this.mapTaskToCard(t))
-        // currentPage: 1
-      }
-      return lane
+  mapStageToLane = (stage: IStage) => {
+    const lane: ILane = {
+      id: stage.id,
+      title: stage.name,
+      label: `${stage.tasks.length}/${stage.taskLimit}`,
+      cards: stage.tasks.map((t) => this.mapTaskToCard(t))
+      // currentPage: 1
     }
+    return lane
+  }
 
-    this.setEventBus = (eventBus) => controller.setEventBus(eventBus)
+  mapStagesToBoardData = (stages: IStage[]) => {
+    console.log('STAGES')
+    console.log(stages)
+    const lanes = stages.map((s) => this.mapStageToLane(s))
+    return { lanes }
+  }
 
-    this.addTask = (task, stageId) =>
-      controller.addCard(this.mapTaskToCard(task), stageId)
+  setEventBus = (eventBus: any) => this.controller.setEventBus(eventBus)
 
-    this.moveTask = (taskId, fromStageId, toStageId, position) =>
-      controller.moveCard(taskId, fromStageId, toStageId, position)
+  addTask = (task: ITask) => {
+    const card = this.mapTaskToCard(task)
+    this.controller.addCard(card, task.stageId)
+  }
 
-    this.removeTask = (taskId, stageId, position) =>
-      controller.removeCard(taskId, stageId, position)
+  moveTask = (taskId: ID, fromStageId: ID, toStageId: ID, position?: number) =>
+    this.controller.moveCard(taskId, fromStageId, toStageId, position)
 
-    this.updateStages = (stages) => {
-      const lanes = stages.map((s) => this.mapStageToLane(s))
-      controller.updateData(lanes)
-    }
+  removeTask = (taskId: ID, stageId: ID, position?: number) =>
+    this.controller.removeCard(taskId, stageId, position)
 
-    this.onStagesChange = (stages) => {
-      const lanes = stages.map((s) => this.mapStageToLane(s))
-      const boardData = { lanes }
-      controller.onDataChange(boardData)
-    }
+  updateStages = (stages: IStage[]) => {
+    const lanes = stages.map((s) => this.mapStageToLane(s))
+    this.controller.updateData(lanes)
+  }
 
-    this.onTaskAdd = (task, stageId) =>
-      controller.onCardAdd(this.mapTaskToCard(task), stageId)
+  onStagesChange = (stages: IStage[]) =>
+    this.controller.onDataChange(this.mapStagesToBoardData(stages))
 
-    this.onTaskClick = (taskId, metadata, stageId) =>
-      controller.onCardClick(taskId, metadata, stageId)
+  onTaskAdd = (task: ITask, stageId: ID) =>
+    this.controller.onCardAdd(this.mapTaskToCard(task), stageId)
 
-    this.onTaskDelete = (taskId, stageId) =>
-      controller.onCardDelete(taskId, stageId)
+  onTaskClick = (taskId: ID, metadata: any, stageId: ID) =>
+    this.controller.onCardClick(taskId, metadata, stageId)
 
-    this.onStageClick = (stageId) => controller.onLaneClick(stageId)
+  onTaskDelete = (taskId: ID, stageId: ID) =>
+    this.controller.onCardDelete(taskId, stageId)
 
-    this.onTaskDragStart = (taskId, stageId) =>
-      controller.handleDragStart(taskId, stageId)
+  onStageClick = (stageId: ID) => this.controller.onLaneClick(stageId)
 
-    this.onTaskDragEnd = (taskId, fromStageId, toStageId) =>
-      controller.handleDragEnd(taskId, fromStageId, toStageId)
+  onTaskDragStart = (taskId: ID, stageId: ID) =>
+    this.controller.handleDragStart(taskId, stageId)
 
-    this.onStageDragStart = (stageId) => controller.handleLaneDragStart(stageId)
+  onTaskDragEnd = (taskId: ID, fromStageId: ID, toStageId: ID) =>
+    this.controller.handleDragEnd(taskId, fromStageId, toStageId)
 
-    this.onStageDragEnd = (oldPosition, newPosition, stage) =>
-      controller.handleLaneDragEnd(
-        oldPosition,
-        newPosition,
-        this.mapStageToLane(stage)
-      )
+  onStageDragStart = (stageId: ID) =>
+    this.controller.handleLaneDragStart(stageId)
 
-    this.stageSortFunction = (task1, task2) => {
-      const card1 = this.mapTaskToCard(task1)
-      const card2 = this.mapTaskToCard(task2)
-      return controller.laneSortFunction(card1, card2)
-    }
+  onStageDragEnd = (oldPosition: number, newPosition: number, stage: IStage) =>
+    this.controller.handleLaneDragEnd(
+      oldPosition,
+      newPosition,
+      this.mapStageToLane(stage)
+    )
+
+  stageSortFunction = (task1: ITask, task2: ITask) => {
+    const card1 = this.mapTaskToCard(task1)
+    const card2 = this.mapTaskToCard(task2)
+    return this.controller.laneSortFunction(card1, card2)
   }
 }

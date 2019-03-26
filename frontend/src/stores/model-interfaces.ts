@@ -32,6 +32,7 @@ export interface IStage {
   projectId: number
   name: string
   position: number
+  taskLimit: number
   tasks: ITask[]
 }
 

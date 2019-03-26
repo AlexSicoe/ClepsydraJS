@@ -1,77 +1,85 @@
 import React, { Component } from 'react'
 // @ts-ignore
 import Board from 'react-trello'
-import KanbanController, { ICard, IBoardData, ILane } from './KanbanController'
+import { IStage, ITask } from '../../stores/model-interfaces'
+import KanbanAdapter from './KanbanAdapter'
 
-const mockData: IBoardData = {
-  lanes: [
-    {
-      id: 'lane1',
-      title: 'Planned Tasks',
-      label: '2/2',
-      cards: [
-        {
-          id: 'Card1',
-          title: 'Write Blog',
-          description: 'Can AI make memes',
-          label: '30 mins'
-        },
-        {
-          id: 'Card2',
-          title: 'Pay Rent',
-          description: 'Transfer via NEFT',
-          label: '5 mins',
-          metadata: { sha: 'be312a1' }
-        }
-      ]
-    },
-    {
-      id: 'lane2',
-      title: 'Completed',
-      label: '0/0',
-      cards: []
-    }
-  ]
-}
-
-const newData: ILane[] = [
+const mockData: IStage[] = [
   {
-    id: 'lane1',
-    title: 'Planned Tasks',
-    label: '2/2',
-    cards: [
+    id: 1,
+    name: 'Planned Tasks',
+    projectId: 1,
+    position: 1,
+    taskLimit: 5,
+    tasks: [
       {
-        id: 'Card1',
-        laneId: 'lane1',
-        title: 'Nike',
-        description: 'Just do it',
-        label: '30 mins'
+        id: 1,
+        name: 'Write Blog',
+        description: 'Can AI make memes',
+        stageId: 1,
+        position: 1
+      },
+      {
+        id: 2,
+        name: 'Pay Rent',
+        description: 'Transfer via NEFT',
+        stageId: 1,
+        position: 2
       }
     ]
   },
   {
-    id: 'lane2',
-    title: 'Completed',
-    label: '0/0',
-    cards: [
+    id: 2,
+    name: 'Completed',
+    projectId: 1,
+    position: 2,
+    taskLimit: 3,
+    tasks: []
+  }
+]
+
+const newData: IStage[] = [
+  {
+    id: 1,
+    name: 'Planned Tasks',
+    projectId: 1,
+    position: 1,
+    taskLimit: 2,
+    tasks: [
       {
-        id: 'Card2',
-        laneId: 'lane2',
-        title: 'Do something',
+        id: 1,
+        stageId: 1,
+        name: 'Nike',
+        description: 'Just do it',
+        position: 1
+      }
+    ]
+  },
+  {
+    id: 2,
+    name: 'Completed',
+    projectId: 1,
+    position: 2,
+    taskLimit: 0,
+    tasks: [
+      {
+        id: 2,
+        stageId: 2,
+        name: 'Do something',
         description: 'Do something something',
-        label: '45 mins'
+        position: 2
       }
     ]
   }
 ]
 
 export default class Area51 extends Component<any, any> {
-  private controller: KanbanController
+  private adapter: KanbanAdapter
 
   constructor(props: any) {
     super(props)
 
-    this.controller = new KanbanController(mockData)
+    this.adapter = new KanbanAdapter(mockData)
   }
 
   componentWillMount() {
@@ -79,22 +87,23 @@ export default class Area51 extends Component<any, any> {
   }
 
   simulateUpdates = () => {
-    const { controller } = this
+    const { adapter } = this
 
-    const card: ICard = {
-      id: 'M1',
-      title: 'Buy Milk',
-      label: '15 mins',
-      description: 'Also set reminder'
+    const task: ITask = {
+      id: 5,
+      name: 'Buy Milk',
+      description: 'Also set reminder',
+      stageId: 2,
+      position: 3
     }
-    setTimeout(() => controller.addCard(card, 'lane1'), 1000)
-    setTimeout(() => controller.moveCard('M1', 'lane1', 'lane2'), 2000)
-    setTimeout(() => controller.updateData(newData), 3000)
-    setTimeout(() => controller.removeCard('Card2', 'lane2'), 4000)
+    setTimeout(() => adapter.addTask(task), 1000)
+    setTimeout(() => adapter.moveTask(5, 2, 1), 2000)
+    setTimeout(() => adapter.updateStages(newData), 3000)
+    setTimeout(() => adapter.removeTask(2, 2), 4000)
   }
 
   render() {
-    const { controller } = this
+    const { adapter } = this
     return (
       <div>
         {/*
@@ -104,18 +113,19 @@ export default class Area51 extends Component<any, any> {
           draggable
           canAddLanes
           // collapsibleLanes
-          data={controller.data}
-          eventBusHandle={controller.setEventBus}
-          onDataChange={controller.onDataChange}
-          onCardAdd={controller.onCardAdd}
-          onCardClick={controller.onCardClick}
-          onCardDelete={controller.onCardDelete}
-          onLaneClick={controller.onLaneClick}
-          handleDragStart={controller.handleDragStart}
-          handleDragEnd={controller.handleDragEnd}
-          handleLaneDragStart={controller.handleLaneDragStart}
-          handleLaneDragEnd={controller.handleLaneDragEnd}
-          laneSortFunction={controller.laneSortFunction}
+          data={adapter.controller.data}
+          eventBusHandle={adapter.setEventBus}
+          laneSortFunction={adapter.stageSortFunction}
+          // FIX
+          // onDataChange={adapter.onStagesChange}
+          onCardAdd={adapter.onTaskAdd}
+          onCardClick={adapter.onTaskClick}
+          onCardDelete={adapter.onTaskDelete}
+          onLaneClick={adapter.onStageClick}
+          handleDragStart={adapter.onTaskDragStart}
+          handleDragEnd={adapter.onTaskDragEnd}
+          handleLaneDragStart={adapter.onStageDragStart}
+          handleLaneDragEnd={adapter.onStageDragEnd}
         />
       </div>
     )
