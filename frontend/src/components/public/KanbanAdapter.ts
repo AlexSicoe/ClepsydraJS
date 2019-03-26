@@ -29,6 +29,7 @@ interface IKanbanAdapter {
     newPosition: number,
     stage: IStage
   ) => void
+  stageSortFunction: (task1: ITask, task2: ITask) => number
 }
 
 export default class KanbanAdapter implements IKanbanAdapter {
@@ -58,14 +59,30 @@ export default class KanbanAdapter implements IKanbanAdapter {
     newPosition: number,
     stage: IStage
   ) => void
+  stageSortFunction: (task1: ITask, task2: ITask) => number
 
   constructor(private controller: KanbanController) {
     this.mapTaskToCard = (task) => {
-      return {} as ICard
+      const card: ICard = {
+        id: task.id,
+        title: task.name,
+        label: '61 mins',
+        description: task.description,
+        laneId: task.stageId,
+        metadata: { position: task.position }
+      }
+      return card
     }
 
     this.mapStageToLane = (stage) => {
-      return {} as ILane
+      const lane: ILane = {
+        id: stage.id,
+        title: stage.name,
+        label: '0/0',
+        cards: stage.tasks.map((t) => this.mapTaskToCard(t))
+        // currentPage: 1
+      }
+      return lane
     }
 
     this.setEventBus = (eventBus) => controller.setEventBus(eventBus)
@@ -115,5 +132,11 @@ export default class KanbanAdapter implements IKanbanAdapter {
         newPosition,
         this.mapStageToLane(stage)
       )
+
+    this.stageSortFunction = (task1, task2) => {
+      const card1 = this.mapTaskToCard(task1)
+      const card2 = this.mapTaskToCard(task2)
+      return controller.laneSortFunction(card1, card2)
+    }
   }
 }

@@ -1,12 +1,16 @@
 import { ID } from '../../util/types'
 
+export interface ICardMetadata {
+  position?: number
+  [key: string]: any
+}
 export interface ICard {
   id: ID
   title: string
   label: string
   description: string
   laneId?: ID
-  metadata?: any
+  metadata?: ICardMetadata
 }
 
 export interface ILane {
@@ -120,5 +124,17 @@ export default class KanbanController {
     console.log(`oldPosition: ${oldPosition}`)
     console.log(`newPosition: ${newPosition}`)
     console.log('payload:', payload)
+  }
+
+  laneSortFunction = (card1: ICard, card2: ICard) => {
+    if (!card1.metadata || !card2.metadata) {
+      return 1
+    }
+    const pos1 = card1.metadata.position
+    const pos2 = card2.metadata.position
+    if (!pos1 || !pos2) {
+      return 1
+    }
+    return pos1 < pos2 ? -1 : 1
   }
 }

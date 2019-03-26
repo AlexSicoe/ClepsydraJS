@@ -87,10 +87,10 @@ export default class Area51 extends Component<any, any> {
       label: '15 mins',
       description: 'Also set reminder'
     }
-    // setTimeout(() => controller.addCard(card, 'lane1'), 1000)
-    // setTimeout(() => controller.moveCard('M1', 'lane1', 'lane2'), 2000)
-    // setTimeout(() => controller.updateData(newData), 3000)
-    // setTimeout(() => controller.removeCard('Card2', 'lane2'), 4000)
+    setTimeout(() => controller.addCard(card, 'lane1'), 1000)
+    setTimeout(() => controller.moveCard('M1', 'lane1', 'lane2'), 2000)
+    setTimeout(() => controller.updateData(newData), 3000)
+    setTimeout(() => controller.removeCard('Card2', 'lane2'), 4000)
   }
 
   render() {
@@ -115,7 +115,7 @@ export default class Area51 extends Component<any, any> {
           handleDragEnd={controller.handleDragEnd}
           handleLaneDragStart={controller.handleLaneDragStart}
           handleLaneDragEnd={controller.handleLaneDragEnd}
-          // laneSortFunction
+          laneSortFunction={controller.laneSortFunction}
         />
       </div>
     )
