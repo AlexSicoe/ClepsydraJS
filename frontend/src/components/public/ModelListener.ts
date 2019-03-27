@@ -1,12 +1,7 @@
-import { ITask, IStage } from '../../stores/model-interfaces'
+import { IStage, ITask } from '../../stores/model-interfaces'
 import { ID } from '../../util/types'
-import { ICard, ILane } from './KanbanController'
 
-interface ITrelloModelAdapter {
-  mapCardToTask: (card: ICard) => ITask
-  mapLaneToStage: (lane: ILane) => IStage
-}
-interface ICallbackAdapter {
+export interface IModelListener {
   onStagesChange: (stages: IStage[]) => void
   onTaskAdd: (task: ITask, stageId: ID) => void
   onTaskClick: (taskId: ID, metadata: any, stageId: ID) => void
@@ -23,17 +18,7 @@ interface ICallbackAdapter {
   stageSortFunction: (task1: ITask, task2: ITask) => number
 }
 
-export default class TrelloModelAdapter
-  implements ITrelloModelAdapter, ICallbackAdapter {
-  mapCardToTask = (card: ICard) => {
-    // TODO
-    return {} as ITask
-  }
-  mapLaneToStage = (lane: ILane) => {
-    // TODO
-    return {} as IStage
-  }
-
+export default class ModelListener implements IModelListener {
   onStagesChange = (stages: IStage[]) => {
     // TODO
   }
