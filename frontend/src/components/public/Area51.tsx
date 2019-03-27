@@ -113,19 +113,18 @@ export default class Area51 extends Component<any, any> {
           draggable
           canAddLanes
           // collapsibleLanes
-          data={adapter.controller.data}
+          data={adapter.data}
           eventBusHandle={adapter.setEventBus}
-          laneSortFunction={adapter.stageSortFunction}
-          // FIX
-          // onDataChange={adapter.onStagesChange}
-          onCardAdd={adapter.onTaskAdd}
-          onCardClick={adapter.onTaskClick}
-          onCardDelete={adapter.onTaskDelete}
-          onLaneClick={adapter.onStageClick}
-          handleDragStart={adapter.onTaskDragStart}
-          handleDragEnd={adapter.onTaskDragEnd}
-          handleLaneDragStart={adapter.onStageDragStart}
-          handleLaneDragEnd={adapter.onStageDragEnd}
+          laneSortFunction={adapter.laneSortFunction}
+          onDataChange={adapter.onDataChange}
+          onCardAdd={adapter.onCardAdd}
+          onCardClick={adapter.onCardClick}
+          onCardDelete={adapter.onCardDelete}
+          onLaneClick={adapter.onLaneClick}
+          handleDragStart={adapter.onDragStart}
+          handleDragEnd={adapter.onDragEnd}
+          handleLaneDragStart={adapter.onLaneDragStart}
+          handleLaneDragEnd={adapter.onLaneDragEnd}
         />
       </div>
     )

@@ -3,11 +3,6 @@ import { ITask, IStage, IProject } from '../../stores/model-interfaces'
 import { ID } from '../../util/types'
 
 interface IKanbanAdapter {
-  mapTaskToCard: (task: ITask) => ICard
-  mapStageToLane: (stage: IStage) => ILane
-  mapStagesToBoardData: (stages: IStage[]) => IBoardData
-
-  setEventBus: (eventBus: any) => void
   addTask: (task: ITask) => void
   moveTask: (
     taskId: ID,
@@ -17,27 +12,42 @@ interface IKanbanAdapter {
   ) => void
   removeTask: (taskId: ID, stageId: ID, position?: number) => void
   updateStages: (stages: IStage[]) => void
-  onStagesChange: (stages: IStage[]) => void
-  onTaskAdd: (task: ITask, stageId: ID) => void
-  onTaskClick: (taskId: ID, metadata: any, stageId: ID) => void
-  onTaskDelete: (taskId: ID, stageId: ID) => void
-  onStageClick: (stageId: ID) => void
-  onTaskDragStart: (taskId: ID, stageId: ID) => void
-  onTaskDragEnd: (taskId: ID, fromStageId: ID, toStageId: ID) => void
-  onStageDragStart: (stageId: ID) => void
-  onStageDragEnd: (
-    oldPosition: number,
-    newPosition: number,
-    stage: IStage
-  ) => void
-  stageSortFunction: (task1: ITask, task2: ITask) => number
 }
 
-export default class KanbanAdapter implements IKanbanAdapter {
-  public controller: KanbanController
+interface IModelTrelloAdapter {
+  mapTaskToCard: (task: ITask) => ICard
+  mapStageToLane: (stage: IStage) => ILane
+  mapStagesToBoardData: (stages: IStage[]) => IBoardData
+  setEventBus: (eventBus: any) => void
+}
 
-  constructor(private data: IStage[]) {
-    this.controller = new KanbanController(this.mapStagesToBoardData(data))
+interface ITrelloCallbacks {
+  onDataChange: (nextData: IBoardData) => void
+  onCardAdd: (card: ICard, laneId: ID) => void
+  onCardClick: (cardId: ID, metadata: any, laneId: ID) => void
+  onCardDelete: (cardId: ID, laneId: ID) => void
+  onLaneClick: (laneId: ID) => void
+  onDragStart: (cardId: ID, laneId: ID) => void
+  onDragEnd: (cardId: ID, sourceLaneId: ID, targetLaneId: ID) => void
+  onLaneDragStart: (laneId: ID) => void
+  onLaneDragEnd: (
+    oldPosition: number,
+    newPositon: number,
+    payload: ILane
+  ) => void
+  laneSortFunction: (card1: ICard, card2: ICard) => number
+}
+
+export default class KanbanAdapter
+  implements IKanbanAdapter, IModelTrelloAdapter, ITrelloCallbacks {
+  private controller: KanbanController
+
+  constructor(private stages: IStage[]) {
+    this.controller = new KanbanController(this.mapStagesToBoardData(stages))
+  }
+
+  get data() {
+    return this.controller.data
   }
 
   mapTaskToCard = (task: ITask) => {
@@ -77,50 +87,51 @@ export default class KanbanAdapter implements IKanbanAdapter {
     this.controller.addCard(card, task.stageId)
   }
 
-  moveTask = (taskId: ID, fromStageId: ID, toStageId: ID, position?: number) =>
+  moveTask = (
+    taskId: ID,
+    fromStageId: ID,
+    toStageId: ID,
+    position?: number
+  ) => {
     this.controller.moveCard(taskId, fromStageId, toStageId, position)
+  }
 
-  removeTask = (taskId: ID, stageId: ID, position?: number) =>
+  removeTask = (taskId: ID, stageId: ID, position?: number) => {
     this.controller.removeCard(taskId, stageId, position)
+  }
 
   updateStages = (stages: IStage[]) => {
     const lanes = stages.map((s) => this.mapStageToLane(s))
     this.controller.updateData(lanes)
   }
 
-  onStagesChange = (stages: IStage[]) =>
-    this.controller.onDataChange(this.mapStagesToBoardData(stages))
+  // @ts-ignore
+  onDataChange = (...args) => this.controller.onDataChange(...args)
 
-  onTaskAdd = (task: ITask, stageId: ID) =>
-    this.controller.onCardAdd(this.mapTaskToCard(task), stageId)
+  // @ts-ignore
+  onCardAdd = (...args) => this.controller.onCardAdd(...args)
 
-  onTaskClick = (taskId: ID, metadata: any, stageId: ID) =>
-    this.controller.onCardClick(taskId, metadata, stageId)
+  // @ts-ignore
+  onCardClick = (...args) => this.controller.onCardClick(...args)
 
-  onTaskDelete = (taskId: ID, stageId: ID) =>
-    this.controller.onCardDelete(taskId, stageId)
+  // @ts-ignore
+  onCardDelete = (...args) => this.controller.onCardDelete(...args)
 
-  onStageClick = (stageId: ID) => this.controller.onLaneClick(stageId)
+  // @ts-ignore
+  onLaneClick = (...args) => this.controller.onLaneClick(...args)
 
-  onTaskDragStart = (taskId: ID, stageId: ID) =>
-    this.controller.handleDragStart(taskId, stageId)
+  // @ts-ignore
+  onDragStart = (...args) => this.controller.handleDragStart(...args)
 
-  onTaskDragEnd = (taskId: ID, fromStageId: ID, toStageId: ID) =>
-    this.controller.handleDragEnd(taskId, fromStageId, toStageId)
+  // @ts-ignore
+  onDragEnd = (...args) => this.controller.handleDragEnd(...args)
 
-  onStageDragStart = (stageId: ID) =>
-    this.controller.handleLaneDragStart(stageId)
+  // @ts-ignore
+  onLaneDragStart = (...args) => this.controller.handleLaneDragStart(...args)
 
-  onStageDragEnd = (oldPosition: number, newPosition: number, stage: IStage) =>
-    this.controller.handleLaneDragEnd(
-      oldPosition,
-      newPosition,
-      this.mapStageToLane(stage)
-    )
+  // @ts-ignore
+  onLaneDragEnd = (...args) => this.controller.handleLaneDragEnd(...args)
 
-  stageSortFunction = (task1: ITask, task2: ITask) => {
-    const card1 = this.mapTaskToCard(task1)
-    const card2 = this.mapTaskToCard(task2)
-    return this.controller.laneSortFunction(card1, card2)
-  }
+  // @ts-ignore
+  laneSortFunction = (...args) => this.controller.laneSortFunction(...args)
 }
