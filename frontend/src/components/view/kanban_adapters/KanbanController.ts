@@ -1,4 +1,4 @@
-import { ID } from '../../util/types'
+import { ID } from '../../../util/types'
 
 export interface ICardMetadata {
   position?: number

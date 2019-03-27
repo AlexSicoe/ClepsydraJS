@@ -1,9 +1,9 @@
-import { ID } from '../../util/types'
+import { ID } from '../../../util/types'
 import { IBoardData, ICard, ILane } from './KanbanController'
 import ModelListener, { IModelListener } from './ModelListener'
 import ViewModelTransformer, {
   IViewModelTransformer
-} from './ViewModelTransfomer'
+} from './transformers/ViewModelTransfomer'
 
 export interface IViewListener {
   onDataChange: (nextData: IBoardData) => void

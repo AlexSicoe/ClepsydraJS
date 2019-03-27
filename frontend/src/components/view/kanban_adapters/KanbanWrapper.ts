@@ -1,9 +1,9 @@
-import { IStage, ITask } from '../../stores/model-interfaces'
-import { ID } from '../../util/types'
+import { IStage, ITask } from '../../../stores/model-interfaces'
+import { ID } from '../../../util/types'
 import KanbanController, { IKanbanController } from './KanbanController'
 import ModelViewTransformer, {
   IModelViewTransformer
-} from './ModelViewTransformer'
+} from './transformers/ModelViewTransformer'
 import ViewListener, { IViewListener } from './ViewListener'
 
 interface IKanbanWrapper {

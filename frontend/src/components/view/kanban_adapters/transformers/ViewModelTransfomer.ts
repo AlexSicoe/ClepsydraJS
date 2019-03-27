@@ -1,5 +1,5 @@
-import { IStage, ITask } from '../../stores/model-interfaces'
-import { ICard, ILane } from './KanbanController'
+import { IStage, ITask } from '../../../../stores/model-interfaces'
+import { ICard, ILane } from '../KanbanController'
 
 export interface IViewModelTransformer {
   mapCardToTask: (card: ICard) => ITask

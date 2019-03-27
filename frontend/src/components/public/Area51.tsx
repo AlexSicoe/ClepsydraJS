@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 // @ts-ignore
 import Board from 'react-trello'
 import { IStage, ITask } from '../../stores/model-interfaces'
-import KanbanWrapper from './KanbanWrapper'
+import KanbanWrapper from '../view/kanban_adapters/KanbanWrapper'
 
 const mockData: IStage[] = [
   {
