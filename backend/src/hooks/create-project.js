@@ -5,6 +5,9 @@
 module.exports = (options = {}) => {
   return async (context) => {
     const { app, params, data } = context
+    const userService = app.service('users')
+    const projectService = app.service('projects')
+    const stageService = app.service('stages')
 
     const options = {
       through: {
@@ -12,8 +15,33 @@ module.exports = (options = {}) => {
       }
     }
 
-    const user = await app.service('users').Model.findByPk(params.user.id)
-    context.result = await user.createProject(data, options)
+    const user = await userService.Model.findByPk(params.user.id)
+    const projectRes = await user.createProject(data, options)
+
+    const defaultStages = [
+      {
+        name: 'To do'
+      },
+      {
+        name: 'In progress'
+      },
+      {
+        name: 'Done'
+      }
+    ]
+    const stageOptions = {
+      query: {
+        projectId: projectRes.id
+      }
+    }
+
+    await Promise.all(
+      defaultStages.map((s) => stageService.create(s, stageOptions))
+    )
+
+    const project = await projectService.get(projectRes.id)
+
+    context.result = project
 
     return context
   }

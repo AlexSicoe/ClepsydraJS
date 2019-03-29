@@ -9,6 +9,8 @@ import LoadingScreen from '../view/LoadingScreen'
 import LogoutButton from '../view/LogoutButton'
 import SimpleAppBar from '../view/SimpleAppBar'
 import MemberList from './MemberList'
+import { IStage } from '../../stores/model-interfaces'
+import { toJS } from 'mobx'
 interface IInjectedProps {
   projectStore: ProjectStore
   match: any
@@ -44,6 +46,8 @@ class ProjectScreen extends Component<any, any> {
         </LoadingScreen>
       )
     }
+
+    console.log('STAGES', toJS<IStage[]>(projectStore.stages))
 
     return (
       <>
