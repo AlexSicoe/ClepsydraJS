@@ -83,9 +83,6 @@ export default class KanbanWrapper implements IKanbanWrapper, IViewListener {
     this.controller.updateData(lanes)
   }
 
-  // TODO
-  // transform view -> model
-  // call modelListener
   onDataChange = (nextData: IBoardData) => {
     const stages = nextData.lanes.map((l) =>
       this.vmTransformer.mapLaneToStage(l)

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "*": ["types/*"] },
     "target": "esNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,

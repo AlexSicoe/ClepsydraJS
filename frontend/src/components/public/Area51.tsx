@@ -74,13 +74,7 @@ const newData: IStage[] = [
 ]
 
 export default class Area51 extends Component<any, any> {
-  private wrapper: KanbanWrapper
-
-  constructor(props: any) {
-    super(props)
-
-    this.wrapper = new KanbanWrapper(mockData)
-  }
+  wrapper = new KanbanWrapper(mockData)
 
   componentWillMount() {
     this.simulateUpdates()

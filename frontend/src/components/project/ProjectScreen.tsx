@@ -13,7 +13,8 @@ import SimpleList from '../view/SimpleList'
 import AddUserButton from './AddMemberButton'
 import ProjectStore from '../../stores/ProjectStore'
 import { IUser } from '../../stores/model-interfaces'
-
+import { PromiseState } from '../../util/enums'
+import { toJS } from 'mobx'
 interface InjectedProps {
   projectStore: ProjectStore
   match: any
@@ -30,7 +31,7 @@ class ProjectScreen extends Component<any, any> {
   }
 
   handleItemClick = (u: any) => {
-    console.log(u)
+    console.log(toJS<IUser>(u))
   }
 
   handleItemView = (onItemClick: any, u: IUser) => {
@@ -56,10 +57,9 @@ class ProjectScreen extends Component<any, any> {
   }
 
   render() {
-    const { match, projectStore } = this.injected
-    const { pid } = match.params
+    const { projectStore } = this.injected
 
-    if (projectStore.state === 'pending') {
+    if (projectStore.state === PromiseState.PENDING) {
       return (
         <LoadingScreen>
           <BackButton callback={this.goBack} />
@@ -87,7 +87,7 @@ class ProjectScreen extends Component<any, any> {
         <br />
         <AddUserButton />
 
-        <Button // TODO pune X la fiecare user
+        <Button
           color="primary"
           variant="contained"
           onClick={() => console.log('remove user mock')}

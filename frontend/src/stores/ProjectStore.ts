@@ -206,7 +206,7 @@ export default class ProjectStore {
     try {
       this.state = PENDING
       const user = await this.userService.get(member.userId, params)
-      user.members = member // TODO make an adapter or something. jeez.
+      user.members = member // TODO make an adapter
       this.upsertUser(user)
       this.state = DONE
     } catch (err) {
