@@ -1,21 +1,15 @@
-import Button from '@material-ui/core/Button'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemText from '@material-ui/core/ListItemText'
 import { History } from 'history'
 import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
+import ProjectStore from '../../stores/ProjectStore'
+import { PromiseState } from '../../util/enums'
 import BackButton from '../view/BackButton'
 import LoadingScreen from '../view/LoadingScreen'
 import LogoutButton from '../view/LogoutButton'
 import SimpleAppBar from '../view/SimpleAppBar'
-import SimpleList from '../view/SimpleList'
-import AddUserButton from './AddMemberButton'
-import ProjectStore from '../../stores/ProjectStore'
-import { IUser } from '../../stores/model-interfaces'
-import { PromiseState } from '../../util/enums'
-import { toJS } from 'mobx'
-interface InjectedProps {
+import MemberList from './MemberList'
+interface IInjectedProps {
   projectStore: ProjectStore
   match: any
   history: History
@@ -24,24 +18,8 @@ interface InjectedProps {
 @inject('projectStore')
 @observer
 class ProjectScreen extends Component<any, any> {
-  state = {}
-
   get injected() {
-    return this.props as InjectedProps
-  }
-
-  handleItemClick = (u: any) => {
-    console.log(toJS<IUser>(u))
-  }
-
-  handleItemView = (onItemClick: any, u: IUser) => {
-    return (
-      <ListItem divider button key={u.id} onClick={() => onItemClick(u)}>
-        <ListItemText primary={u.name} />
-        <ListItemText secondary={u.email} />
-        <ListItemText secondary={u.members!.role} />
-      </ListItem>
-    )
+    return this.props as IInjectedProps
   }
 
   goBack = () => this.injected.history.goBack()
@@ -73,27 +51,9 @@ class ProjectScreen extends Component<any, any> {
           <LogoutButton />
         </SimpleAppBar>
 
-        {/* 
-        //@ts-ignore */}
-        <SimpleList
-          items={projectStore.users}
-          subheader="Users"
-          emptyMessage="No users"
-          onItemClick={this.handleItemClick}
-          onItemView={this.handleItemView}
-        />
-        <BackButton callback={this.goBack} />
-        <br />
-        <br />
-        <AddUserButton />
+        <MemberList users={projectStore.users} />
 
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={() => console.log('remove user mock')}
-        >
-          Remove User
-        </Button>
+        <BackButton callback={this.goBack} />
       </>
     )
   }

@@ -15,7 +15,8 @@
     "jsx-no-lambda": false,
     "jsx-boolean-value": false,
     "no-console": false,
-    "triple-equals": false
+    "triple-equals": false,
+    "no-empty-interface": false
   },
   "rulesDirectory": []
 }
