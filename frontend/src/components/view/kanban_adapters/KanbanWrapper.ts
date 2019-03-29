@@ -1,10 +1,18 @@
 import { IStage, ITask } from '../../../stores/model-interfaces'
 import { ID } from '../../../util/types'
-import KanbanController, { IKanbanController } from './KanbanController'
+import KanbanController, {
+  IBoardData,
+  ICard,
+  IKanbanController,
+  ILane
+} from './KanbanController'
+import ModelListener, { IModelListener } from './ModelListener'
 import ModelViewTransformer, {
   IModelViewTransformer
 } from './transformers/ModelViewTransformer'
-import ViewListener, { IViewListener } from './ViewListener'
+import ViewModelTransformer, {
+  IViewModelTransformer
+} from './transformers/ViewModelTransfomer'
 
 interface IKanbanWrapper {
   addTask: (task: ITask) => void
@@ -18,14 +26,33 @@ interface IKanbanWrapper {
   updateStages: (stages: IStage[]) => void
 }
 
+export interface IViewListener {
+  onDataChange: (nextData: IBoardData) => void
+  onCardAdd: (card: ICard, laneId: ID) => void
+  onCardClick: (cardId: ID, metadata: any, laneId: ID) => void
+  onCardDelete: (cardId: ID, laneId: ID) => void
+  onLaneClick: (laneId: ID) => void
+  onDragStart: (cardId: ID, laneId: ID) => void
+  onDragEnd: (cardId: ID, sourceLaneId: ID, targetLaneId: ID) => void
+  onLaneDragStart: (laneId: ID) => void
+  onLaneDragEnd: (
+    oldPosition: number,
+    newPositon: number,
+    payload: ILane
+  ) => void
+  laneSortFunction: (card1: ICard, card2: ICard) => number
+}
+
 export default class KanbanWrapper implements IKanbanWrapper, IViewListener {
   private mvTransformer: IModelViewTransformer
-  private viewListener: IViewListener
+  private vmTransformer: IViewModelTransformer
+  private modelListener: IModelListener
   private controller: IKanbanController
 
   constructor(private stages: IStage[]) {
     this.mvTransformer = new ModelViewTransformer()
-    this.viewListener = new ViewListener()
+    this.vmTransformer = new ViewModelTransformer()
+    this.modelListener = new ModelListener()
     this.controller = new KanbanController(
       this.mvTransformer.mapStagesToBoardData(stages)
     )
@@ -60,33 +87,75 @@ export default class KanbanWrapper implements IKanbanWrapper, IViewListener {
     this.controller.updateData(lanes)
   }
 
-  // @ts-ignore
-  onDataChange = (...args) => this.viewListener.onDataChange(...args)
+  // TODO
+  // transform view -> model
+  // call modelListener
+  onDataChange = (nextData: IBoardData) => {
+    console.log('DATA CHANGED')
+    console.log(nextData)
+  }
 
-  // @ts-ignore
-  onCardAdd = (...args) => this.viewListener.onCardAdd(...args)
+  onCardAdd = (card: ICard, laneId: ID) => {
+    console.log(`NEW CARD ADDED ON LANE ${laneId}`)
+    console.log(card)
+  }
 
-  // @ts-ignore
-  onCardClick = (...args) => this.viewListener.onCardClick(...args)
+  onCardClick = (cardId: ID, metadata: any, laneId: ID) => {
+    console.log('CARD CLICKED')
+    console.log(`cardId: ${cardId}`)
+    console.log(`laneId: ${laneId}`)
+    console.log(`metadata: ${metadata}`)
+  }
 
-  // @ts-ignore
-  onCardDelete = (...args) => this.viewListener.onCardDelete(...args)
+  onCardDelete = (cardId: ID, laneId: ID) => {
+    console.log('CARD DELETED')
+    console.log(`cardId: ${cardId}`)
+    console.log(`laneId: ${laneId}`)
+  }
 
-  // @ts-ignore
-  onLaneClick = (...args) => this.viewListener.onLaneClick(...args)
+  onLaneClick = (laneId: ID) => {
+    console.log('LANE CLICKED')
+    console.log(`laneId: ${laneId}`)
+  }
 
-  // @ts-ignore
-  onDragStart = (...args) => this.viewListener.onDragStart(...args)
+  onDragStart = (cardId: ID, laneId: ID) => {
+    // console.log('DRAG STARTED')
+    // console.log(`cardId: ${cardId}`)
+    // console.log(`laneId: ${laneId}`)
+  }
 
-  // @ts-ignore
-  onDragEnd = (...args) => this.viewListener.onDragEnd(...args)
+  onDragEnd = (cardId: ID, sourceLaneId: ID, targetLaneId: ID) => {
+    console.log('DRAG ENDED')
+    console.log(`cardId: ${cardId}`)
+    console.log(`sourceLaneId: ${sourceLaneId}`)
+    console.log(`targetLaneId: ${targetLaneId}`)
+  }
 
-  // @ts-ignore
-  onLaneDragStart = (...args) => this.viewListener.onLaneDragStart(...args)
+  onLaneDragStart = (laneId: ID) => {
+    // console.log('LANE DRAG STARTED')
+    // console.log(`laneId: ${laneId}`)
+  }
 
-  // @ts-ignore
-  onLaneDragEnd = (...args) => this.viewListener.onLaneDragEnd(...args)
+  onLaneDragEnd = (
+    oldPosition: number,
+    newPosition: number,
+    payload: ILane
+  ) => {
+    console.log('LANE DRAG ENDED')
+    console.log(`oldPosition: ${oldPosition}`)
+    console.log(`newPosition: ${newPosition}`)
+    console.log('payload:', payload)
+  }
 
-  // @ts-ignore
-  laneSortFunction = (...args) => this.viewListener.laneSortFunction(...args)
+  laneSortFunction = (card1: ICard, card2: ICard) => {
+    if (!card1.metadata || !card2.metadata) {
+      return 1
+    }
+    const pos1 = card1.metadata.position
+    const pos2 = card2.metadata.position
+    if (!pos1 || !pos2) {
+      return 1
+    }
+    return pos1 < pos2 ? -1 : 1
+  }
 }

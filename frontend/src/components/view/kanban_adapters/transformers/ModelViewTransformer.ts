@@ -8,27 +8,25 @@ export interface IModelViewTransformer {
 }
 
 export default class ModelViewTransformer implements IModelViewTransformer {
-  mapTaskToCard = (task: ITask) => {
-    const card: ICard = {
+  mapTaskToCard = (task: ITask): ICard => {
+    return {
       id: task.id,
       title: task.name,
-      label: '61 mins',
+      label: '61 mins', // TODO
       description: task.description,
       laneId: task.stageId,
       metadata: { position: task.position }
     }
-    return card
   }
 
-  mapStageToLane = (stage: IStage) => {
-    const lane: ILane = {
+  mapStageToLane = (stage: IStage): ILane => {
+    return {
       id: stage.id,
       title: stage.name,
       label: `${stage.tasks.length}/${stage.taskLimit}`,
       cards: stage.tasks.map((t) => this.mapTaskToCard(t))
       // currentPage: 1
     }
-    return lane
   }
 
   mapStagesToBoardData = (stages: IStage[]) => {
