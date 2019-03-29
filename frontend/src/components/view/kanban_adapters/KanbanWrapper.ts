@@ -35,11 +35,7 @@ export interface IViewListener {
   onDragStart: (cardId: ID, laneId: ID) => void
   onDragEnd: (cardId: ID, sourceLaneId: ID, targetLaneId: ID) => void
   onLaneDragStart: (laneId: ID) => void
-  onLaneDragEnd: (
-    oldPosition: number,
-    newPositon: number,
-    payload: ILane
-  ) => void
+  onLaneDragEnd: (oldPosition: number, newPositon: number, lane: ILane) => void
   laneSortFunction: (card1: ICard, card2: ICard) => number
 }
 
@@ -91,71 +87,49 @@ export default class KanbanWrapper implements IKanbanWrapper, IViewListener {
   // transform view -> model
   // call modelListener
   onDataChange = (nextData: IBoardData) => {
-    console.log('DATA CHANGED')
-    console.log(nextData)
+    const stages = nextData.lanes.map((l) =>
+      this.vmTransformer.mapLaneToStage(l)
+    )
+    this.modelListener.onStagesChange(stages)
   }
 
   onCardAdd = (card: ICard, laneId: ID) => {
-    console.log(`NEW CARD ADDED ON LANE ${laneId}`)
-    console.log(card)
+    const task = this.vmTransformer.mapCardToTask(card)
+    this.modelListener.onTaskAdd(task, laneId)
   }
 
   onCardClick = (cardId: ID, metadata: any, laneId: ID) => {
-    console.log('CARD CLICKED')
-    console.log(`cardId: ${cardId}`)
-    console.log(`laneId: ${laneId}`)
-    console.log(`metadata: ${metadata}`)
+    this.modelListener.onTaskClick(cardId, metadata, laneId)
   }
 
   onCardDelete = (cardId: ID, laneId: ID) => {
-    console.log('CARD DELETED')
-    console.log(`cardId: ${cardId}`)
-    console.log(`laneId: ${laneId}`)
+    this.modelListener.onTaskDelete(cardId, laneId)
   }
 
   onLaneClick = (laneId: ID) => {
-    console.log('LANE CLICKED')
-    console.log(`laneId: ${laneId}`)
+    this.modelListener.onStageClick(laneId)
   }
 
   onDragStart = (cardId: ID, laneId: ID) => {
-    // console.log('DRAG STARTED')
-    // console.log(`cardId: ${cardId}`)
-    // console.log(`laneId: ${laneId}`)
+    this.modelListener.onTaskDragStart(cardId, laneId)
   }
 
   onDragEnd = (cardId: ID, sourceLaneId: ID, targetLaneId: ID) => {
-    console.log('DRAG ENDED')
-    console.log(`cardId: ${cardId}`)
-    console.log(`sourceLaneId: ${sourceLaneId}`)
-    console.log(`targetLaneId: ${targetLaneId}`)
+    this.modelListener.onTaskDragEnd(cardId, sourceLaneId, targetLaneId)
   }
 
   onLaneDragStart = (laneId: ID) => {
-    // console.log('LANE DRAG STARTED')
-    // console.log(`laneId: ${laneId}`)
+    this.modelListener.onStageDragStart(laneId)
   }
 
-  onLaneDragEnd = (
-    oldPosition: number,
-    newPosition: number,
-    payload: ILane
-  ) => {
-    console.log('LANE DRAG ENDED')
-    console.log(`oldPosition: ${oldPosition}`)
-    console.log(`newPosition: ${newPosition}`)
-    console.log('payload:', payload)
+  onLaneDragEnd = (oldPosition: number, newPosition: number, lane: ILane) => {
+    const stage = this.vmTransformer.mapLaneToStage(lane)
+    this.modelListener.onStageDragEnd(oldPosition, newPosition, stage)
   }
 
   laneSortFunction = (card1: ICard, card2: ICard) => {
-    if (!card1.metadata || !card2.metadata) {
-      return 1
-    }
-    const pos1 = card1.metadata.position
-    const pos2 = card2.metadata.position
-    if (!pos1 || !pos2) {
-      return 1
-    }
-    return pos1 < pos2 ? -1 : 1
+    const task1 = this.vmTransformer.mapCardToTask(card1)
+    const task2 = this.vmTransformer.mapCardToTask(card2)
+    return this.modelListener.stageSortFunction(task1, task2)
   }
 }
