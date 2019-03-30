@@ -7,8 +7,9 @@ module.exports = function(options = {}) {
     const { app, result } = context
     const projectService = app.service('projects')
     const stageService = app.service('stages')
+    const taskService = app.service('tasks')
 
-    const defaultStages = [
+    const stages = [
       {
         name: 'To do'
       },
@@ -19,15 +20,35 @@ module.exports = function(options = {}) {
         name: 'Done'
       }
     ]
+
     const stageOptions = {
       query: {
         projectId: result.id
       }
     }
 
-    await Promise.all(
-      defaultStages.map((s) => stageService.create(s, stageOptions))
+    const stagesRes = await Promise.all(
+      stages.map((s) => stageService.create(s, stageOptions))
     )
+
+    const tasks = [
+      {
+        name: 'Research backend architecture',
+        description: 'Google it'
+      },
+      {
+        name: 'Cleanup code',
+        description: 'Apply a design pattern'
+      }
+    ]
+
+    const taskOptions = {
+      query: {
+        stageId: stagesRes[0].id
+      }
+    }
+
+    await Promise.all(tasks.map((t) => taskService.create(t, taskOptions)))
 
     context.result = await projectService.get(result.id)
 
