@@ -2,12 +2,14 @@ const { authenticate } = require('@feathersjs/authentication').hooks
 const createProject = require('../../hooks/create-project')
 const includeAssociationsForced = require('../../hooks/include-associations-forced')
 
+const populateProject = require('../../hooks/populate-project')
+
 module.exports = {
   before: {
     all: [authenticate('jwt')],
     find: [],
     get: [],
-    create: [createProject()],
+    create: [createProject(), populateProject()],
     update: [],
     patch: [],
     remove: []
