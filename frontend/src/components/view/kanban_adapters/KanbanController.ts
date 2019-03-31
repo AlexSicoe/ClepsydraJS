@@ -42,7 +42,6 @@ export default class KanbanController {
   constructor(public data: IBoardData) {}
 
   setEventBus = (eventBus: any) => {
-    console.log('SET EVENT BUS')
     this.eventBus = eventBus
   }
 

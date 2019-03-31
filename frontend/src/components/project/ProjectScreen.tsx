@@ -8,9 +8,8 @@ import BackButton from '../view/BackButton'
 import LoadingScreen from '../view/LoadingScreen'
 import LogoutButton from '../view/LogoutButton'
 import SimpleAppBar from '../view/SimpleAppBar'
+import KanbanBoard from './KanbanBoard'
 import MemberList from './MemberList'
-import { IStage } from '../../stores/model-interfaces'
-import { toJS } from 'mobx'
 interface IInjectedProps {
   projectStore: ProjectStore
   match: any
@@ -47,7 +46,7 @@ class ProjectScreen extends Component<any, any> {
       )
     }
 
-    console.log('STAGES', toJS<IStage[]>(projectStore.stages))
+    // console.log('STAGES', toJS<IStage[]>(projectStore.stages))
 
     return (
       <>
@@ -56,6 +55,7 @@ class ProjectScreen extends Component<any, any> {
         </SimpleAppBar>
 
         <MemberList users={projectStore.users} />
+        <KanbanBoard />
 
         <BackButton callback={this.goBack} />
       </>

@@ -30,8 +30,8 @@ export default class ModelViewTransformer implements IModelViewTransformer {
   }
 
   mapStagesToBoardData = (stages: IStage[]) => {
-    console.log('STAGES')
-    console.log(stages)
+    // console.log('STAGES')
+    // console.log(stages)
     const lanes = stages.map((s) => this.mapStageToLane(s))
     return { lanes }
   }
