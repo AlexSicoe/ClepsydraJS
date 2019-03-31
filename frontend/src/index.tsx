@@ -29,7 +29,8 @@ const projectStore = new ProjectStore(
   app,
   projectService,
   memberService,
-  userService
+  userService,
+  stageService
 )
 
 const stores = {

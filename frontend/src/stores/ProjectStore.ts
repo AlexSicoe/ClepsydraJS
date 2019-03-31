@@ -1,5 +1,5 @@
 import { Application, Service } from '@feathersjs/feathers'
-import { action, IObservableArray, observable } from 'mobx'
+import { action, IObservableArray, observable, runInAction } from 'mobx'
 import { PromiseState, SocketEvent } from '../util/enums'
 import { safeSet } from '../util/functions'
 import { notifyError, notifySuccess } from '../util/notification-factories'
@@ -19,7 +19,8 @@ export default class ProjectStore {
     app: Application<any>,
     private projectService: Service<IProject>,
     private memberService: Service<IMember>,
-    private userService: Service<IUser>
+    private userService: Service<IUser>,
+    private stageService: Service<IStage>
   ) {
     app.on('logout', () => this.reset())
 
@@ -95,6 +96,24 @@ export default class ProjectStore {
     this.users = this.users.filter((u) => u.id !== userId)
   }
 
+  getStages = async (stages: IStage[]) => {
+    const params = {
+      query: { $include: 'true' }
+    }
+
+    try {
+      this.state = PENDING
+      stages = await Promise.all(
+        stages.map((s) => this.stageService.get(s.id, params))
+      )
+      this.state = DONE
+      return stages
+    } catch (err) {
+      this.state = ERROR
+      notifyError(err)
+    }
+  }
+
   get = async (id: number) => {
     const params = {
       query: { $include: 'true' }
@@ -104,6 +123,7 @@ export default class ProjectStore {
       this.state = PENDING
       const project = await this.projectService.get(id, params)
       this.state = DONE
+      project.stages = (await this.getStages(project.stages)) as IStage[]
       this.set(project)
     } catch (err) {
       this.state = ERROR
