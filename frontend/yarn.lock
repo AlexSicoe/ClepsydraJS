@@ -1031,6 +1031,11 @@
   resolved "https://registry.yarnpkg.com/@terebentina/react-popover/-/react-popover-2.0.0.tgz#46a46052a889d423646daa1057bbb07879d19908"
   integrity sha1-RqRgUqiJ1CNkbaoQV7uweHnRmQg=
 
+"@types/classnames@^2.2.7":
+  version "2.2.7"
+  resolved "https://registry.yarnpkg.com/@types/classnames/-/classnames-2.2.7.tgz#fb68cc9be8487e6ea5b13700e759bfbab7e0fefd"
+  integrity sha512-rzOhiQ55WzAiFgXRtitP/ZUT8iVNyllEpylJ5zHzR4vArUvMB39GTk+Zon/uAM0JxEFAWnwsxC2gH8s+tZ3Myg==
+
 "@types/feathersjs__authentication-client@*", "@types/feathersjs__authentication-client@^1.0.5":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@types/feathersjs__authentication-client/-/feathersjs__authentication-client-1.0.5.tgz#732c645dc16b5cb00367e2f811e869eb99d439e8"

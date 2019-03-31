@@ -10,6 +10,7 @@ import LogoutButton from '../view/LogoutButton'
 import SimpleAppBar from '../view/SimpleAppBar'
 import KanbanBoard from './KanbanBoard'
 import MemberList from './MemberList'
+import { IDrawerItem } from '../view/MyDrawer'
 interface IInjectedProps {
   projectStore: ProjectStore
   match: any
@@ -19,6 +20,24 @@ interface IInjectedProps {
 @inject('projectStore')
 @observer
 class ProjectScreen extends Component<any, any> {
+  drawerItems: IDrawerItem[] = [
+    {
+      text: 'Kanban Board',
+      iconType: 'Dashboard',
+      handleClick: () => console.log('Redirect to Kanban board')
+    },
+    {
+      text: 'Members',
+      iconType: 'People',
+      handleClick: () => console.log('Redirect to Member list')
+    },
+    {
+      text: 'Settings',
+      iconType: 'Settings',
+      handleClick: () => console.log('Redirect to Settings')
+    }
+  ]
+
   get injected() {
     return this.props as IInjectedProps
   }
@@ -50,7 +69,7 @@ class ProjectScreen extends Component<any, any> {
 
     return (
       <>
-        <SimpleAppBar title={projectStore.name}>
+        <SimpleAppBar title={projectStore.name} drawerItems={this.drawerItems}>
           <LogoutButton />
         </SimpleAppBar>
 
