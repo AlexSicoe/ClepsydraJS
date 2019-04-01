@@ -7,34 +7,49 @@ import { PromiseState } from '../../util/enums'
 import BackButton from '../view/BackButton'
 import LoadingScreen from '../view/LoadingScreen'
 import LogoutButton from '../view/LogoutButton'
+import { IDrawerItem } from '../view/MyDrawer'
 import SimpleAppBar from '../view/SimpleAppBar'
 import KanbanBoard from './KanbanBoard'
 import MemberList from './MemberList'
-import { IDrawerItem } from '../view/MyDrawer'
-interface IInjectedProps {
+
+enum Fragment {
+  KanbanBoard = 'KanbanBoard',
+  MemberList = 'MemberList',
+  Settings = 'Settings'
+}
+interface IProps {}
+interface IInjectedProps extends IProps {
   projectStore: ProjectStore
   match: any
   history: History
 }
 
+interface IState {
+  fragment: Fragment
+}
+
 @inject('projectStore')
 @observer
-class ProjectScreen extends Component<any, any> {
+class ProjectScreen extends Component<IProps, IState> {
+  state = {
+    fragment: Fragment.KanbanBoard
+  }
+
   drawerItems: IDrawerItem[] = [
     {
       text: 'Kanban Board',
       iconType: 'Dashboard',
-      handleClick: () => console.log('Redirect to Kanban board')
+      handleClick: () => this.setState({ fragment: Fragment.KanbanBoard })
     },
     {
       text: 'Members',
       iconType: 'People',
-      handleClick: () => console.log('Redirect to Member list')
+      handleClick: () => this.setState({ fragment: Fragment.MemberList })
     },
     {
       text: 'Settings',
       iconType: 'Settings',
-      handleClick: () => console.log('Redirect to Settings')
+      handleClick: () => this.setState({ fragment: Fragment.Settings })
     }
   ]
 
@@ -54,6 +69,23 @@ class ProjectScreen extends Component<any, any> {
     this.handleFetch()
   }
 
+  renderFragment = () => {
+    const { fragment } = this.state
+    const { projectStore } = this.injected
+
+    switch (fragment) {
+      case Fragment.KanbanBoard:
+        return <KanbanBoard />
+      case Fragment.MemberList:
+        return <MemberList users={projectStore.users} />
+      case Fragment.Settings:
+        console.warn('Settings component not implemented!')
+        break
+      default:
+        console.warn('Fragment case not implemented!')
+    }
+  }
+
   render() {
     const { projectStore } = this.injected
 
@@ -70,13 +102,11 @@ class ProjectScreen extends Component<any, any> {
     return (
       <>
         <SimpleAppBar title={projectStore.name} drawerItems={this.drawerItems}>
+          <BackButton callback={this.goBack} />
           <LogoutButton />
         </SimpleAppBar>
 
-        <MemberList users={projectStore.users} />
-        <KanbanBoard />
-
-        <BackButton callback={this.goBack} />
+        {this.renderFragment()}
       </>
     )
   }
