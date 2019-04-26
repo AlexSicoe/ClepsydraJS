@@ -1,4 +1,4 @@
-import React, { useState, ReactChild, FunctionComponent } from 'react'
+import React, { useState, FunctionComponent } from 'react'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
@@ -49,7 +49,11 @@ const SimpleAppBar: FunctionComponent<IProps> = ({
       <AppBar position="static">
         <Toolbar>
           <IconButton
-            className={classNames(classes.menuButton, open && classes.hide)}
+            // className={classNames(classes.menuButton, open && classes.hide)}
+            className={classNames(
+              classes.menuButton,
+              window.open && classes.hide
+            )}
             color="inherit"
             aria-label="Menu"
             onClick={openDrawer}
