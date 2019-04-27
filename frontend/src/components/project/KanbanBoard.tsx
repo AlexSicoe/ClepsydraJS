@@ -7,11 +7,11 @@ import KanbanWrapper from '../view/kanban_adapters/KanbanWrapper'
 import { IStage } from '../../stores/model-interfaces'
 import { toJS } from 'mobx'
 
-interface IProps {}
-
-interface IInjectedProps extends IProps {
-  projectStore: ProjectStore
+interface IProps {
+  stages: IStage[]
 }
+
+interface IInjectedProps extends IProps {}
 
 interface IState {
   // TODO
@@ -27,8 +27,10 @@ export default class KanbanBoard extends Component<IProps, IState> {
 
     this.state = {}
 
-    const { projectStore } = this.injected
-    this.wrapper = new KanbanWrapper(projectStore.stages)
+    console.log('====STAGES====')
+    console.log(toJS(props.stages))
+    console.log('==============')
+    this.wrapper = new KanbanWrapper(props.stages)
   }
 
   get injected() {
@@ -37,8 +39,12 @@ export default class KanbanBoard extends Component<IProps, IState> {
 
   render() {
     const { wrapper } = this
-    const { projectStore } = this.injected
-    // wrapper.updateStages()
+    const { stages } = this.props
+
+    if (wrapper.eventBus) {
+      wrapper.updateStages(stages)
+    }
+
     return (
       <div>
         <Board

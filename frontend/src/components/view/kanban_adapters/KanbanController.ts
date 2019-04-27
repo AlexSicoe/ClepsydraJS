@@ -31,6 +31,7 @@ export interface IEventBus {
 export interface IKanbanController {
   data: IBoardData
   setEventBus: (eventBus: any) => void
+  getEventBus: () => any
   addCard: (card: ICard, laneId: ID) => void
   moveCard: (cardId: ID, fromLaneId: ID, toLaneId: ID, index?: number) => void
   removeCard: (cardId: ID, laneId: ID, index?: number) => void
@@ -43,6 +44,10 @@ export default class KanbanController {
 
   setEventBus = (eventBus: any) => {
     this.eventBus = eventBus
+  }
+
+  getEventBus = () => {
+    return this.eventBus
   }
 
   addCard = (card: ICard, laneId: ID) => {

@@ -45,17 +45,20 @@ export default class KanbanWrapper implements IKanbanWrapper, IViewListener {
   private modelListener: IModelListener
   private controller: IKanbanController
 
-  constructor(private stages: IStage[]) {
+  constructor(stages: IStage[]) {
     this.mvTransformer = new ModelViewTransformer()
     this.vmTransformer = new ViewModelTransformer()
     this.modelListener = new ModelListener()
-    this.controller = new KanbanController(
-      this.mvTransformer.mapStagesToBoardData(stages)
-    )
+    const boardData = this.mvTransformer.mapStagesToBoardData(stages)
+    this.controller = new KanbanController(boardData)
   }
 
   get data() {
     return this.controller.data
+  }
+
+  get eventBus() {
+    return this.controller.getEventBus()
   }
 
   setEventBus = (eventBus: any) => this.controller.setEventBus(eventBus)
