@@ -75,7 +75,7 @@ class ProjectScreen extends Component<IProps, IState> {
 
     switch (fragment) {
       case Fragment.KanbanBoard:
-        return <KanbanBoard stages={projectStore.stages} />
+        return <KanbanBoard projectStore={projectStore} />
       case Fragment.MemberList:
         return <MemberList users={projectStore.users} />
       case Fragment.Settings:

@@ -3,16 +3,15 @@ import React, { Component } from 'react'
 import Board from 'react-trello'
 import { IStage } from '../../stores/model-interfaces'
 import KanbanWrapper from '../view/kanban_adapters/KanbanWrapper'
+import ProjectStore from '../../stores/ProjectStore'
 
 interface IProps {
-  stages: IStage[]
+  projectStore: ProjectStore
 }
 
 interface IInjectedProps extends IProps {}
 
-interface IState {
-  // TODO
-}
+interface IState {}
 
 export default class KanbanBoard extends Component<IProps, IState> {
   wrapper: KanbanWrapper
@@ -25,7 +24,7 @@ export default class KanbanBoard extends Component<IProps, IState> {
     // console.log('====STAGES====')
     // console.log(toJS(props.stages))
     // console.log('==============')
-    this.wrapper = new KanbanWrapper(props.stages)
+    this.wrapper = new KanbanWrapper(props.projectStore.stages)
   }
 
   get injected() {
@@ -34,7 +33,7 @@ export default class KanbanBoard extends Component<IProps, IState> {
 
   render() {
     const { wrapper } = this
-    const { stages } = this.props
+    const { stages } = this.props.projectStore
 
     if (wrapper.eventBus) {
       wrapper.updateStages(stages)

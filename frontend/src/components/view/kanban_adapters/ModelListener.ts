@@ -1,5 +1,6 @@
 import { IStage, ITask } from '../../../stores/model-interfaces'
 import { ID } from '../../../util/types'
+import ProjectStore from '../../../stores/ProjectStore'
 
 export interface IModelListener {
   onStagesChange: (stages: IStage[]) => void
