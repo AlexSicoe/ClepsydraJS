@@ -6,7 +6,7 @@ import KanbanController, {
   IKanbanController,
   ILane
 } from './KanbanController'
-import ModelListener, { IModelListener } from './ModelListener'
+import { IModelListener } from './ModelListener'
 import ModelViewTransformer, {
   IModelViewTransformer
 } from './transformers/ModelViewTransformer'

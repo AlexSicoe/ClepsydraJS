@@ -4,6 +4,7 @@ import { PromiseState, SocketEvent } from '../util/enums'
 import { safeSet } from '../util/functions'
 import { notifyError, notifySuccess } from '../util/notification-factories'
 import { IMember, IProject, IStage, ITask, IUser } from './model-interfaces'
+import { ID } from '../util/types'
 const { PENDING, DONE, ERROR } = PromiseState
 const { Created, Updated, Patched, Removed } = SocketEvent
 
@@ -20,7 +21,10 @@ export default class ProjectStore {
     private projectService: Service<IProject>,
     private memberService: Service<IMember>,
     private userService: Service<IUser>,
-    private stageService: Service<IStage>
+    private stageService: Service<IStage>,
+    private taskService: Service<ITask>,
+    private swapTasksService: Service<any>,
+    private swapStagesService: Service<any>
   ) {
     app.on('logout', () => this.reset())
 
@@ -228,6 +232,86 @@ export default class ProjectStore {
       const user = await this.userService.get(member.userId, params)
       user.members = member // TODO make an adapter
       this.upsertUser(user)
+      this.state = DONE
+    } catch (err) {
+      this.state = ERROR
+      notifyError(err)
+    }
+  }
+
+  addTask = async (stageId: ID, task: Partial<ITask>) => {
+    const params = {
+      stageId
+    }
+
+    try {
+      this.state = PENDING
+      await this.taskService.create(task, params)
+      this.state = DONE
+    } catch (err) {
+      this.state = ERROR
+      notifyError(err)
+    }
+  }
+
+  updateTask = async (id: ID, task: ITask) => {
+    try {
+      this.state = PENDING
+      await this.taskService.update(id, task)
+      this.state = DONE
+    } catch (err) {
+      this.state = ERROR
+      notifyError(err)
+    }
+  }
+
+  patchTask = async (id: ID, task: Partial<ITask>) => {
+    try {
+      this.state = PENDING
+      await this.taskService.patch(id, task)
+      this.state = DONE
+    } catch (err) {
+      this.state = ERROR
+      notifyError(err)
+    }
+  }
+
+  removeTask = async (taskId: ID) => {
+    try {
+      this.state = PENDING
+      await this.taskService.remove(taskId)
+      this.state = DONE
+    } catch (err) {
+      this.state = ERROR
+      notifyError(err)
+    }
+  }
+
+  swapTasks = async (sourceId: ID, targetId: ID) => {
+    const params = {
+      sourceId,
+      targetId
+    }
+
+    try {
+      this.state = PENDING
+      await this.swapTasksService.patch(null, {}, params)
+      this.state = DONE
+    } catch (err) {
+      this.state = ERROR
+      notifyError(err)
+    }
+  }
+
+  swapStages = async (sourceId: ID, targetId: ID) => {
+    const params = {
+      sourceId,
+      targetId
+    }
+
+    try {
+      this.state = PENDING
+      await this.swapStagesService.patch(null, {}, params)
       this.state = DONE
     } catch (err) {
       this.state = ERROR

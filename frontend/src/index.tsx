@@ -15,6 +15,8 @@ const memberService = app.service('members')
 const stageService = app.service('stages')
 const taskService = app.service('tasks')
 const userTaskService = app.service('user-tasks')
+const swapTasksService = app.service('swap-tasks')
+const swapStagesService = app.service('swap-stages')
 
 const authStore = new AuthStore(app, userService)
 const userStore = new UserStore(
@@ -30,7 +32,10 @@ const projectStore = new ProjectStore(
   projectService,
   memberService,
   userService,
-  stageService
+  stageService,
+  taskService,
+  swapTasksService,
+  swapStagesService
 )
 
 const stores = {

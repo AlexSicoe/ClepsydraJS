@@ -28,8 +28,7 @@ export default class ModelListener implements IModelListener {
   }
 
   onTaskAdd = (task: ITask, stageId: ID) => {
-    console.log(`NEW TASK ADDED ON STAGE ${stageId}`)
-    console.log(task)
+    this.projectStore.addTask(stageId, task)
   }
 
   onTaskClick = (taskId: ID, metadata: any, stageId: ID) => {
@@ -40,31 +39,24 @@ export default class ModelListener implements IModelListener {
   }
 
   onTaskDelete = (taskId: ID, stageId: ID) => {
-    console.log('TASK DELETED')
-    console.log(`taskId: ${taskId}`)
-    console.log(`stageId: ${stageId}`)
+    this.projectStore.removeTask(taskId)
   }
+
   onStageClick = (stageId: ID) => {
     console.log('STAGE CLICKED')
     console.log(`stageId: ${stageId}`)
   }
 
   onTaskDragStart = (taskId: ID, stageId: ID) => {
-    // console.log('TASK DRAG STARTED')
-    // console.log(`taskId: ${taskId}`)
-    // console.log(`stageId: ${stageId}`)
+    //
   }
 
   onTaskDragEnd = (taskId: ID, fromStageId: ID, toStageId: ID) => {
-    console.log('TASK DRAG ENDED')
-    console.log(`taskId: ${taskId}`)
-    console.log(`fromStageId: ${fromStageId}`)
-    console.log(`toStageId: ${toStageId}`)
+    this.projectStore.swapTasks(fromStageId, toStageId)
   }
 
   onStageDragStart = (stageId: ID) => {
-    // console.log('STAGE DRAG STARTED')
-    // console.log(`stageId: ${stageId}`)
+    //
   }
 
   onStageDragEnd = (
@@ -72,15 +64,12 @@ export default class ModelListener implements IModelListener {
     newPosition: number,
     stage: IStage
   ) => {
-    console.log('STAGE DRAG ENDED')
-    console.log(`oldPosition: ${oldPosition}`)
-    console.log(`newPosition: ${newPosition}`)
-    console.log('stage:', stage)
+    this.projectStore.swapStages(oldPosition, newPosition)
   }
 
   stageSortFunction = (task1: ITask, task2: ITask) => {
     const pos1 = task1.position
     const pos2 = task2.position
-    return pos1 < pos2 ? -1 : 1
+    return pos1 - pos2
   }
 }
