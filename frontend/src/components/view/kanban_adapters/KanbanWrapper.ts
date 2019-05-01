@@ -42,13 +42,11 @@ export interface IViewListener {
 export default class KanbanWrapper implements IKanbanWrapper, IViewListener {
   private mvTransformer: IModelViewTransformer
   private vmTransformer: IViewModelTransformer
-  private modelListener: IModelListener
   private controller: IKanbanController
 
-  constructor(stages: IStage[]) {
+  constructor(stages: IStage[], private modelListener: IModelListener) {
     this.mvTransformer = new ModelViewTransformer()
     this.vmTransformer = new ViewModelTransformer()
-    this.modelListener = new ModelListener()
     const boardData = this.mvTransformer.mapStagesToBoardData(stages)
     this.controller = new KanbanController(boardData)
   }

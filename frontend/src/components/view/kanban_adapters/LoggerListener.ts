@@ -1,27 +1,8 @@
 import { IStage, ITask } from '../../../stores/model-interfaces'
 import { ID } from '../../../util/types'
-import ProjectStore from '../../../stores/ProjectStore'
+import { IModelListener } from './ModelListener'
 
-export interface IModelListener {
-  onStagesChange: (stages: IStage[]) => void
-  onTaskAdd: (task: ITask, stageId: ID) => void
-  onTaskClick: (taskId: ID, metadata: any, stageId: ID) => void
-  onTaskDelete: (taskId: ID, stageId: ID) => void
-  onStageClick: (stageId: ID) => void
-  onTaskDragStart: (taskId: ID, stageId: ID) => void
-  onTaskDragEnd: (taskId: ID, fromStageId: ID, toStageId: ID) => void
-  onStageDragStart: (stageId: ID) => void
-  onStageDragEnd: (
-    oldPosition: number,
-    newPosition: number,
-    stage: IStage
-  ) => void
-  stageSortFunction: (task1: ITask, task2: ITask) => number
-}
-
-export default class ModelListener implements IModelListener {
-  constructor(private projectStore: ProjectStore) {}
-
+export default class LoggerListener implements IModelListener {
   onStagesChange = (stages: IStage[]) => {
     console.log('STAGE DATA CHANGED')
     console.log(stages)

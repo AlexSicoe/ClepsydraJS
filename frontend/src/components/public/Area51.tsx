@@ -3,6 +3,9 @@ import React, { Component } from 'react'
 import Board from 'react-trello'
 import { IStage, ITask } from '../../stores/model-interfaces'
 import KanbanWrapper from '../view/kanban_adapters/KanbanWrapper'
+import LoggerListener from '../view/kanban_adapters/LoggerListener'
+
+interface IProps {}
 
 const mockData: IStage[] = [
   {
@@ -74,7 +77,13 @@ const newData: IStage[] = [
 ]
 
 export default class Area51 extends Component<any, any> {
-  wrapper = new KanbanWrapper(mockData)
+  wrapper: KanbanWrapper
+
+  constructor(props: IProps) {
+    super(props)
+    const loggerListener = new LoggerListener()
+    this.wrapper = new KanbanWrapper(mockData, loggerListener)
+  }
 
   componentWillMount() {
     this.simulateUpdates()

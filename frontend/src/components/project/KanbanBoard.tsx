@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 // @ts-ignore
 import Board from 'react-trello'
-import { IStage } from '../../stores/model-interfaces'
-import KanbanWrapper from '../view/kanban_adapters/KanbanWrapper'
 import ProjectStore from '../../stores/ProjectStore'
+import KanbanWrapper from '../view/kanban_adapters/KanbanWrapper'
+import ModelListener from '../view/kanban_adapters/ModelListener'
 
 interface IProps {
   projectStore: ProjectStore
@@ -19,12 +19,10 @@ export default class KanbanBoard extends Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
 
-    this.state = {}
+    const { projectStore } = props
+    const modelListener = new ModelListener(projectStore)
 
-    // console.log('====STAGES====')
-    // console.log(toJS(props.stages))
-    // console.log('==============')
-    this.wrapper = new KanbanWrapper(props.projectStore.stages)
+    this.wrapper = new KanbanWrapper(projectStore.stages, modelListener)
   }
 
   get injected() {
