@@ -1,11 +1,8 @@
-import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
 // @ts-ignore
 import Board from 'react-trello'
-import ProjectStore from '../../stores/ProjectStore'
-import KanbanWrapper from '../view/kanban_adapters/KanbanWrapper'
 import { IStage } from '../../stores/model-interfaces'
-import { toJS } from 'mobx'
+import KanbanWrapper from '../view/kanban_adapters/KanbanWrapper'
 
 interface IProps {
   stages: IStage[]
@@ -17,8 +14,6 @@ interface IState {
   // TODO
 }
 
-@inject('projectStore')
-@observer
 export default class KanbanBoard extends Component<IProps, IState> {
   wrapper: KanbanWrapper
 
@@ -27,9 +22,9 @@ export default class KanbanBoard extends Component<IProps, IState> {
 
     this.state = {}
 
-    console.log('====STAGES====')
-    console.log(toJS(props.stages))
-    console.log('==============')
+    // console.log('====STAGES====')
+    // console.log(toJS(props.stages))
+    // console.log('==============')
     this.wrapper = new KanbanWrapper(props.stages)
   }
 
