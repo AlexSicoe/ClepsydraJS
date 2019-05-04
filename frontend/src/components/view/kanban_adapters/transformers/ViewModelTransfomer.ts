@@ -8,12 +8,14 @@ export interface IViewModelTransformer {
 
 export default class ViewModelTransformer implements IViewModelTransformer {
   mapCardToTask = (card: ICard): ITask => {
+    // if (card.metadata === undefined) throw new Error(`Card has no metadata`)
+
     return {
       id: card.id as number,
       name: card.title,
       description: card.description,
       stageId: card.laneId as number,
-      position: card.metadata!.position!
+      position: (card.metadata && card.metadata.position) || 0
     }
   }
 

@@ -31,11 +31,18 @@ export interface IViewListener {
   onCardAdd: (card: ICard, laneId: ID) => void
   onCardClick: (cardId: ID, metadata: any, laneId: ID) => void
   onCardDelete: (cardId: ID, laneId: ID) => void
+  onLaneAdd: (params: any) => void
   onLaneClick: (laneId: ID) => void
   onDragStart: (cardId: ID, laneId: ID) => void
-  onDragEnd: (cardId: ID, sourceLaneId: ID, targetLaneId: ID) => void
+  onDragEnd: (
+    cardId: ID,
+    sourceLaneId: ID,
+    targetLaneId: ID,
+    position: number,
+    cardDetails: any
+  ) => void
   onLaneDragStart: (laneId: ID) => void
-  onLaneDragEnd: (oldPosition: number, newPositon: number, lane: ILane) => void
+  onLaneDragEnd: (oldPosition: number, newPositon: number, lane: ILane) => void // TODO test
   laneSortFunction: (card1: ICard, card2: ICard) => number
 }
 
@@ -108,11 +115,28 @@ export default class KanbanAdapter implements IKanbanAdapter, IViewListener {
     this.modelListener.onStageClick(laneId)
   }
 
+  onLaneAdd = (params: any) => {
+    console.log(params)
+  }
+
   onDragStart = (cardId: ID, laneId: ID) => {
     this.modelListener.onTaskDragStart(cardId, laneId)
   }
 
-  onDragEnd = (cardId: ID, sourceLaneId: ID, targetLaneId: ID) => {
+  onDragEnd = (
+    cardId: ID,
+    sourceLaneId: ID,
+    targetLaneId: ID,
+    position: number,
+    cardDetails: any
+  ) => {
+    console.log('====DEBUG====')
+    console.log(`cardId: ${cardId}`)
+    console.log(`sourceLaneId: ${sourceLaneId}`)
+    console.log(`targetLaneId: ${targetLaneId}`)
+    console.log(`position: ${position}`)
+    console.dir(`cardDetails: ${cardDetails}`)
+    console.log(cardDetails)
     this.modelListener.onTaskDragEnd(cardId, sourceLaneId, targetLaneId)
   }
 

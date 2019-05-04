@@ -123,6 +123,7 @@ export default class Area51 extends Component<any, any> {
           onCardAdd={adapter.onCardAdd}
           onCardClick={adapter.onCardClick}
           onCardDelete={adapter.onCardDelete}
+          onLaneAdd={adapter.onLaneAdd}
           onLaneClick={adapter.onLaneClick}
           handleDragStart={adapter.onDragStart}
           handleDragEnd={adapter.onDragEnd}

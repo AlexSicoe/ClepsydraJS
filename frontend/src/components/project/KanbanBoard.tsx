@@ -51,6 +51,7 @@ export default class KanbanBoard extends Component<IProps, IState> {
           onCardAdd={adapter.onCardAdd}
           onCardClick={adapter.onCardClick}
           onCardDelete={adapter.onCardDelete}
+          onLaneAdd={adapter.onLaneAdd}
           onLaneClick={adapter.onLaneClick}
           handleDragStart={adapter.onDragStart}
           handleDragEnd={adapter.onDragEnd}

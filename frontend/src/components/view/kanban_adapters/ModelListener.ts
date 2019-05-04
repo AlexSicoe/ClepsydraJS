@@ -36,6 +36,7 @@ export default class ModelListener implements IModelListener {
     console.log(`taskId: ${taskId}`)
     console.log(`stageId: ${stageId}`)
     console.log(`metadata: ${metadata}`)
+    console.log(metadata)
   }
 
   onTaskDelete = (taskId: ID, stageId: ID) => {

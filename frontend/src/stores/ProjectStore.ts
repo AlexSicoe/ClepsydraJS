@@ -241,11 +241,12 @@ export default class ProjectStore {
 
   addTask = async (stageId: ID, task: Partial<ITask>) => {
     const params = {
-      stageId
+      query: { stageId }
     }
 
     try {
       this.state = PENDING
+      delete task.id
       await this.taskService.create(task, params)
       this.state = DONE
     } catch (err) {
