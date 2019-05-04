@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 // @ts-ignore
 import Board from 'react-trello'
 import ProjectStore from '../../stores/ProjectStore'
-import KanbanWrapper from '../view/kanban_adapters/KanbanWrapper'
+import KanbanAdapter from '../view/kanban_adapters/KanbanAdapter'
 import ModelListener from '../view/kanban_adapters/ModelListener'
 
 interface IProps {
@@ -14,7 +14,7 @@ interface IInjectedProps extends IProps {}
 interface IState {}
 
 export default class KanbanBoard extends Component<IProps, IState> {
-  wrapper: KanbanWrapper
+  adapter: KanbanAdapter
 
   constructor(props: IProps) {
     super(props)
@@ -22,7 +22,7 @@ export default class KanbanBoard extends Component<IProps, IState> {
     const { projectStore } = props
     const modelListener = new ModelListener(projectStore)
 
-    this.wrapper = new KanbanWrapper(projectStore.stages, modelListener)
+    this.adapter = new KanbanAdapter(projectStore.stages, modelListener)
   }
 
   get injected() {
@@ -30,11 +30,11 @@ export default class KanbanBoard extends Component<IProps, IState> {
   }
 
   render() {
-    const { wrapper } = this
+    const { adapter } = this
     const { stages } = this.props.projectStore
 
-    if (wrapper.eventBus) {
-      wrapper.updateStages(stages)
+    if (adapter.eventBus) {
+      adapter.updateStages(stages)
     }
 
     return (
@@ -44,18 +44,18 @@ export default class KanbanBoard extends Component<IProps, IState> {
           draggable
           canAddLanes
           // collapsibleLanes
-          data={wrapper.data}
-          eventBusHandle={wrapper.setEventBus}
-          laneSortFunction={wrapper.laneSortFunction}
-          onDataChange={wrapper.onDataChange}
-          onCardAdd={wrapper.onCardAdd}
-          onCardClick={wrapper.onCardClick}
-          onCardDelete={wrapper.onCardDelete}
-          onLaneClick={wrapper.onLaneClick}
-          handleDragStart={wrapper.onDragStart}
-          handleDragEnd={wrapper.onDragEnd}
-          handleLaneDragStart={wrapper.onLaneDragStart}
-          handleLaneDragEnd={wrapper.onLaneDragEnd}
+          data={adapter.data}
+          eventBusHandle={adapter.setEventBus}
+          laneSortFunction={adapter.laneSortFunction}
+          onDataChange={adapter.onDataChange}
+          onCardAdd={adapter.onCardAdd}
+          onCardClick={adapter.onCardClick}
+          onCardDelete={adapter.onCardDelete}
+          onLaneClick={adapter.onLaneClick}
+          handleDragStart={adapter.onDragStart}
+          handleDragEnd={adapter.onDragEnd}
+          handleLaneDragStart={adapter.onLaneDragStart}
+          handleLaneDragEnd={adapter.onLaneDragEnd}
         />
       </div>
     )

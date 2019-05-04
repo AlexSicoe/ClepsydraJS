@@ -14,7 +14,7 @@ import ViewModelTransformer, {
   IViewModelTransformer
 } from './transformers/ViewModelTransfomer'
 
-interface IKanbanWrapper {
+interface IKanbanAdapter {
   addTask: (task: ITask) => void
   moveTask: (
     taskId: ID,
@@ -39,7 +39,7 @@ export interface IViewListener {
   laneSortFunction: (card1: ICard, card2: ICard) => number
 }
 
-export default class KanbanWrapper implements IKanbanWrapper, IViewListener {
+export default class KanbanAdapter implements IKanbanAdapter, IViewListener {
   private mvTransformer: IModelViewTransformer
   private vmTransformer: IViewModelTransformer
   private controller: IKanbanController
@@ -81,7 +81,7 @@ export default class KanbanWrapper implements IKanbanWrapper, IViewListener {
 
   updateStages = (stages: IStage[]) => {
     const lanes = stages.map((s) => this.mvTransformer.mapStageToLane(s))
-    this.controller.updateData(lanes)
+    this.controller.updateLanes(lanes)
   }
 
   onDataChange = (nextData: IBoardData) => {

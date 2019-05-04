@@ -35,7 +35,7 @@ export interface IKanbanController {
   addCard: (card: ICard, laneId: ID) => void
   moveCard: (cardId: ID, fromLaneId: ID, toLaneId: ID, index?: number) => void
   removeCard: (cardId: ID, laneId: ID, index?: number) => void
-  updateData: (lanes: ILane[]) => void
+  updateLanes: (lanes: ILane[]) => void
 }
 export default class KanbanController {
   private eventBus: any
@@ -77,7 +77,7 @@ export default class KanbanController {
     })
   }
 
-  updateData = (lanes: ILane[]) => {
+  updateLanes = (lanes: ILane[]) => {
     this.eventBus.publish({
       type: 'UPDATE_LANES',
       lanes

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 // @ts-ignore
 import Board from 'react-trello'
 import { IStage, ITask } from '../../stores/model-interfaces'
-import KanbanWrapper from '../view/kanban_adapters/KanbanWrapper'
+import KanbanAdapter from '../view/kanban_adapters/KanbanAdapter'
 import LoggerListener from '../view/kanban_adapters/LoggerListener'
 
 interface IProps {}
@@ -77,12 +77,12 @@ const newData: IStage[] = [
 ]
 
 export default class Area51 extends Component<any, any> {
-  wrapper: KanbanWrapper
+  adapter: KanbanAdapter
 
   constructor(props: IProps) {
     super(props)
     const loggerListener = new LoggerListener()
-    this.wrapper = new KanbanWrapper(mockData, loggerListener)
+    this.adapter = new KanbanAdapter(mockData, loggerListener)
   }
 
   componentWillMount() {
@@ -90,7 +90,7 @@ export default class Area51 extends Component<any, any> {
   }
 
   simulateUpdates = () => {
-    const { wrapper } = this
+    const { adapter } = this
 
     const task: ITask = {
       id: 5,
@@ -99,14 +99,14 @@ export default class Area51 extends Component<any, any> {
       stageId: 2,
       position: 3
     }
-    setTimeout(() => wrapper.addTask(task), 1000)
-    setTimeout(() => wrapper.moveTask(5, 2, 1), 2000)
-    setTimeout(() => wrapper.updateStages(newData), 3000)
-    setTimeout(() => wrapper.removeTask(2, 2), 4000)
+    setTimeout(() => adapter.addTask(task), 1000)
+    setTimeout(() => adapter.moveTask(5, 2, 1), 2000)
+    setTimeout(() => adapter.updateStages(newData), 3000)
+    setTimeout(() => adapter.removeTask(2, 2), 4000)
   }
 
   render() {
-    const { wrapper } = this
+    const { adapter } = this
     return (
       <div>
         {/*
@@ -116,18 +116,18 @@ export default class Area51 extends Component<any, any> {
           draggable
           canAddLanes
           // collapsibleLanes
-          data={wrapper.data}
-          eventBusHandle={wrapper.setEventBus}
-          laneSortFunction={wrapper.laneSortFunction}
-          onDataChange={wrapper.onDataChange}
-          onCardAdd={wrapper.onCardAdd}
-          onCardClick={wrapper.onCardClick}
-          onCardDelete={wrapper.onCardDelete}
-          onLaneClick={wrapper.onLaneClick}
-          handleDragStart={wrapper.onDragStart}
-          handleDragEnd={wrapper.onDragEnd}
-          handleLaneDragStart={wrapper.onLaneDragStart}
-          handleLaneDragEnd={wrapper.onLaneDragEnd}
+          data={adapter.data}
+          eventBusHandle={adapter.setEventBus}
+          laneSortFunction={adapter.laneSortFunction}
+          onDataChange={adapter.onDataChange}
+          onCardAdd={adapter.onCardAdd}
+          onCardClick={adapter.onCardClick}
+          onCardDelete={adapter.onCardDelete}
+          onLaneClick={adapter.onLaneClick}
+          handleDragStart={adapter.onDragStart}
+          handleDragEnd={adapter.onDragEnd}
+          handleLaneDragStart={adapter.onLaneDragStart}
+          handleLaneDragEnd={adapter.onLaneDragEnd}
         />
       </div>
     )
