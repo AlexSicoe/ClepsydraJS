@@ -1,4 +1,5 @@
 const { authenticate } = require('@feathersjs/authentication').hooks
+const includeAssociationsForced = require('../../hooks/include-associations-forced')
 
 const handleStages = require('../../hooks/handle-stages')
 
@@ -17,7 +18,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [includeAssociationsForced()],
     update: [],
     patch: [],
     remove: []
