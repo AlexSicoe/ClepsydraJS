@@ -14,7 +14,7 @@ import ViewModelTransformer, {
   IViewModelTransformer
 } from './transformers/ViewModelTransfomer'
 
-interface IKanbanAdapter {
+export interface IKanbanAdapter {
   addTask: (task: ITask) => void
   moveTask: (
     taskId: ID,
@@ -22,7 +22,7 @@ interface IKanbanAdapter {
     toStageId: ID,
     position?: number
   ) => void
-  removeTask: (taskId: ID, stageId: ID, position?: number) => void
+  removeTask: (task: ITask) => void
   updateStages: (stages: IStage[]) => void
 }
 
@@ -82,11 +82,12 @@ export default class KanbanAdapter implements IKanbanAdapter, IViewListener {
     this.controller.moveCard(taskId, fromStageId, toStageId, position)
   }
 
-  removeTask = (taskId: ID, stageId: ID, position?: number) => {
-    this.controller.removeCard(taskId, stageId, position)
+  removeTask = (task: ITask) => {
+    this.controller.removeCard(task.id, task.stageId, task.position--)
   }
 
   updateStages = (stages: IStage[]) => {
+    console.log('updateStages called')
     const lanes = stages.map((s) => this.mvTransformer.mapStageToLane(s))
     this.controller.updateLanes(lanes)
   }

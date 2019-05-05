@@ -23,6 +23,7 @@ export default class KanbanBoard extends Component<IProps, IState> {
     const modelListener = new ModelListener(projectStore)
 
     this.adapter = new KanbanAdapter(projectStore.stages, modelListener)
+    projectStore.adapter = this.adapter // maybe not here
   }
 
   get injected() {

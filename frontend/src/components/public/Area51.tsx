@@ -99,10 +99,19 @@ export default class Area51 extends Component<any, any> {
       stageId: 2,
       position: 3
     }
+
+    const removedTask: ITask = {
+      id: 2,
+      name: '',
+      description: '',
+      stageId: 2,
+      position: 1
+    }
+
     setTimeout(() => adapter.addTask(task), 1000)
     setTimeout(() => adapter.moveTask(5, 2, 1), 2000)
     setTimeout(() => adapter.updateStages(newData), 3000)
-    setTimeout(() => adapter.removeTask(2, 2), 4000)
+    setTimeout(() => adapter.removeTask(removedTask), 4000)
   }
 
   render() {

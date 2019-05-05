@@ -5,6 +5,7 @@ import { safeSet } from '../util/functions'
 import { notifyError, notifySuccess } from '../util/notification-factories'
 import { IMember, IProject, IStage, ITask, IUser } from './model-interfaces'
 import { ID } from '../util/types'
+import { IKanbanAdapter } from '../components/view/kanban_adapters/KanbanAdapter'
 const { PENDING, DONE, ERROR } = PromiseState
 const { Created, Updated, Patched, Removed } = SocketEvent
 
@@ -14,6 +15,15 @@ export default class ProjectStore {
   @observable name: string = ''
   @observable users: IObservableArray<IUser> = observable([])
   @observable stages: IObservableArray<IStage> = observable([])
+  private _adapter?: IKanbanAdapter
+
+  set adapter(adapter: IKanbanAdapter) {
+    this._adapter = adapter
+  }
+
+  get adapter() {
+    if (this._adapter) return this._adapter
+  }
 
   constructor(
     app: Application<any>,
@@ -70,16 +80,28 @@ export default class ProjectStore {
 
     taskService.on(Created, (task: ITask) => {
       console.log('Task created', task)
-      const stage = this.stages.find((s) => s.id === task.stageId)
-      if (stage) {
-        stage.tasks.push(task)
+      if (this._adapter) {
+        this._adapter.addTask(task)
       }
+
+      const stage = this.stages.find((s) => s.id === task.stageId)
+      if (!stage) return
+      stage.tasks.push(task)
     })
 
     taskService.on(Updated, (task: ITask) => {
       console.log('Task updated', task)
       const stage = this.stages.find((s) => s.id === task.stageId)
       if (!stage) return
+
+      if (this._adapter) {
+        const oldTask = stage.tasks.find((t) => t.id === task.id)
+        if (oldTask) {
+          this._adapter.removeTask(oldTask)
+          this._adapter.addTask(task)
+        }
+      }
+
       stage.tasks = stage.tasks.map((t) => (t.id === task.id ? task : t))
     })
 
@@ -87,6 +109,15 @@ export default class ProjectStore {
       console.log('Task patched', task)
       const stage = this.stages.find((s) => s.id === task.stageId)
       if (!stage) return
+
+      if (this._adapter) {
+        const oldTask = stage.tasks.find((t) => t.id === task.id)
+        if (oldTask) {
+          this._adapter.removeTask(oldTask)
+          this._adapter.addTask(task)
+        }
+      }
+
       stage.tasks = stage.tasks.map((t) => (t.id === task.id ? task : t))
     })
 
@@ -94,6 +125,11 @@ export default class ProjectStore {
       console.log('Task removed', task)
       const stage = this.stages.find((s) => s.id === task.stageId)
       if (!stage) return
+
+      if (this._adapter) {
+        this._adapter.removeTask(task)
+      }
+
       stage.tasks = stage.tasks.filter((t) => t.id !== task.id)
     })
 
