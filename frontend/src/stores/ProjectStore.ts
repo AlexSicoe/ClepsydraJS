@@ -12,9 +12,8 @@ export default class ProjectStore {
   @observable state: PromiseState = PENDING
   @observable id?: number
   @observable name: string = ''
-  @observable users: IObservableArray<IUser> = [] as any
-  @observable stages: IObservableArray<IStage> = [] as any
-  @observable tasks: IObservableArray<ITask> = [] as any
+  @observable users: IObservableArray<IUser> = observable([])
+  @observable stages: IObservableArray<IStage> = observable([])
 
   constructor(
     app: Application<any>,
@@ -68,6 +67,62 @@ export default class ProjectStore {
       console.log('Member patched', member)
       await this.getUser(member)
     })
+
+    taskService.on(Created, (task: ITask) => {
+      console.log('Task created', task)
+      const stage = this.stages.find((s) => s.id === task.stageId)
+      if (stage) {
+        stage.tasks.push(task)
+      }
+    })
+
+    taskService.on(Updated, (task: ITask) => {
+      console.log('Task updated', task)
+      const stage = this.stages.find((s) => s.id === task.stageId)
+      if (!stage) return
+      stage.tasks = stage.tasks.map((t) => (t.id === task.id ? task : t))
+    })
+
+    taskService.on(Patched, (task: ITask) => {
+      console.log('Task patched', task)
+      const stage = this.stages.find((s) => s.id === task.stageId)
+      if (!stage) return
+      stage.tasks = stage.tasks.map((t) => (t.id === task.id ? task : t))
+    })
+
+    taskService.on(Removed, (task: ITask) => {
+      console.log('Task removed', task)
+      const stage = this.stages.find((s) => s.id === task.stageId)
+      if (!stage) return
+      stage.tasks = stage.tasks.filter((t) => t.id !== task.id)
+    })
+
+    stageService.on(Created, (stage: IStage) => {
+      console.log('Stage created', stage)
+      this.stages.push(stage)
+    })
+
+    stageService.on(Updated, (stage: IStage) => {
+      console.log('Stage updated', stage)
+
+      this.stages = observable(
+        this.stages.map((s) => (s.id === stage.id ? stage : s))
+      )
+    })
+
+    stageService.on(Patched, (stage: IStage) => {
+      console.log('Stage patched', stage)
+
+      this.stages = observable(
+        this.stages.map((s) => (s.id === stage.id ? stage : s))
+      )
+    })
+
+    stageService.on(Removed, (stage: IStage) => {
+      console.log('Stage removed', stage)
+
+      this.stages = observable(this.stages.filter((s) => s.id !== stage.id))
+    })
   }
 
   @action reset = () => {
@@ -76,7 +131,6 @@ export default class ProjectStore {
     this.name = ''
     this.users.clear()
     this.stages.clear()
-    this.tasks.clear()
   }
 
   @action set = (project: IProject) => {
@@ -96,8 +150,7 @@ export default class ProjectStore {
   }
 
   @action deleteUser = (userId: number) => {
-    // @ts-ignore
-    this.users = this.users.filter((u) => u.id !== userId)
+    this.users = observable(this.users.filter((u) => u.id !== userId))
   }
 
   getStages = async (stages: IStage[]) => {
