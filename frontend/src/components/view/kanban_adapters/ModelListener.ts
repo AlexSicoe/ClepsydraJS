@@ -7,6 +7,7 @@ export interface IModelListener {
   onTaskAdd: (task: ITask, stageId: ID) => void
   onTaskClick: (taskId: ID, metadata: any, stageId: ID) => void
   onTaskDelete: (taskId: ID, stageId: ID) => void
+  onStageAdd: (stage: IStage) => void
   onStageClick: (stageId: ID) => void
   onTaskDragStart: (taskId: ID, stageId: ID) => void
   onTaskDragEnd: (taskId: ID, fromStageId: ID, toStageId: ID) => void
@@ -41,6 +42,10 @@ export default class ModelListener implements IModelListener {
 
   onTaskDelete = (taskId: ID, stageId: ID) => {
     this.projectStore.removeTask(taskId)
+  }
+
+  onStageAdd = (stage: IStage) => {
+    this.projectStore.addStage(stage)
   }
 
   onStageClick = (stageId: ID) => {

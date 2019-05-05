@@ -25,6 +25,12 @@ export default class LoggerListener implements IModelListener {
     console.log(`taskId: ${taskId}`)
     console.log(`stageId: ${stageId}`)
   }
+
+  onStageAdd = (stage: IStage) => {
+    console.log('stage: ')
+    console.log(stage)
+  }
+
   onStageClick = (stageId: ID) => {
     console.log('STAGE CLICKED')
     console.log(`stageId: ${stageId}`)

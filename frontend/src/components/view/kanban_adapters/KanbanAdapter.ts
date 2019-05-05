@@ -39,7 +39,7 @@ export interface IViewListener {
     sourceLaneId: ID,
     targetLaneId: ID,
     position: number,
-    cardDetails: any
+    card: ICard
   ) => void
   onLaneDragStart: (laneId: ID) => void
   onLaneDragEnd: (oldPosition: number, newPositon: number, lane: ILane) => void // TODO test
@@ -115,8 +115,9 @@ export default class KanbanAdapter implements IKanbanAdapter, IViewListener {
     this.modelListener.onStageClick(laneId)
   }
 
-  onLaneAdd = (params: any) => {
-    console.log(params)
+  onLaneAdd = (lane: ILane) => {
+    const stage = this.vmTransformer.mapLaneToStage(lane)
+    this.modelListener.onStageAdd(stage)
   }
 
   onDragStart = (cardId: ID, laneId: ID) => {
@@ -128,16 +129,16 @@ export default class KanbanAdapter implements IKanbanAdapter, IViewListener {
     sourceLaneId: ID,
     targetLaneId: ID,
     position: number,
-    cardDetails: any
+    card: ICard
   ) => {
-    console.log('====DEBUG====')
-    console.log(`cardId: ${cardId}`)
-    console.log(`sourceLaneId: ${sourceLaneId}`)
-    console.log(`targetLaneId: ${targetLaneId}`)
-    console.log(`position: ${position}`)
-    console.dir(`cardDetails: ${cardDetails}`)
-    console.log(cardDetails)
-    this.modelListener.onTaskDragEnd(cardId, sourceLaneId, targetLaneId)
+    // const task = this.vmTransformer.mapCardToTask(card)
+    this.modelListener.onTaskDragEnd(
+      cardId,
+      sourceLaneId,
+      targetLaneId
+      // position,
+      // task,
+    )
   }
 
   onLaneDragStart = (laneId: ID) => {

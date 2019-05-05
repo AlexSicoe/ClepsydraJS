@@ -8,25 +8,23 @@ export interface IViewModelTransformer {
 
 export default class ViewModelTransformer implements IViewModelTransformer {
   mapCardToTask = (card: ICard): ITask => {
-    // if (card.metadata === undefined) throw new Error(`Card has no metadata`)
-
     return {
       id: card.id as number,
       name: card.title,
       description: card.description,
       stageId: card.laneId as number,
-      position: (card.metadata && card.metadata.position) || 0
+      position: (card.metadata && card.metadata.position) || undefined!
     }
   }
 
   mapLaneToStage = (lane: ILane): IStage => {
     return {
       id: lane.id as number,
-      name: lane.title,
-      taskLimit: 999, // TODO
-      tasks: lane.cards.map((c) => this.mapCardToTask(c)),
-      position: 0, // TODO
-      projectId: 0 // TODO
+      name: lane.title!,
+      taskLimit: undefined!, // TODO
+      tasks: (lane.cards && lane.cards.map((c) => this.mapCardToTask(c))) || [],
+      position: undefined!, // TODO
+      projectId: undefined! // TODO
     }
   }
 }

@@ -304,6 +304,21 @@ export default class ProjectStore {
     }
   }
 
+  addStage = async (stage: Partial<IStage>) => {
+    const params = {
+      query: { projectId: this.id }
+    }
+
+    try {
+      this.state = PENDING
+      await this.stageService.create(stage, params)
+      this.state = DONE
+    } catch (err) {
+      this.state = ERROR
+      notifyError(err)
+    }
+  }
+
   swapStages = async (sourceId: ID, targetId: ID) => {
     const params = {
       sourceId,
