@@ -17,11 +17,11 @@ export default class ProjectStore {
   @observable stages: IObservableArray<IStage> = observable([])
   private _adapter?: IKanbanAdapter
 
-  set adapter(adapter: IKanbanAdapter) {
+  setAdapter(adapter: IKanbanAdapter) {
     this._adapter = adapter
   }
 
-  get adapter() {
+  getAdapter() {
     if (this._adapter) return this._adapter
   }
 
