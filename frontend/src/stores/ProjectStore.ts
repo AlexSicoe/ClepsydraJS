@@ -379,8 +379,10 @@ export default class ProjectStore {
 
   swapTasks = async (sourceId: ID, targetId: ID) => {
     const params = {
-      sourceId,
-      targetId
+      query: {
+        sourceId,
+        targetId
+      }
     }
 
     try {
@@ -410,8 +412,10 @@ export default class ProjectStore {
 
   swapStages = async (sourceId: ID, targetId: ID) => {
     const params = {
-      sourceId,
-      targetId
+      query: {
+        sourceId,
+        targetId
+      }
     }
 
     try {
