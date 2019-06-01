@@ -8,10 +8,12 @@
     "@feathersjs/socketio-client": "^1.2.1",
     "@material-ui/core": "^3.9.2",
     "@material-ui/icons": "^3.0.2",
+    "chart.js": "^2.8.0",
     "lodash": "^4.17.11",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
     "react": "^16.8.6",
+    "react-chartjs-2": "^2.7.6",
     "react-dom": "^16.8.6",
     "react-router": "^5.0.0",
     "react-router-dom": "^5.0.0",
@@ -39,6 +41,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "@types/chart.js": "^2.7.53",
     "@types/classnames": "^2.2.7",
     "@types/feathersjs__authentication-client": "^1.0.5",
     "@types/feathersjs__feathers": "^3.1.2",
