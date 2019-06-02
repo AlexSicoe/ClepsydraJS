@@ -1,32 +1,44 @@
 // See http://docs.sequelizejs.com/en/latest/docs/models-definition/
 // for more of what you can do here.
 const Sequelize = require('sequelize')
-const DataTypes = Sequelize.DataTypes
+const { ENUM, INTEGER, DATE, NOW } = Sequelize.DataTypes
 
-module.exports = function(app) {
+module.exports = (app) => {
   const sequelizeClient = app.get('sequelizeClient')
-  const taskLogs = sequelizeClient.define(
-    'task_logs',
-    {
-      text: {
-        type: DataTypes.STRING,
-        allowNull: false
-      }
+  const attributes = {
+    type: {
+      type: ENUM,
+      values: ['ADD_TASK', 'REMOVE_TASK']
     },
-    {
-      hooks: {
-        beforeCount(options) {
-          options.raw = true
-        }
+    counter: {
+      type: INTEGER,
+      allowNull: false
+    },
+    date: {
+      type: DATE,
+      allowNull: false,
+      defaultValue: NOW
+    }
+  }
+  const options = {
+    hooks: {
+      beforeCount(options) {
+        options.raw = true
       }
     }
-  )
+  }
+  const TaskLog = sequelizeClient.define('taskLogs', attributes, options)
 
-  // eslint-disable-next-line no-unused-vars
-  taskLogs.associate = function(models) {
+  TaskLog.associate = (models) => {
+    // console.log('MODELS')
+    // console.log(Object.keys(models))
+
+    const { projects } = models
+    TaskLog.belongsTo(projects)
+
     // Define associations here
     // See http://docs.sequelizejs.com/en/latest/docs/associations/
   }
 
-  return taskLogs
+  return TaskLog
 }

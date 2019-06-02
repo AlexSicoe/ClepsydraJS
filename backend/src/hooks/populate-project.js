@@ -27,9 +27,12 @@ module.exports = function(options = {}) {
       }
     }
 
-    const stagesRes = await Promise.all(
-      stages.map((s) => stageService.create(s, stageOptions))
-    )
+    const resStages = []
+    for (const stage of stages) {
+      const resStage = await stageService.create(stage, stageOptions)
+      resStages.push(resStage)
+    }
+    // const resStages = await Promise.all(stages.map((s) => stageService.create(s, stageOptions)))
 
     const tasks = [
       {
@@ -44,11 +47,13 @@ module.exports = function(options = {}) {
 
     const taskOptions = {
       query: {
-        stageId: stagesRes[0].id
+        stageId: resStages[0].id
       }
     }
-
-    await Promise.all(tasks.map((t) => taskService.create(t, taskOptions)))
+    for (const task of tasks) {
+      await taskService.create(task, taskOptions)
+    }
+    // await Promise.all(tasks.map((t) => taskService.create(t, taskOptions)))
 
     context.result = await projectService.get(result.id)
 

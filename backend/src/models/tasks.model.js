@@ -33,10 +33,36 @@ module.exports = (app) => {
     hooks: {
       beforeCount(options) {
         options.raw = true
+      },
+      async afterCreate(task, options) {
+        let stage = await task.getStage()
+        let project = await stage.getProject()
+        let stages = await project.getStages()
+        let taskCounters = await Promise.all(stages.map((s) => s.countTasks()))
+        let counter = taskCounters.reduce((acc, cur) => acc + cur)
+
+        await project.createTaskLog({
+          type: 'ADD_TASK',
+          counter
+        })
+      },
+      async beforeDestroy(task, options) {
+        let stage = await task.getStage()
+        let project = await stage.getProject()
+        let stages = await project.getStages()
+        let taskCounters = await Promise.all(stages.map((s) => s.countTasks()))
+        let counter = taskCounters.reduce((acc, cur) => acc + cur)
+        counter--
+
+        await project.createTaskLog({
+          type: 'REMOVE_TASK',
+          counter
+        })
       }
     }
   }
   const Task = sequelizeClient.define('tasks', attributes, options)
+  // console.dir(Task)
 
   Task.associate = (models) => {
     const { stages, users } = models
