@@ -2,6 +2,8 @@ const { authenticate } = require('@feathersjs/authentication').hooks
 
 const handleTasks = require('../../hooks/handle-tasks')
 
+const logTasks = require('../../hooks/log-tasks')
+
 module.exports = {
   before: {
     all: [authenticate('jwt')],
@@ -10,14 +12,14 @@ module.exports = {
     create: [handleTasks()],
     update: [],
     patch: [],
-    remove: []
+    remove: [logTasks()]
   },
 
   after: {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [logTasks()],
     update: [],
     patch: [],
     remove: []
@@ -30,6 +32,6 @@ module.exports = {
     create: [],
     update: [],
     patch: [],
-    remove: []
+    remove: [logTasks()]
   }
 }

@@ -18,6 +18,10 @@ module.exports = (app) => {
       type: DATE,
       allowNull: false,
       defaultValue: NOW
+    },
+    taskId: {
+      type: INTEGER,
+      allowNull: false
     }
   }
   const options = {
@@ -25,7 +29,8 @@ module.exports = (app) => {
       beforeCount(options) {
         options.raw = true
       }
-    }
+    },
+    timestamps: false
   }
   const TaskLog = sequelizeClient.define('taskLogs', attributes, options)
 

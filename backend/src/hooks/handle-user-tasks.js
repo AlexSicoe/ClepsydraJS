@@ -1,8 +1,5 @@
-// Use this hook to manipulate incoming or outgoing data.
-// For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
+const { NotImplemented, BadRequest } = require('@feathersjs/errors')
 
-const errors = require('@feathersjs/errors')
-const { NotImplemented, BadRequest } = errors
 module.exports = function(options = {}) {
   return async (context) => {
     const { method } = context
