@@ -1,20 +1,74 @@
 import React, { Component } from 'react'
-import { Bar, ChartData } from 'react-chartjs-2'
+import { Line } from 'react-chartjs-2'
+
+interface IBookkeepData {
+  date: string
+  counter: number
+}
+
+const mockData: IBookkeepData[] = [
+  {
+    date: '1/1/2019',
+    counter: 1
+  },
+  {
+    date: '1/3/2019',
+    counter: 2
+  },
+  {
+    date: '2/4/2019',
+    counter: 4
+  },
+  {
+    date: '7/5/2019',
+    counter: 3
+  },
+  {
+    date: '1/6/2019',
+    counter: 5
+  }
+]
+
+function mapDataToAxes(data: IBookkeepData[]) {
+  const mappedData = data.map((e) => {
+    const o: any = {}
+    o.t = e.date
+    o.y = e.counter
+    return o
+  })
+
+  console.log(mappedData)
+  return mappedData
+}
 
 export default class ChartPlayground extends Component<any, any> {
   chartData = {
-    labels: ['Boston', 'Worcester', 'SpringField'],
     datasets: [
       {
-        label: 'Population',
-        data: [123456, 425364, 465364],
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)'
-        ]
+        label: 'Number of tasks',
+        data: mapDataToAxes(mockData)
       }
     ]
+  }
+
+  chartOptions = {
+    title: {
+      display: true,
+      text: 'Graph',
+      fontSize: 25
+    },
+    legend: {
+      display: true,
+      position: 'right'
+    },
+    scales: {
+      xAxes: [
+        {
+          type: 'time',
+          distribution: 'linear'
+        }
+      ]
+    }
   }
 
   constructor(props: any) {
@@ -25,20 +79,9 @@ export default class ChartPlayground extends Component<any, any> {
   render() {
     return (
       <div className="chart">
-        <Bar
-          data={this.chartData}
-          options={{
-            title: {
-              display: true,
-              text: 'Largest Cities in Massachusetts',
-              fontSize: 25
-            },
-            legend: {
-              display: true,
-              position: 'right'
-            }
-          }}
-        />
+        {/* 
+        //@ts-ignore */}
+        <Line data={this.chartData} options={this.chartOptions} />
       </div>
     )
   }
