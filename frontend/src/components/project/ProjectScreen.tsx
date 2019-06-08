@@ -11,9 +11,11 @@ import { IDrawerItem } from '../view/MyDrawer'
 import SimpleAppBar from '../view/SimpleAppBar'
 import KanbanBoard from './KanbanBoard'
 import MemberList from './MemberList'
+import ChartFragment from './ChartFragment'
 
 enum Fragment {
   KanbanBoard = 'KanbanBoard',
+  Chart = 'Chart',
   MemberList = 'MemberList',
   Settings = 'Settings'
 }
@@ -47,6 +49,11 @@ class ProjectScreen extends Component<IProps, IState> {
       handleClick: () => this.setState({ fragment: Fragment.MemberList })
     },
     {
+      text: 'Charts',
+      iconType: 'Chart',
+      handleClick: () => this.setState({ fragment: Fragment.Chart })
+    },
+    {
       text: 'Settings',
       iconType: 'Settings',
       handleClick: () => this.setState({ fragment: Fragment.Settings })
@@ -78,6 +85,8 @@ class ProjectScreen extends Component<IProps, IState> {
         return <KanbanBoard projectStore={projectStore} />
       case Fragment.MemberList:
         return <MemberList users={projectStore.users} />
+      case Fragment.Chart:
+        return <ChartFragment projectStore={projectStore} />
       case Fragment.Settings:
         console.warn('Settings component not implemented!')
         break

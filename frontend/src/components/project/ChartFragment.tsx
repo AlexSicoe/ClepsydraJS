@@ -1,6 +1,14 @@
 import React, { Component } from 'react'
 import { Line } from 'react-chartjs-2'
 
+import ProjectStore from '../../stores/ProjectStore'
+
+interface IProps {
+  projectStore: ProjectStore
+}
+
+interface IState {}
+
 interface IBookkeepData {
   date: string
   counter: number
@@ -37,15 +45,11 @@ function mapDataToAxes(data: IBookkeepData[]) {
     return o
   })
 
-  console.log(mappedData)
   return mappedData
 }
 
-export default class ChartPlayground extends Component<any, any> {
-  constructor(props: any) {
-    super(props)
-    this.state = {}
-  }
+export default class ChartFragment extends Component<IProps, IState> {
+  state = {}
 
   chartData = {
     datasets: [
