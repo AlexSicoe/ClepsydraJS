@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Line } from 'react-chartjs-2'
-
+import { ITaskLog } from '../../stores/model-interfaces'
 import ProjectStore from '../../stores/ProjectStore'
+import { PromiseState } from '../../util/enums'
 
 interface IProps {
   projectStore: ProjectStore
@@ -9,83 +10,76 @@ interface IProps {
 
 interface IState {}
 
-interface IBookkeepData {
-  date: string
-  counter: number
-}
-
-const mockData: IBookkeepData[] = [
-  {
-    date: '1/1/2019',
-    counter: 1
-  },
-  {
-    date: '1/3/2019',
-    counter: 2
-  },
-  {
-    date: '2/4/2019',
-    counter: 4
-  },
-  {
-    date: '7/5/2019',
-    counter: 3
-  },
-  {
-    date: '1/6/2019',
-    counter: 5
-  }
-]
-
-function mapDataToAxes(data: IBookkeepData[]) {
-  const mappedData = data.map((e) => {
-    const o: any = {}
-    o.t = e.date
-    o.y = e.counter
-    return o
-  })
-
-  return mappedData
-}
-
 export default class ChartFragment extends Component<IProps, IState> {
   state = {}
 
-  chartData = {
-    datasets: [
-      {
-        label: 'Number of tasks',
-        data: mapDataToAxes(mockData)
-      }
-    ]
+  handleFetch = () => {
+    const { projectStore } = this.props
+    projectStore.getTaskLogs()
   }
 
-  chartOptions = {
-    title: {
-      display: true,
-      text: 'Graph',
-      fontSize: 25
-    },
-    legend: {
-      display: true,
-      position: 'right'
-    },
-    scales: {
-      xAxes: [
+  componentWillMount() {
+    this.handleFetch()
+  }
+
+  makeChartData(taskLogs: ITaskLog[]) {
+    function mapDataToAxes(taskLogs: ITaskLog[]) {
+      const mappedData = taskLogs.map((e) => {
+        const o: any = {}
+        o.t = e.date
+        o.y = e.counter
+        return o
+      })
+
+      return mappedData
+    }
+
+    const data = {
+      datasets: [
         {
-          type: 'time',
-          distribution: 'linear'
+          label: 'Number of tasks',
+          data: mapDataToAxes(taskLogs)
         }
       ]
     }
+
+    const options = {
+      title: {
+        display: true,
+        text: 'Graph',
+        fontSize: 25
+      },
+      legend: {
+        display: true,
+        position: 'right'
+      },
+      scales: {
+        xAxes: [
+          {
+            type: 'time',
+            distribution: 'linear'
+          }
+        ]
+      }
+    }
+
+    return [data, options]
   }
 
   render() {
+    const { projectStore } = this.props
+
+    if (projectStore.chartState === PromiseState.PENDING) {
+      return <div> Loading chart </div>
+    }
+
+    const [data, options] = this.makeChartData(projectStore.taskLogs)
+
     return (
       <div className="chart">
         {/* 
         //@ts-ignore */}
-        <Line data={this.chartData} options={this.chartOptions} />
+        <Line data={data} options={options} />
       </div>
     )
   }

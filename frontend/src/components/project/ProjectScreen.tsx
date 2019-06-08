@@ -9,9 +9,9 @@ import LoadingScreen from '../view/LoadingScreen'
 import LogoutButton from '../view/LogoutButton'
 import { IDrawerItem } from '../view/MyDrawer'
 import SimpleAppBar from '../view/SimpleAppBar'
+import ChartFragment from './ChartFragment'
 import KanbanBoard from './KanbanBoard'
 import MemberList from './MemberList'
-import ChartFragment from './ChartFragment'
 
 enum Fragment {
   KanbanBoard = 'KanbanBoard',
