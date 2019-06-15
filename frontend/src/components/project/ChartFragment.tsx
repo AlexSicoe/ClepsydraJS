@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2'
 import { ITaskLog } from '../../stores/model-interfaces'
 import ProjectStore from '../../stores/ProjectStore'
 import { PromiseState } from '../../util/enums'
+import { observer } from 'mobx-react'
 
 interface IProps {
   projectStore: ProjectStore
@@ -10,6 +11,7 @@ interface IProps {
 
 interface IState {}
 
+@observer
 export default class ChartFragment extends Component<IProps, IState> {
   state = {}
 
@@ -57,7 +59,7 @@ export default class ChartFragment extends Component<IProps, IState> {
         xAxes: [
           {
             type: 'time',
-            distribution: 'linear'
+            distribution: 'series'
           }
         ]
       }
@@ -73,7 +75,10 @@ export default class ChartFragment extends Component<IProps, IState> {
       return <div> Loading chart </div>
     }
 
-    const [data, options] = this.makeChartData(projectStore.taskLogs)
+    console.log('taskLogs')
+    console.log(projectStore.taskLogs.toJS())
+
+    const [data, options] = this.makeChartData(projectStore.taskLogs.toJS())
 
     return (
       <div className="chart">

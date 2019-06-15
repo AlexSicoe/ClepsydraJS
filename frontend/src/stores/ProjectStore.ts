@@ -1,4 +1,4 @@
-import { Application, Service } from '@feathersjs/feathers'
+import { Application, Service, Paginated } from '@feathersjs/feathers'
 import { action, IObservableArray, observable, runInAction } from 'mobx'
 import { PromiseState, SocketEvent } from '../util/enums'
 import { safeSet } from '../util/functions'
@@ -423,9 +423,11 @@ export default class ProjectStore {
 
     try {
       this.chartState = PENDING
-      const taskLogs = await this.taskLogsService.find(params)
+      const res = (await this.taskLogsService.find(params)) as Paginated<
+        ITaskLog
+      >
+      this.setTaskLogs(res.data)
       this.chartState = DONE
-      this.setTaskLogs(taskLogs as ITaskLog[])
     } catch (err) {
       this.chartState = ERROR
       notifyError(err)
