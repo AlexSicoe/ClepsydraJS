@@ -1,10 +1,9 @@
 import { Application, Service } from '@feathersjs/feathers'
 import { action, observable } from 'mobx'
 import { PromiseState } from '../util/enums'
+import { notifyError, notifySuccess } from '../util/notification-factories'
 import { Callback } from '../util/types'
 import { IUser } from './model-interfaces'
-import { notifyError, notifySuccess } from '../util/notification-factories'
-import notify from '../components/view/notify'
 const { PENDING, DONE, ERROR } = PromiseState
 
 export default class AuthStore {

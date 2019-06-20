@@ -1,9 +1,16 @@
-import { Application, Service } from '@feathersjs/feathers'
+import { Application, Service, Paginated } from '@feathersjs/feathers'
 import { action, IObservableArray, observable, runInAction } from 'mobx'
 import { PromiseState, SocketEvent } from '../util/enums'
 import { safeSet } from '../util/functions'
 import { notifyError, notifySuccess } from '../util/notification-factories'
-import { IMember, IProject, IStage, ITask, IUser } from './model-interfaces'
+import {
+  IMember,
+  IProject,
+  IStage,
+  ITask,
+  IUser,
+  ITaskLog
+} from './model-interfaces'
 import { ID } from '../util/types'
 import { IKanbanAdapter } from '../components/view/kanban_adapters/KanbanAdapter'
 const { PENDING, DONE, ERROR } = PromiseState
@@ -11,17 +18,19 @@ const { Created, Updated, Patched, Removed } = SocketEvent
 
 export default class ProjectStore {
   @observable state: PromiseState = PENDING
+  @observable chartState: PromiseState = PENDING
   @observable id?: number
   @observable name: string = ''
   @observable users: IObservableArray<IUser> = observable([])
   @observable stages: IObservableArray<IStage> = observable([])
+  @observable taskLogs: IObservableArray<ITaskLog> = observable([])
   private _adapter?: IKanbanAdapter
 
-  set adapter(adapter: IKanbanAdapter) {
+  setAdapter(adapter: IKanbanAdapter) {
     this._adapter = adapter
   }
 
-  get adapter() {
+  getAdapter() {
     if (this._adapter) return this._adapter
   }
 
@@ -33,7 +42,8 @@ export default class ProjectStore {
     private stageService: Service<IStage>,
     private taskService: Service<ITask>,
     private swapTasksService: Service<any>,
-    private swapStagesService: Service<any>
+    private swapStagesService: Service<any>,
+    private taskLogsService: Service<ITaskLog>
   ) {
     app.on('logout', () => this.reset())
 
@@ -174,6 +184,10 @@ export default class ProjectStore {
     this.name = safeSet(this.name, project.name)
     this.users = safeSet(this.users, project.users)
     this.stages = safeSet(this.stages, project.stages)
+  }
+
+  @action setTaskLogs = (taskLogs: ITaskLog[]) => {
+    this.taskLogs = observable(taskLogs)
   }
 
   @action upsertUser = (user: IUser) => {
@@ -379,8 +393,10 @@ export default class ProjectStore {
 
   swapTasks = async (sourceId: ID, targetId: ID) => {
     const params = {
-      sourceId,
-      targetId
+      query: {
+        sourceId,
+        targetId
+      }
     }
 
     try {
@@ -389,6 +405,31 @@ export default class ProjectStore {
       this.state = DONE
     } catch (err) {
       this.state = ERROR
+      notifyError(err)
+    }
+  }
+
+  getTaskLogs = async () => {
+    if (!this.id) {
+      return
+    }
+
+    const params = {
+      // query: {
+      //   // projectId: this.id
+      //   // limit: 100
+      // }
+    }
+
+    try {
+      this.chartState = PENDING
+      const res = (await this.taskLogsService.find(params)) as Paginated<
+        ITaskLog
+      >
+      this.setTaskLogs(res.data)
+      this.chartState = DONE
+    } catch (err) {
+      this.chartState = ERROR
       notifyError(err)
     }
   }
@@ -410,8 +451,10 @@ export default class ProjectStore {
 
   swapStages = async (sourceId: ID, targetId: ID) => {
     const params = {
-      sourceId,
-      targetId
+      query: {
+        sourceId,
+        targetId
+      }
     }
 
     try {

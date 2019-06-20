@@ -45,6 +45,15 @@ export interface ITask {
   position: number
 }
 
+export interface ITaskLog {
+  id: number
+  taskId: number
+  projectId: number
+  type: string
+  counter: number
+  date: string
+}
+
 export interface ITimestamp {
   updatedAt: string
   createdAt: string

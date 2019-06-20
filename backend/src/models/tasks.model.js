@@ -37,6 +37,7 @@ module.exports = (app) => {
     }
   }
   const Task = sequelizeClient.define('tasks', attributes, options)
+  // console.dir(Task)
 
   Task.associate = (models) => {
     const { stages, users } = models

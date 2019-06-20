@@ -101,6 +101,8 @@ function renderIcon(iconType: string) {
       return <Icons.AccountBox />
     case 'People':
       return <Icons.People />
+    case 'Chart':
+      return <Icons.ShowChart />
     default:
       throw new Error('Unknown iconType case')
   }

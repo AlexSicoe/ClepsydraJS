@@ -4,8 +4,9 @@ import './App.css'
 import HomeScreen from './home/HomeScreen'
 import NoMatch from './NoMatch'
 import ProjectScreen from './project/ProjectScreen'
-import Area51 from './public/Area51'
+import KanbanPlayground from './public/KanbanPlayground'
 import PublicScreen from './public/PublicScreen'
+import ChartPlayground from './public/ChartPlayground'
 
 class App extends Component<any, any> {
   render() {
@@ -17,7 +18,8 @@ class App extends Component<any, any> {
               <Route exact path="/" component={PublicScreen} />
               <Route path="/home" component={HomeScreen} />
               <Route path="/projects/:projectId" component={ProjectScreen} />
-              <Route path="/area51" component={Area51} />
+              <Route path="/kanbanPlayground" component={KanbanPlayground} />
+              <Route path="/chartPlayground" component={ChartPlayground} />
               <Route component={NoMatch} />
             </Switch>
           </>
